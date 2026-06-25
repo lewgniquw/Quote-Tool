@@ -112,7 +112,7 @@ h1{text-align:center;font-size:1.5rem;color:#2c3e50;padding:20px 0}
     <h2>⚙ 加工费用</h2>
     <div class="row">
         <div class="field"><label>裱瓦 <span class="auto-tag">自动</span></label><input type="text" id="mountDisplay" value="--" readonly style="color:#3498db"></div>
-        <div class="field"><label>模切机型 <span class="help-tip" data-tip="930手动: 900×640mm&#10;1100手动: 1070×760mm&#10;1300自动: 1270×970 / 430×430mm&#10;1500自动: 1470×1070 / 550×550mm&#10;1800手动: 1780×1260mm">?</span></label>
+        <div class="field"><label>模切机型 <span class="help-tip" data-tip="930手动: 900×640mm&#10;1100手动: 1070×760mm&#10;1300自动: 1270×970 / 430×430mm&#10;1500自动: 1470×1070 / 550×550mm&#10;1800手动: 1780×1260mm">?</span> <span id="dieCutSugg" style="font-size:0.7rem;color:#27ae60"></span></label>
             <select id="dieCutMachine">
                 <option value="930手动" title="最大 900×640mm">930手动 (装35 加0.08)</option>
                 <option value="1100手动" title="最大 1070×760mm">1100手动 (装35 加0.10)</option>
@@ -155,7 +155,7 @@ h1{text-align:center;font-size:1.5rem;color:#2c3e50;padding:20px 0}
         <div class="field"><label>其他成本 (元/个)</label><input type="number" id="extraCost" value="" step="0.001" placeholder="外加工等"></div>
     </div>
     <div class="row" style="margin-top:8px">
-        <div class="field"><label>数量 (个)</label><input type="number" id="quantity" value="1000" min="1" step="100"></div>
+        <div class="field"><label>数量 (个)</label><input type="number" id="quantity" value="" placeholder="必填" min="1" step="100"></div>
         <div class="field"><label>税率 (%)</label><input type="number" id="taxRate" value="7" min="0" max="20" step="1"></div>
         <div class="field">
             <label>毛利率 (%)</label>
@@ -214,7 +214,8 @@ var PRICE = {
   mount: 0.20,
   dieCut: {"930手动":[35,0.08],"1100手动":[35,0.10],"1300自动":[40,0.12],"1500自动":[50,0.20],"1800手动":[50,0.30]},
   glue: {"卡盒 糊口<20":0.03,"卡盒 展开>80":0.05,"瓦楞 糊口<20":0.05,"瓦楞 糊口>30":0.08,"瓦楞 长>60":0.13,"瓦楞 长>80":0.16},
-  transport: {"庆元":0.12,"龙泉":0.08,"政和":0.15,"建瓯":0.25,"景宁":0.15,"丽水":0.18,"松阳":0.25}
+  transport: {"庆元":0.12,"龙泉":0.08,"政和":0.15,"建瓯":0.25,"景宁":0.15,"丽水":0.18,"松阳":0.25},
+  dieCutLimit: {"930手动":[90,64],"1100手动":[107,76],"1300自动":[127,97],"1500自动":[147,107],"1800手动":[178,126]}
 };
 // 从 localStorage 恢复设置价格
 (function(){
@@ -245,19 +246,30 @@ function checkPressLimit(){
   calcPressCost();return ok;
 }
 
+function suggestDieCut(){
+  var pL=parseFloat(document.getElementById('paperL').value)||0,pW=parseFloat(document.getElementById('paperW').value)||0;
+  if(!pL||!pW){document.getElementById('dieCutSugg').textContent='';return;}
+  var cmL=pL/10,cmW=pW/10;
+  var best=null;
+  Object.keys(PRICE.dieCutLimit).forEach(function(k){
+    var lim=PRICE.dieCutLimit[k];
+    if(cmL<=lim[0]&&cmW<=lim[1]&&!best)best=k;
+  });
+  document.getElementById('dieCutSugg').textContent=best?'→ 建议: '+best:'→ 超出最大机型';
+}
 function calcPressCost(){
   var mKey=document.getElementById('pressMachine').value,cn=document.getElementById('colors').value;
   var press=mKey==='120'?PRICE.press120:PRICE.press142;
   var tier=press[cn]||[0,0,0];
   var nUp=parseInt(document.getElementById('piecesPerSheet').value)||1;
-  var qty=parseInt(document.getElementById('quantity').value)||1000;
-  var totalSheets=Math.ceil(qty/nUp);
+  var qty=parseInt(document.getElementById('quantity').value)||0;
+  var totalSheets=Math.ceil(qty>0?qty:nUp?1000/nUp:1000);
   var base=tier[0],overflow=tier[1];
   var totalCost=totalSheets<=3000?base:totalSheets<10000?base+overflow*(totalSheets-3000):overflow*totalSheets;
   var offset=document.getElementById('chkOffset').checked?tier[2]:0;
   var plate=document.getElementById('chkPlate').checked?tier[2]:0;
   totalCost+=offset+plate;
-  var costPerK=totalCost/(qty/1000);
+  var costPerK=totalCost/((qty>0?qty:1000)/1000);
   var perSheet=(totalCost-offset-plate)/totalSheets;
   var extra=(offset?' +下机¥'+offset:'')+(plate?' +改版¥'+plate:'');
   document.getElementById('pressCostDisplay').value='单价¥'+perSheet.toFixed(4)+'/张 × '+totalSheets+'张'+extra+' = ¥'+totalCost.toFixed(0);
@@ -273,13 +285,25 @@ function calculate(){
   var enGlue=document.getElementById('chkGlue').checked;
   var enSurface=document.getElementById('chkSurface').checked;
   var enTransport=document.getElementById('chkTransport').checked;
+  if(enPaper){
+    if(!document.getElementById('paperL').value){alert('请填写面纸裁切长');return;}
+    if(!document.getElementById('paperW').value){alert('请填写面纸裁切宽');return;}
+    if(!document.getElementById('paperGram').value){alert('请填写面纸克重');return;}
+    if(!document.getElementById('paperTon').value){alert('请填写面纸吨价');return;}
+  }
+  if(enFlute){
+    if(!document.getElementById('fluteL').value){alert('请填写浪纸长');return;}
+    if(!document.getElementById('fluteW').value){alert('请填写浪纸宽');return;}
+    if(!document.getElementById('flutePrice').value){alert('请填写浪纸单价');return;}
+  }
   var pL=parseFloat(document.getElementById('paperL').value)||0,pW=parseFloat(document.getElementById('paperW').value)||0;
-  var gram=parseInt(document.getElementById('paperGram').value)||300;
+  var gram=parseInt(document.getElementById('paperGram').value)||0;
   var tonPrice=parseFloat(document.getElementById('paperTon').value)||0;
   var nUp=parseInt(document.getElementById('piecesPerSheet').value)||1;
   var fL=parseFloat(document.getElementById('fluteL').value)||0,fW=parseFloat(document.getElementById('fluteW').value)||0;
   var fPrice=parseFloat(document.getElementById('flutePrice').value)||0;
-  var qty=parseInt(document.getElementById('quantity').value)||1000;
+  if(!document.getElementById('quantity').value){alert('请填写数量');return;}
+  var qty=parseInt(document.getElementById('quantity').value);
   var sheetsPerK=1000/nUp;
   var totalSheets=Math.ceil(qty/nUp);
 
@@ -361,7 +385,7 @@ function calculate(){
   else{
   lines.push('【面纸】'+gram+'g 吨价¥'+tonPrice);
   lines.push('  平方单价: ¥'+pricePerM2.toFixed(4)+'/㎡');
-  lines.push('  单张: '+pL.toFixed(1)+'×'+pW.toFixed(1)+'mm = '+pArea.toFixed(4)+'㎡ × ¥'+pricePerM2.toFixed(4)+' = ¥'+paperRaw.toFixed(4));
+  lines.push('  计价面积: '+pL.toFixed(1)+'×'+pW.toFixed(1)+'mm = '+pArea.toFixed(4)+'㎡ × ¥'+pricePerM2.toFixed(4)+' = ¥'+paperRaw.toFixed(4));
   if(!isNaN(pLoss)&&pLoss>0) lines.push('  损耗: ('+totalSheets+'+'+pLoss+')/'+totalSheets+' = '+pLossMul.toFixed(4));
   else lines.push('  损耗: 默认5% = '+pLossMul.toFixed(4));
   lines.push('  单张价: ¥'+paperRaw.toFixed(4)+' × '+pLossMul.toFixed(4)+' = ¥'+paperPerSheet.toFixed(4)+'/张 → ¥'+(paperPerSheet/nUp).toFixed(4)+'/个');
@@ -435,9 +459,12 @@ function calculate(){
     lines.push('');
   }
   
-  lines.push('══════════════════════');
-  lines.push('合计 ¥'+allCost.toFixed(2)+' ÷ '+qty+'个 = ¥'+cpu.toFixed(4)+'/个');
-  lines.push('含税('+(tax*100).toFixed(0)+'%) ¥'+taxPrice.toFixed(4)+' ÷ (1-'+(margin*100).toFixed(0)+'%) = ¥'+sp.toFixed(4)+'/个');
+  lines.push('═════════════════════════════════════════════════════════════════════════════════');
+  lines.push('<span style="word-break:break-all">面纸 ¥'+paperTotal.toFixed(2)+' + 浪纸 ¥'+fluteTotal.toFixed(2)+' + 印刷 ¥'+pressTotal.toFixed(2)+' + 裱瓦 ¥'+mountTotal.toFixed(2)+' + 模切 ¥'+dieCutCost.toFixed(2)+' + 粘盒 ¥'+glueCost.toFixed(2)+' + 刀版 ¥'+dieFee.toFixed(2)+' + 运输 ¥'+tsCost.toFixed(2)+' + 表面 ¥'+surfaceCost.toFixed(2)+' + 其他 ¥'+extraCost.toFixed(2)+' = <b>合计 ¥'+allCost.toFixed(2)+'</b></span>');
+  lines.push('═════════════════════════════════════════════════════════════════════════════════');
+  lines.push('成本价 ¥'+cpu.toFixed(4)+'/个 (¥'+allCost.toFixed(2)+' ÷ '+qty+'个)');
+  lines.push('含税价 ¥'+taxPrice.toFixed(4)+'/个 (¥'+cpu.toFixed(4)+' × '+(1+tax).toFixed(2)+')');
+  lines.push('含毛利 ¥'+sp.toFixed(4)+'/个 (¥'+taxPrice.toFixed(4)+' ÷ '+(1-margin).toFixed(2)+')');
   lines.push('总价 ¥'+total.toFixed(2)+' ('+qty+'个)');
   document.getElementById('breakdown').innerHTML=lines.join('<br>');
 }
@@ -457,8 +484,8 @@ onSurfaceChange=function(){
 };
 adjMargin=function(d){var el=document.getElementById('marginPct');var v=(parseInt(el.value)||15)+d;if(v<0)v=0;if(v>200)v=200;el.value=v;};
 
-document.getElementById('paperL').addEventListener('input',function(){calcMount();checkPressLimit();});
-document.getElementById('paperW').addEventListener('input',function(){calcMount();checkPressLimit();});
+document.getElementById('paperL').addEventListener('input',function(){calcMount();checkPressLimit();suggestDieCut();});
+document.getElementById('paperW').addEventListener('input',function(){calcMount();checkPressLimit();suggestDieCut();});
 document.getElementById('pressMachine').addEventListener('change',checkPressLimit);
 document.getElementById('colors').addEventListener('change',calcPressCost);
 document.getElementById('piecesPerSheet').addEventListener('input',function(){calcPressCost();calcMount();});
