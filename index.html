@@ -176,7 +176,7 @@ h1{text-align:center;font-size:1.5rem;color:#2c3e50;padding:20px 0}
     <div class="detail" id="breakdown"></div>
 </div>
 
-<div class="footer">2026.06.25 13:01 · <span onclick="showPwd()" style="cursor:pointer;text-decoration:underline">⚙ 设置</span></div>
+<div class="footer">2026.06.25 13:58 · <span onclick="showPwd()" style="cursor:pointer;text-decoration:underline">⚙ 设置</span></div>
 </div>
 
 <div class="overlay" id="pwdOverlay"><div class="panel" style="max-width:300px;text-align:center">
@@ -458,9 +458,9 @@ function calculate(){
     lines.push('');
   }
   
-  lines.push('═════════════════════════════════════════════════════════════════════════════════');
+  lines.push('<hr>');
   lines.push('<span style="word-break:break-all">面纸 ¥'+paperTotal.toFixed(2)+' + 浪纸 ¥'+fluteTotal.toFixed(2)+' + 印刷 ¥'+pressTotal.toFixed(2)+' + 裱瓦 ¥'+mountTotal.toFixed(2)+' + 模切 ¥'+dieCutCost.toFixed(2)+' + 粘盒 ¥'+glueCost.toFixed(2)+' + 刀版 ¥'+dieFee.toFixed(2)+' + 运输 ¥'+tsCost.toFixed(2)+' + 表面 ¥'+surfaceCost.toFixed(2)+' + 其他 ¥'+extraCost.toFixed(2)+' = <b>合计 ¥'+allCost.toFixed(2)+'</b></span>');
-  lines.push('═════════════════════════════════════════════════════════════════════════════════');
+  lines.push('<hr>');
   lines.push('成本价 ¥'+cpu.toFixed(4)+'/个 (¥'+allCost.toFixed(2)+' ÷ '+qty+'个)');
   lines.push('含税价 ¥'+taxPrice.toFixed(4)+'/个 (¥'+cpu.toFixed(4)+' × '+(1+tax).toFixed(2)+')');
   lines.push('含毛利 ¥'+sp.toFixed(4)+'/个 (¥'+taxPrice.toFixed(4)+' ÷ '+(1-margin).toFixed(2)+')');
