@@ -50,24 +50,30 @@ h1{text-align:center;font-size:1.5rem;color:#2c3e50;padding:20px 0}
 <div class="container">
 
 <div class="card">
+    <h2>🔪 刀版</h2>
+    <div class="row">
+        <div class="field"><label>刀版长 (mm)</label><input type="number" id="dieL" value="" step="1" placeholder="" oninput="updateDimensions()"></div>
+        <div class="field"><label>刀版宽 (mm)</label><input type="number" id="dieW" value="" step="1" placeholder="" oninput="updateDimensions()"></div>
+        <div class="field"><label>拼版数 (个/张)</label><input type="number" id="piecesPerSheet" value="1" step="1"></div>
+    </div>
+</div>
+
+<div class="card">
     <h2>📄 面纸</h2>
     <div class="row">
-        <div class="field"><label>裁切长 (mm)</label><input type="number" id="paperL" value="" step="1" placeholder=""></div>
-        <div class="field"><label>裁切宽 (mm)</label><input type="number" id="paperW" value="" step="1" placeholder=""></div>
-        <div class="field"><label>克重 (g)</label><input type="number" id="paperGram" value="" placeholder=""></div>
-        <div class="field"><label>吨价 (元/吨)</label><input type="number" id="paperTon" value="" placeholder=""></div>
-    </div>
-    <div class="row" style="margin-top:8px">
-        <div class="field"><label>损耗 (张) 留空=5%</label><input type="number" id="paperLoss" value="180" step="1" placeholder="留空默认5%"></div>
-        <div class="field"><label>拼版数 (个/张)</label><input type="number" id="piecesPerSheet" value="1" step="1"></div>
+        <div class="field"><label>裁切长 <span class="auto-tag">自动</span></label><input type="text" id="cutSizeL" value="--" readonly style="color:#3498db;font-size:0.82rem"></div>
+        <div class="field"><label>裁切宽 <span class="auto-tag">自动</span></label><input type="text" id="cutSizeW" value="--" readonly style="color:#3498db;font-size:0.82rem"></div>
+        <div class="field"><label>克重(g)</label><input type="number" id="paperGram" value="" placeholder="" style="font-size:0.82rem"></div>
+        <div class="field"><label>吨价(元/吨)</label><input type="number" id="paperTon" value="" placeholder="" style="font-size:0.82rem"></div>
+        <div class="field" style="min-width:80px"><label>损耗(张)</label><input type="number" id="paperLoss" value="180" step="1" placeholder="5%" style="font-size:0.82rem"></div>
     </div>
 </div>
 
 <div class="card">
     <h2>📦 浪纸</h2>
     <div class="row">
-        <div class="field"><label>浪纸长 (mm)</label><input type="number" id="fluteL" value="" step="1" placeholder=""></div>
-        <div class="field"><label>浪纸宽 (mm)</label><input type="number" id="fluteW" value="" step="1" placeholder=""></div>
+        <div class="field"><label>浪纸长 (mm) <span class="auto-tag">自动</span></label><input type="text" id="fluteLDisp" value="--" readonly style="color:#3498db"></div>
+        <div class="field"><label>浪纸宽 (mm) <span class="auto-tag">自动</span></label><input type="text" id="fluteWDisp" value="--" readonly style="color:#3498db"></div>
         <div class="field"><label>单价 (元/㎡)</label><input type="number" id="flutePrice" value="" step="0.1"></div>
         <div class="field"><label>损耗 (张) 留空=3%</label><input type="number" id="fluteLoss" value="30" step="1" placeholder="留空默认3%"></div>
     </div>
@@ -76,10 +82,8 @@ h1{text-align:center;font-size:1.5rem;color:#2c3e50;padding:20px 0}
 <div class="card">
     <h2>🖨 印刷 <span id="pressLimit" style="font-size:0.75rem;font-weight:normal"></span></h2>
     <div class="row">
-        <div class="field"><label>机型</label><select id="pressMachine" onchange="checkPressLimit()"><option value="120">120五色机 (对开小机器)</option><option value="142" selected>142五色机 (全开大机器)</option></select></div>
-        <div class="field"><label>色数</label><select id="colors"><option value="4" selected>4色（CMYK）</option><option value="5">5色（4+1）</option></select></div>
-    </div>
-    <div class="row" style="margin-top:4px">
+        <div class="field"><label>机型</label><select id="pressMachine" onchange="checkPressLimit()"><option value="120">120对开机</option><option value="142" selected>142全开机</option></select></div>
+        <div class="field"><label>色数</label><select id="colors"><option value="4" selected>4色</option><option value="5">5色</option></select></div>
         <div class="field"><label>印刷费 <span class="auto-tag">自动</span></label><input type="text" id="pressCostDisplay" value="--" readonly style="color:#3498db"></div>
     </div>
     <span id="pressWarning" style="display:none;font-size:0.75rem;color:#e74c3c"></span>
@@ -178,7 +182,7 @@ h1{text-align:center;font-size:1.5rem;color:#2c3e50;padding:20px 0}
     <div class="detail" id="breakdown"></div>
 </div>
 
-<div class="footer">2026.06.26 10:56 · <span onclick="showPwd()" style="cursor:pointer;text-decoration:underline">⚙ 设置</span></div>
+<div class="footer">2026.06.26 14:49 · <span onclick="showPwd()" style="cursor:pointer;text-decoration:underline">⚙ 设置</span></div>
 </div>
 
 <div class="overlay" id="pwdOverlay"><div class="panel" style="max-width:300px;text-align:center">
@@ -238,11 +242,12 @@ var PRICE = {
 })();
 var SET_PWD='888888';
 
-function calcMount(){var pL=parseFloat(document.getElementById('paperL').value)||0,pW=parseFloat(document.getElementById('paperW').value)||0;var area=pL*pW/1000000;var perSheet=area*PRICE.mount;document.getElementById('mountDisplay').value='¥'+perSheet.toFixed(4)+'/张 ('+(pL*pW).toFixed(0)+'mm²)';return perSheet;}
+function calcMount(){var pL=parseFloat(document.getElementById('dieL').value)||0,pW=parseFloat(document.getElementById('dieW').value)||0;if(!pL||!pW){document.getElementById('mountDisplay').value='--';return 0;}var cutL=pL+20,cutW=pW+20;cutW=Math.ceil(cutW/50)*50;var area=cutL*cutW/1000000;var perSheet=area*PRICE.mount;document.getElementById('mountDisplay').value='¥'+perSheet.toFixed(4)+'/张 ('+(cutL*cutW).toFixed(0)+'mm²)';return perSheet;}
 
 function checkPressLimit(){
-  var pLmm=parseFloat(document.getElementById('paperL').value)||0,pWmm=parseFloat(document.getElementById('paperW').value)||0;
-  var pL=pLmm/10,pW=pWmm/10;
+  var pLmm=parseFloat(document.getElementById('dieL').value)||0,pWmm=parseFloat(document.getElementById('dieW').value)||0;
+  var cutWmm=pWmm+20;cutWmm=Math.ceil(cutWmm/5)*5;
+  var pL=(pLmm+20)/10,pW=cutWmm/10;
   var mKey=document.getElementById('pressMachine').value,lim=PRICE.pressLimit[mKey]||[999,999,0,0];
   var ok=pL>=lim[2]&&pL<=lim[0]&&pW>=lim[3]&&pW<=lim[1];
   var el=document.getElementById('pressLimit'),warn=document.getElementById('pressWarning');
@@ -255,8 +260,22 @@ function toggleExtraUnit(){
   var btn=document.getElementById('extraCostUnit');
   btn.textContent=btn.textContent==='元/个'?'总价':'元/个';
 }
+function updateDimensions(){
+  var pL=parseFloat(document.getElementById('dieL').value)||0,pW=parseFloat(document.getElementById('dieW').value)||0;
+  if(!pL||!pW){document.getElementById('cutSizeL').value='--';document.getElementById('cutSizeW').value='--';document.getElementById('fluteLDisp').value='--';document.getElementById('fluteWDisp').value='--';return;}
+  // 裁纸: 刀版+20mm, 宽向上凑整5cm
+  var cutL=pL+20,cutW=pW+20;
+  cutW=Math.ceil(cutW/50)*50;
+  document.getElementById('cutSizeL').value=cutL.toFixed(0);
+  document.getElementById('cutSizeW').value=cutW.toFixed(0)+' (凑整)';
+  // 浪纸: 刀版+10mm(长), 刀版+30mm(宽)
+  var fluteL=pL+10,fluteW=pW+30;
+  document.getElementById('fluteLDisp').value=fluteL.toFixed(0);
+  document.getElementById('fluteWDisp').value=fluteW.toFixed(0)+' (+20mm)';
+  calcMount();checkPressLimit();suggestDieCut();
+}
 function suggestDieCut(){
-  var pL=parseFloat(document.getElementById('paperL').value)||0,pW=parseFloat(document.getElementById('paperW').value)||0;
+  var pL=parseFloat(document.getElementById('dieL').value)||0,pW=parseFloat(document.getElementById('dieW').value)||0;
   if(!pL||!pW){document.getElementById('dieCutSugg').textContent='';return;}
   var cmL=pL/10,cmW=pW/10;
   var best=null;
@@ -291,22 +310,25 @@ function calculate(){
   var enSurface=document.getElementById('chkSurface').checked;
   var enTransport=document.getElementById('chkTransport').checked;
   if(enPaper){
-    if(!document.getElementById('paperL').value){alert('请填写面纸裁切长');return;}
-    if(!document.getElementById('paperW').value){alert('请填写面纸裁切宽');return;}
+    if(!document.getElementById('dieL').value){alert('请填写刀版长');return;}
+    if(!document.getElementById('dieW').value){alert('请填写刀版宽');return;}
     if(!document.getElementById('paperGram').value){alert('请填写面纸克重');return;}
     if(!document.getElementById('paperTon').value){alert('请填写面纸吨价');return;}
   }
-  if(enFlute){
-    if(!document.getElementById('fluteL').value){alert('请填写浪纸长');return;}
-    if(!document.getElementById('fluteW').value){alert('请填写浪纸宽');return;}
-    if(!document.getElementById('flutePrice').value){alert('请填写浪纸单价');return;}
-  }
-  var pL=parseFloat(document.getElementById('paperL').value)||0,pW=parseFloat(document.getElementById('paperW').value)||0;
+  var pL=parseFloat(document.getElementById('dieL').value)||0,pW=parseFloat(document.getElementById('dieW').value)||0;
   var gram=parseInt(document.getElementById('paperGram').value)||0;
   var tonPrice=parseFloat(document.getElementById('paperTon').value)||0;
   var nUp=parseInt(document.getElementById('piecesPerSheet').value)||1;
-  var fL=parseFloat(document.getElementById('fluteL').value)||0,fW=parseFloat(document.getElementById('fluteW').value)||0;
+  // 裁纸尺寸: 刀版+20mm, 宽凑整5cm
+  var cutL=pL+20,cutW=pW+20;
+  cutW=Math.ceil(cutW/50)*50;
+  // 浪纸尺寸: 刀版+10mm(长), 刀版+30mm(宽)
+  var fL=pL+10,fW=pW+30;
   var fPrice=parseFloat(document.getElementById('flutePrice').value)||0;
+  if(enFlute){
+    if(!pL||!pW){alert('请填写刀版尺寸');return;}
+    if(!fPrice){alert('请填写浪纸单价');return;}
+  }
   if(!document.getElementById('quantity').value){alert('请填写数量');return;}
   var qty=parseInt(document.getElementById('quantity').value);
   var sheetsPerK=1000/nUp;
@@ -318,7 +340,7 @@ function calculate(){
   var pLossMul = isNaN(pLoss)||pLoss===0 ? 1.05 : (totalSheets+pLoss)/totalSheets;
   var fLossMul = isNaN(fLoss)||fLoss===0 ? 1.03 : (totalSheets+fLoss)/totalSheets;
 
-  var pArea=pL*pW/1000000;
+  var pArea=cutL*cutW/1000000;
   var areaPerTon=1000000/gram;
   var pricePerM2=tonPrice/areaPerTon;
   var paperRaw=pricePerM2*pArea;
@@ -392,7 +414,7 @@ function calculate(){
   else{
   lines.push('【面纸】'+gram+'g 吨价¥'+tonPrice);
   lines.push('  平方单价: ¥'+pricePerM2.toFixed(4)+'/㎡');
-  lines.push('  计价面积: '+pL.toFixed(1)+'×'+pW.toFixed(1)+'mm = '+pArea.toFixed(4)+'㎡ × ¥'+pricePerM2.toFixed(4)+' = ¥'+paperRaw.toFixed(4));
+  lines.push('  刀版: '+pL.toFixed(0)+'×'+pW.toFixed(0)+'mm → 裁切: '+cutL.toFixed(0)+'×'+cutW.toFixed(0)+'mm = '+pArea.toFixed(4)+'㎡ × ¥'+pricePerM2.toFixed(4)+' = ¥'+paperRaw.toFixed(4));
   if(!isNaN(pLoss)&&pLoss>0) lines.push('  损耗: ('+totalSheets+'+'+pLoss+')/'+totalSheets+' = '+pLossMul.toFixed(4));
   else lines.push('  损耗: 默认5% = '+pLossMul.toFixed(4));
   lines.push('  单张价: ¥'+paperRaw.toFixed(4)+' × '+pLossMul.toFixed(4)+' = ¥'+paperPerSheet.toFixed(4)+'/张 → ¥'+(paperPerSheet/nUp).toFixed(4)+'/个');
@@ -403,7 +425,7 @@ function calculate(){
   if(!enFlute){lines.push('【浪纸】已跳过');lines.push('');}
   else{
   lines.push('【浪纸】¥'+fPrice.toFixed(2)+'/㎡');
-  lines.push('  计价面积: '+fL.toFixed(1)+'×'+fW.toFixed(1)+' = '+fArea.toFixed(4)+'㎡ × ¥'+fPrice.toFixed(2)+' = ¥'+fluteRaw.toFixed(4));
+  lines.push('  刀版: '+pL.toFixed(0)+'×'+pW.toFixed(0)+'mm → 浪纸: '+fL.toFixed(0)+'×'+fW.toFixed(0)+'mm (+1cm/+3cm) = '+fArea.toFixed(4)+'㎡ × ¥'+fPrice.toFixed(2)+' = ¥'+fluteRaw.toFixed(4));
   if(!isNaN(fLoss)&&fLoss>0) lines.push('  损耗: ('+totalSheets+'+'+fLoss+')/'+totalSheets+' = '+fLossMul.toFixed(4));
   else lines.push('  损耗: 默认3% = '+fLossMul.toFixed(4));
   lines.push('  单张价: ¥'+fluteRaw.toFixed(4)+' × '+fLossMul.toFixed(4)+' = ¥'+flutePerSheet.toFixed(4)+'/张 → ¥'+(flutePerSheet/nUp).toFixed(4)+'/个');
@@ -492,8 +514,8 @@ onSurfaceChange=function(){
 };
 adjMargin=function(d){var el=document.getElementById('marginPct');var v=(parseInt(el.value)||15)+d;if(v<0)v=0;if(v>200)v=200;el.value=v;};
 
-document.getElementById('paperL').addEventListener('input',function(){calcMount();checkPressLimit();suggestDieCut();});
-document.getElementById('paperW').addEventListener('input',function(){calcMount();checkPressLimit();suggestDieCut();});
+document.getElementById('dieL').addEventListener('input',function(){updateDimensions();calcPressCost();});
+document.getElementById('dieW').addEventListener('input',function(){updateDimensions();calcPressCost();});
 document.getElementById('pressMachine').addEventListener('change',checkPressLimit);
 document.getElementById('colors').addEventListener('change',calcPressCost);
 document.getElementById('piecesPerSheet').addEventListener('input',function(){calcPressCost();calcMount();});
