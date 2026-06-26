@@ -173,7 +173,7 @@ h1{text-align:center;font-size:1.5rem;color:#2c3e50;padding:20px 0}
     </div>
 </div>
 
-<button class="btn" onclick="calculate()">💰 计算报价</button>
+<div class="row" style="gap:8px"><button class="btn" onclick="calculate()" style="flex:1">💰 计算报价</button><button class="btn" id="btnExport" onclick="exportXLS()" style="flex:1;background:#27ae60;display:none">📥 导出报价表</button></div>
 
 <div class="result" id="result">
     <div class="unit">预估报价</div>
@@ -182,7 +182,7 @@ h1{text-align:center;font-size:1.5rem;color:#2c3e50;padding:20px 0}
     <div class="detail" id="breakdown"></div>
 </div>
 
-<div class="footer">2026.06.26 14:49 · <span onclick="showPwd()" style="cursor:pointer;text-decoration:underline">⚙ 设置</span></div>
+<div class="footer">2026.06.26 18:27 · <span onclick="showPwd()" style="cursor:pointer;text-decoration:underline">⚙ 设置</span></div>
 </div>
 
 <div class="overlay" id="pwdOverlay"><div class="panel" style="max-width:300px;text-align:center">
@@ -398,13 +398,21 @@ function calculate(){
     var extraUnit=document.getElementById('extraCostUnit').textContent;
   var extraVal=parseFloat(document.getElementById('extraCost').value)||0;
   var extraCost=extraUnit==='元/个'?extraVal*qty:extraVal;
+  window._costs={
+    paper:paperTotal,flute:fluteTotal,press:pressTotal,mount:mountTotal,
+    dieCut:dieCutCost,glue:glueCost,die:dieFee,transport:tsCost,
+    surface:surfaceCost,extra:extraCost,
+    gram:gram,ton:tonPrice,fPrice:fPrice,mountPrice:PRICE.mount,
+    dcKey:dcKey,glueKey:glueKey,gluePrice:PRICE.glue[glueKey]||0,
+    tsKey:tsKey,tsPrice:PRICE.transport[tsKey]||0
+  };
   var allCost=paperTotal+fluteTotal+pressTotal+mountTotal+dieCutCost+glueCost+dieFee+tsCost+surfaceCost+extraCost;
   var cpu=allCost/qty;
   var taxPrice=cpu*(1+tax);
   var sp=taxPrice/(1-margin);
   var total=sp*qty;
 
-  document.getElementById('result').style.display='block';
+  document.getElementById('result').style.display='block';document.getElementById('btnExport').style.display='block';
   document.getElementById('totalPrice').textContent='¥ '+total.toFixed(2);
   document.getElementById('unitPrice').textContent='单价 ¥ '+sp.toFixed(4)+'/个（含税'+(tax*100).toFixed(0)+'% 毛利率'+(margin*100).toFixed(0)+'%）';
 
@@ -526,6 +534,85 @@ document.querySelectorAll('#surfaceGroup input').forEach(function(el){el.addEven
 
 showPwd=function(){document.getElementById('pwdOverlay').classList.add('show');document.getElementById('pwdInput').focus();};
 checkPwd=function(){if(document.getElementById('pwdInput').value===SET_PWD){document.getElementById('pwdOverlay').classList.remove('show');openSettings();}else{document.getElementById('pwdError').style.display='block';}};
+
+
+function exportXLS(){
+  var C=window._costs||{};
+  var qty=parseInt(document.getElementById('quantity').value)||0;
+  var dieL=document.getElementById('dieL').value||'',dieW=document.getElementById('dieW').value||'';
+  var nUp=document.getElementById('piecesPerSheet').value||1;
+  var cutL=document.getElementById('cutSizeL').value||'',cutW=(document.getElementById('cutSizeW').value||'').replace(/ \(.+?\)/,'');
+  var fL=document.getElementById('fluteLDisp').value||'',fW=(document.getElementById('fluteWDisp').value||'').replace(/ \(.+?\)/,'');
+  var pressKey=document.getElementById('pressMachine').value;
+  var pressName=pressKey==='120'?'120对开机':'142全开机';
+  var colors=document.getElementById('colors').value;
+  var date=new Date().toLocaleDateString('zh-CN');
+  
+  // Cost rows from global data
+  var costRows=[];
+  var items=[
+    {key:'paper',name:'面纸',desc:(C.gram||'')+'g '+(C.ton||'')+'/t'},
+    {key:'flute',name:'浪纸',desc:(C.fPrice||'')+'/'+String.fromCharCode(13217)},
+    {key:'press',name:'印刷',desc:pressName+' '+colors+'色'},
+    {key:'surface',name:'表面处理',desc:(function(){
+    var sel=[];document.querySelectorAll('#surfaceGroup input:checked').forEach(function(c){sel.push(c.value);});
+    return sel.length?sel.join('+'):'';
+  })()},
+    {key:'mount',name:'裱瓦',desc:(C.mountPrice||'')+'/'+String.fromCharCode(13217)},
+    {key:'die',name:'刀版',desc:'新版x200'},
+    {key:'dieCut',name:'模切',desc:C.dcKey||''},
+    {key:'glue',name:'粘盒',desc:(C.gluePrice||'')+'/'+String.fromCharCode(20010)},
+    {key:'transport',name:'运输',desc:(C.tsKey||'')+' '+(C.tsPrice||'')+'/'+String.fromCharCode(13217)},
+    {key:'extra',name:'其他成本',desc:''}
+  ];
+  var totalCost=0;
+  items.forEach(function(it){
+    var v=C[it.key]||0;
+    if(v>0){
+      var label=it.name+(it.desc?'-'+it.desc:'');
+      costRows.push({name:label,val:v});
+      totalCost+=v;
+    }
+  });
+
+  var singleCost=totalCost/qty;
+  var taxPrice=singleCost*1.07;
+  var marginPrice=taxPrice/0.85;
+  var taxRate=document.getElementById('taxRate').value||7;
+  var marginRate=document.getElementById('marginPct').value||15;
+
+  var l='<td class="xl70" height="22" style="height:22px">';
+  var r='<td class="xl72" height="22" style="height:22px" x:num>';
+  var st=' style="height:22px"';
+
+  var body='<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40"><head><meta charset="UTF-8"><style>.xl68{color:#FFF;font-size:14px;font-weight:700;text-align:center;background:#2F5496;border:.5pt solid #000;padding:6px}.xl70{font-size:11px;font-weight:700;color:#333;border:.5pt solid #000;padding:4px 8px;background:#F2F2F2}.xl72{font-size:11px;text-align:right;border:.5pt solid #000;padding:4px 8px}.xl73{color:#FFF;font-size:11px;font-weight:700;text-align:center;background:#2F5496;border:.5pt solid #000;padding:4px}.xl77{font-size:12px;font-weight:700;text-align:right;border:.5pt solid #000;padding:4px 8px}tr{height:22px}</style></head><body><table border="1" style="border-collapse:collapse">';
+  body+='<tr><td class="xl68" colspan="2" height="28">浙江国立包装有限公司 · 彩盒报价表</td></tr>';
+  body+='<tr'+st+'>'+l+'日期</td><td class="xl72">'+date+'</td></tr>';
+  body+='<tr'+st+'>'+l+'数量</td>'+r+qty+'</td></tr>';
+  body+='<tr'+st+'>'+l+'刀版尺寸</td><td class="xl72">'+dieL+' × '+dieW+' mm</td></tr>';
+  body+='<tr'+st+'>'+l+'裁切尺寸 (凑整)</td><td class="xl72">'+cutL+' × '+cutW+' mm</td></tr>';
+  body+='<tr'+st+'>'+l+'浪纸尺寸 (+20mm)</td><td class="xl72">'+fL+' × '+fW+' mm</td></tr>';
+  body+='<tr'+st+'>'+l+'拼版数</td>'+r+nUp+'</td></tr>';
+  body+='<tr><td class="xl73" colspan="2" height="24">成本明细</td></tr>';
+  body+='<tr'+st+'>'+l+'工序</td><td class="xl70" style="text-align:right">小计 (元)</td></tr>';
+  for(var i=0;i<costRows.length;i++){
+    body+='<tr'+st+'>'+l+costRows[i].name+'</td>'+r+costRows[i].val.toFixed(2)+'</td></tr>';
+  }
+  var startRow=10;
+  var endRow=9+costRows.length;
+  body+='<tr><td class="xl73" colspan="2" height="24">报价汇总</td></tr>';
+  body+='<tr'+st+'>'+l+'总价</td><td class="xl77" x:fmla="=SUM(B'+startRow+':B'+endRow+')" x:num="'+totalCost.toFixed(4)+'">¥'+totalCost.toFixed(2)+'</td></tr>';
+  body+='<tr'+st+'>'+l+'单个成本</td><td class="xl77" x:fmla="=B'+(endRow+2)+'/B3" x:num="'+singleCost.toFixed(4)+'">¥'+singleCost.toFixed(4)+'</td></tr>';
+  body+='<tr'+st+'>'+l+'含税'+taxRate+'%</td><td class="xl77" x:fmla="=B'+(endRow+3)+'*(1+'+taxRate+'/100)" x:num="'+taxPrice.toFixed(4)+'">¥'+taxPrice.toFixed(4)+'</td></tr>';
+  body+='<tr'+st+'>'+l+'毛利'+marginRate+'%</td><td class="xl77" x:fmla="=B'+(endRow+4)+'/(1-'+marginRate+'/100)" x:num="'+marginPrice.toFixed(4)+'">¥'+marginPrice.toFixed(4)+'</td></tr>';
+  body+='</table></body></html>';
+
+  var blob=new Blob([body],{type:'application/vnd.ms-excel;charset=utf-8'});
+  var a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download='报价表_'+new Date().toISOString().slice(0,10)+'.xls';
+  a.click();
+}
 
 function openSettings(){
   function sf(k,v,u,s){return'<div class="srow"><label>'+k+'</label><input type="number" value="'+v+'" step="'+s+'" data-cat="'+k+'" data-unit="'+u+'"><span class="unit">'+u+'</span></div>';}
