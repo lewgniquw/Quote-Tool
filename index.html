@@ -240,7 +240,7 @@ var PRICE = {
     if(s.transport)PRICE.transport=s.transport;
   }catch(e){}
 })();
-var SET_PWD='888888';
+var SET_PWD='+987';
 
 function calcMount(){var pL=parseFloat(document.getElementById('dieL').value)||0,pW=parseFloat(document.getElementById('dieW').value)||0;if(!pL||!pW){document.getElementById('mountDisplay').value='--';return 0;}var cutL=pL+20,cutW=pW+20;cutW=Math.ceil(cutW/50)*50;var area=cutL*cutW/1000000;var perSheet=area*PRICE.mount;document.getElementById('mountDisplay').value='¥'+perSheet.toFixed(4)+'/张 ('+(cutL*cutW).toFixed(0)+'mm²)';return perSheet;}
 
