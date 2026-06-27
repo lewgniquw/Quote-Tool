@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>彩盒报价计算器 · 浙江国立包装</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Microsoft YaHei',sans-serif;background:#f0f2f5;min-height:100vh;padding:20px}
+.container{max-width:800px;margin:0 auto}
+h1{text-align:center;font-size:1.5rem;color:#2c3e50;padding:20px 0}
+.card{background:#fff;border-radius:10px;padding:20px;margin-bottom:14px;box-shadow:0 1px 8px rgba(0,0,0,0.06)}
+.card h2{font-size:1rem;color:#2c3e50;margin-bottom:14px;padding-bottom:8px;border-bottom:2px solid #3498db}
+.row{display:flex;flex-wrap:wrap;gap:10px}
+.field{flex:1;min-width:100px}
+.field label{display:block;font-size:0.78rem;color:#888;margin-bottom:3px}
+.field input,.field select{width:100%;padding:10px;border:1px solid #ddd;border-radius:6px;font-size:0.9rem;text-align:center;background:#fff}
+.field input:focus,.field select:focus{outline:none;border-color:#3498db}
+.check-group{display:flex;flex-wrap:wrap;gap:6px}
+.check-group label{display:flex;align-items:center;gap:4px;padding:8px 14px;border:1px solid #ddd;border-radius:20px;font-size:0.85rem;cursor:pointer;background:#fafafa}
+.check-group input{display:none}
+.check-group label:has(input:checked){background:#e8f4fd;border-color:#3498db;color:#3498db}
+.btn{display:block;width:100%;padding:14px;border:none;border-radius:8px;background:#3498db;color:#fff;font-size:1.1rem;cursor:pointer;margin-top:8px}
+.btn:hover{background:#2980b9}
+.btn-sm{padding:8px 18px;font-size:0.85rem;border-radius:6px;width:auto}
+.result{background:linear-gradient(135deg,#2c3e50,#3498db);color:#fff;border-radius:10px;padding:30px;text-align:center;display:none}
+.result .total{font-size:3rem;font-weight:700;margin:8px 0}
+.result .unit{font-size:0.9rem;opacity:0.85}
+.result .detail{font-size:0.8rem;opacity:0.75;margin-top:12px;line-height:1.8;text-align:left}
+.overlay{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);z-index:100;justify-content:center;align-items:center}
+.overlay.show{display:flex}
+.panel{background:#fff;border-radius:16px;padding:28px;max-width:700px;width:95%;max-height:85vh;overflow-y:auto}
+.panel h3{font-size:1.1rem;margin-bottom:16px}
+.set-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px}
+.set-card{background:#fafbfc;border:1px solid #e0e0e0;border-radius:10px;padding:14px}
+.set-card h4{font-size:0.82rem;margin-bottom:10px;color:#2c3e50;font-weight:600}
+.set-card .srow{display:flex;align-items:center;gap:6px;margin-bottom:5px}
+.set-card .srow label{font-size:0.78rem;color:#444;min-width:52px;font-weight:500}
+.set-card .srow input{width:72px;padding:7px 8px;border:1px solid #d0d0d0;border-radius:5px;font-size:0.82rem;text-align:right}
+.set-card .srow .unit{font-size:0.72rem;color:#999;min-width:36px}
+.set-card .srow span{font-size:0.72rem;color:#888;margin:0 2px}
+.footer{text-align:center;color:#aaa;font-size:0.7rem;margin-top:20px}
+.auto-tag{font-size:0.7rem;color:#3498db;margin-left:4px}
+
+.help-tip{position:relative;cursor:help;color:#999;font-size:0.8rem;margin-left:4px}
+.mode-tabs{display:flex;gap:0;margin-bottom:14px;border-radius:8px;overflow:hidden}
+.mode-tab{flex:1;padding:12px;text-align:center;font-size:0.95rem;font-weight:600;cursor:pointer;border:none;background:#e8e8e8;color:#666;transition:all 0.2s;text-decoration:none;display:block}
+.mode-tab.active{background:#3498db;color:#fff}
+.help-tip:hover::after{content:attr(data-tip);position:absolute;left:0;top:24px;background:#333;color:#fff;padding:8px 12px;border-radius:6px;font-size:0.75rem;white-space:pre-line;line-height:1.6;z-index:999;min-width:220px;box-shadow:0 4px 12px rgba(0,0,0,0.2)}
+</style>
+</head>
+<body>
+<div class="container">
+    <div class="mode-tabs"><a class="mode-tab" href="index.html">📦 彩盒报价</a><a class="mode-tab active" href="javascript:void(0)">📐 瓦楞箱报价</a></div>
+<div class="card">
+    <h2>📐 纸板</h2>
+    <div class="row">
+        <div class="field"><label>纸箱长 (cm)</label><input type="number" id="cartonL" value="" step="0.1" oninput="calcCartonBoard()"></div>
+        <div class="field"><label>纸箱宽 (cm)</label><input type="number" id="cartonW" value="" step="0.1" oninput="calcCartonBoard()"></div>
+        <div class="field"><label>纸箱高 (cm)</label><input type="number" id="cartonH" value="" step="0.1" oninput="calcCartonBoard()"></div>
+        <div class="field"><label>盒型</label><select id="cartonType" onchange="calcCartonBoard()"><option value="normal" selected>普通</option><option value="fullcover">全盖</option><option value="manual">异形</option></select></div>
+    </div>
+    <div class="row" style="margin-top:4px">
+        <div class="field"><label>单价 (元/㎡)</label><input type="number" id="cartonPrice" value="" step="0.1"></div>
+        <div class="field"><label>纸板长 (cm) <span class="auto-tag">自动</span></label><input type="number" id="cartonBoardL" value="" step="0.1" placeholder="自动或手动"></div>
+        <div class="field"><label>纸板宽 (cm) <span class="auto-tag">自动</span></label><input type="number" id="cartonBoardW" value="" step="0.1" placeholder="自动或手动"></div>
+    </div>
+
+</div>
+
+<div class="card">
+    <h2>⚙ 刀版 / 模切 <span id="dieCutSugg" style="font-size:0.7rem;color:#27ae60;font-weight:normal"></span></h2>
+    <div class="row">
+        <div class="field"><label>刀版费</label><select id="cartonDie"><option value="0" selected>不需要</option><option value="1">新版 ×200</option></select></div>
+        <div class="field"><label>模切机型</label><select id="cartonDieCut" onchange="document.getElementById('cartonPieces').disabled=this.value==='0'"><option value="0" selected>不需要</option></select></div>
+        <div class="field"><label>拼版数</label><input type="number" id="cartonPieces" value="" step="1" placeholder="不模切不填" disabled></div>
+    </div>
+</div>
+
+<div class="card">
+    <h2>🖨 印刷</h2>
+    <div class="row">
+        <div class="field"><label>印刷方式</label><select id="cartonPressType" onchange="document.getElementById('pressRow').style.display=this.value==='digital'?'none':''"><option value="traditional" selected>传统印刷</option><option value="digital">数码印刷 (免制版)</option></select></div>
+        <div class="field" id="pressRow"><label>色数</label><select id="cartonColors" onchange="updatePressDefaults()"><option value="1" selected>1色</option><option value="2">2色</option><option value="3">3色</option></select></div>
+        <div class="field"><label>上机费</label><input type="number" id="cartonPressBase" value="15" step="1"></div>
+        <div class="field"><label>单价</label><input type="number" id="cartonPressOver" value="0.07" step="0.01"></div>
+        <div class="field"><label>柔版费</label><input type="number" id="cartonPlate" value="0" step="1"></div>
+    </div>
+</div>
+
+<div class="card">
+    <h2>🔧 糊口 / 打钉</h2>
+    <div class="row">
+        <div class="field"><label>糊口/打钉 (元/个)</label><input type="number" id="cartonGlue" value="0.05" step="0.01"></div>
+        <div class="field"><label>运输</label><select id="cartonTransport"></select></div>
+    </div>
+</div>
+
+<div class="card">
+    <h2>🎨 其他</h2>
+    <div class="row">
+        <div class="field"><label>数量</label><input type="number" id="quantity" value="" step="1" placeholder="必填"></div>
+        <div class="field"><label>税率 (%)</label><input type="number" id="taxRate" value="7"></div>
+        <div class="field"><label>毛利率 (%)</label><div style="display:flex;gap:0"><button onclick="adjMargin(-1)" style="padding:8px 10px;border:1px solid #ddd;border-radius:6px 0 0 6px;cursor:pointer;background:#f5f5f5">−</button><input type="number" id="marginPct" value="10" style="text-align:center;border-radius:0;border-left:0;border-right:0;font-size:0.82rem"><button onclick="adjMargin(1)" style="padding:8px 10px;border:1px solid #ddd;border-radius:0 6px 6px 0;cursor:pointer;background:#f5f5f5">+</button></div></div>
+        <div class="field"><label>其他成本</label><div style="display:flex;gap:4px"><input type="number" id="extraCost" value="" step="0.001" placeholder="外加工等" style="flex:1;min-width:0"><button id="extraCostUnit" onclick="toggleExtraUnit()" style="font-size:0.7rem;padding:0 8px;height:38px;min-width:40px;border:1.5px solid #2980b9;border-radius:3px;background:#ebf5fb;color:#2980b9;cursor:pointer;font-weight:600;flex-shrink:0">元/个</button></div></div>
+    </div>
+</div>
+<div class="row" style="gap:8px"><button class="btn" onclick="calculate()" style="flex:1">💰 计算报价</button><button class="btn" id="btnExport" onclick="exportXLS()" style="flex:1;background:#27ae60;display:none">📥 导出报价表</button></div>
+
+<div class="result" id="result">
+    <div class="unit">预估报价</div>
+    <div class="total" id="totalPrice">¥ --</div>
+    <div class="unit" id="unitPrice"></div>
+    <div class="detail" id="breakdown"></div>
+</div>
+
+<div class="footer">2026.06.27 14:39 · <span onclick="showPwd()" style="cursor:pointer;text-decoration:underline">⚙ 设置</span></div>
+</div>
+
+<div class="overlay" id="pwdOverlay"><div class="panel" style="max-width:300px;text-align:center">
+    <h3>🔐 输入密码</h3>
+    <div style="display:flex;gap:8px"><input type="password" id="pwdInput" placeholder="密码" style="flex:1;padding:10px;border:1px solid #ddd;border-radius:6px" onkeydown="if(event.key==='Enter')checkPwd()"></div>
+    <button class="btn" onclick="checkPwd()" style="margin-top:12px">确认</button>
+    <button onclick="document.getElementById('pwdOverlay').classList.remove('show')" style="margin-top:8px;padding:8px 30px;border:1px solid #ddd;border-radius:6px;background:#eee;cursor:pointer">取消</button>
+    <p style="font-size:0.75rem;color:#e74c3c;margin-top:8px;display:none" id="pwdError">密码错误</p>
+</div></div>
+
+<div class="overlay" id="setOverlay"><div class="panel">
+    <h3>⚙ 后台价格设置</h3>
+    <div class="set-grid">
+        <div class="set-card"><h4>🖨 印刷 (上机费,单价)</h4><div id="setPress"></div></div>
+        <div class="set-card"><h4>🔪 模切</h4><div id="setDieCut"></div></div>
+        <div class="set-card"><h4>🚚 运输</h4><div id="setTransport"></div></div>
+    </div>
+    <div style="display:flex;gap:10px;justify-content:center;margin-top:16px">
+        <button class="btn btn-sm" onclick="saveSettings()">💾 保存</button>
+        <button onclick="closeSettings()" style="padding:8px 30px;border:1px solid #ddd;border-radius:6px;background:#eee;cursor:pointer">取消</button>
+    </div>
+</div></div>
+
+<div class="overlay" id="pwdOverlay"><div class="panel" style="max-width:300px;text-align:center">
+    <h3>🔐 输入密码</h3>
+    <div style="display:flex;gap:8px"><input type="password" id="pwdInput" placeholder="密码" style="flex:1;padding:10px;border:1px solid #ddd;border-radius:6px" onkeydown="if(event.key==='Enter')checkPwd()"></div>
+    <button class="btn" onclick="checkPwd()" style="margin-top:12px">确认</button>
+    <button onclick="document.getElementById('pwdOverlay').classList.remove('show')" style="margin-top:8px;padding:8px 30px;border:1px solid #ddd;border-radius:6px;background:#eee;cursor:pointer">取消</button>
+    <p style="font-size:0.75rem;color:#e74c3c;margin-top:8px;display:none" id="pwdError">密码错误</p>
+</div></div>
+
+<div class="overlay" id="setOverlay"><div class="panel">
+    <h3>⚙ 后台价格设置</h3>
+    <div class="set-grid">
+        <div class="set-card"><h4>✨ 表面处理 (元/㎡)</h4><div id="setSurfaceFilm"></div></div>
+        <div class="set-card"><h4>✨ 表面处理 (元/张)</h4><div id="setSurfaceK"></div></div>
+        <div class="set-card"><h4>🖨 120五色机 (开机费,超量单价)</h4><div id="setPress120"></div></div>
+        <div class="set-card"><h4>🖨 142五色机 (开机费,超量单价)</h4><div id="setPress142"></div></div>
+        <div class="set-card"><h4>📦 裱瓦 (元/㎡)</h4><div id="setMount"></div></div>
+        <div class="set-card"><h4>🔪 模切 (装版费,加工费)</h4><div id="setDieCut"></div></div>
+        <div class="set-card"><h4>📐 粘盒 (元/个)</h4><div id="setGlue"></div></div>
+        <div class="set-card"><h4>🚚 运输 (元/㎡)</h4><div id="setTransport"></div></div>
+    </div>
+    <div style="display:flex;gap:10px;justify-content:center;margin-top:16px">
+        <button class="btn btn-sm" onclick="saveSettings()">💾 保存</button>
+        <button onclick="closeSettings()" style="padding:8px 30px;border:1px solid #ddd;border-radius:6px;background:#eee;cursor:pointer">取消</button>
+    </div>
+</div></div>
+
+<script>
+var PRICE = {
+  press: {1:[15,0.07],2:[22,0.085],3:[30,0.10]},
+  dieCut: {"930手动":[35,0.08],"1100手动":[35,0.10],"1300自动":[40,0.12],"1500自动":[50,0.20],"1800手动":[50,0.30]},
+  transport: {"庆元":0.12,"龙泉":0.08,"政和":0.15,"建瓯":0.25,"景宁":0.15,"丽水":0.18,"松阳":0.25},
+  dieCutLimit: {"930手动":[90,64],"1100手动":[107,76],"1300自动":[127,97],"1500自动":[147,107],"1800手动":[178,126]}
+};
+var SET_PWD='+987';
+
+function updatePressDefaults(){
+  var cn=document.getElementById('cartonColors').value;
+  var d=PRICE.press[cn];
+  document.getElementById('cartonPressBase').value=d[0];
+  document.getElementById('cartonPressOver').value=d[1];
+}
+function calcCartonBoard(){
+  var type=document.getElementById('cartonType').value;
+  if(type==='manual')return;
+  var l=parseFloat(document.getElementById('cartonL').value)||0;
+  var w=parseFloat(document.getElementById('cartonW').value)||0;
+  var h=parseFloat(document.getElementById('cartonH').value)||0;
+  if(!l||!w||!h)return;
+  var boardL=(l+w)*2+3.5;
+  var boardW=type==='fullcover'?w+l+w:w+h;
+  document.getElementById('cartonBoardL').value=boardL.toFixed(1);
+  document.getElementById('cartonBoardW').value=boardW.toFixed(1);
+  // 模切机型建议
+  var bl=boardL,bw=boardW,best=null;
+  Object.keys(PRICE.dieCutLimit).forEach(function(k){
+    var lim=PRICE.dieCutLimit[k];
+    if(bl<=lim[0]&&bw<=lim[1]&&!best)best=k;
+  });
+  document.getElementById('dieCutSugg').textContent=best?'→ 建议: '+best:'→ 超出最大机型';
+}
+
+function calculate(){
+  var l=parseFloat(document.getElementById('cartonL').value)||0;
+  var w=parseFloat(document.getElementById('cartonW').value)||0;
+  var h=parseFloat(document.getElementById('cartonH').value)||0;
+  if(!l||!w||!h)return;
+  var price=parseFloat(document.getElementById('cartonPrice').value)||0;
+  if(!price)return;
+  var qty=parseInt(document.getElementById('quantity').value)||0;
+  if(!qty)return;
+  
+  var pieces=parseInt(document.getElementById('cartonPieces').value)||1;
+  var totalSheets=Math.ceil(qty/pieces);
+  var lossMul=(totalSheets+2)/totalSheets;
+  
+  var boardL=parseFloat(document.getElementById('cartonBoardL').value)||0;
+  var boardW=parseFloat(document.getElementById('cartonBoardW').value)||0;
+  if(!boardL||!boardW)return;
+  var boardArea=boardL*boardW/10000;
+  var boardCost=boardArea*price*lossMul;
+  var boardTotal=boardCost*totalSheets;
+  
+  // Die + dieCut
+  var dieFee=parseInt(document.getElementById('cartonDie').value)?boardArea*200:0;
+  var dcKey=document.getElementById('cartonDieCut').value;
+  var dc=dcKey==='0'?[0,0]:(PRICE.dieCut[dcKey]||[0,0]);
+  var dieCutCost=dcKey==='0'?0:(dc[0]+dc[1]*totalSheets);
+  
+  // Press
+  var pressType=document.getElementById('cartonPressType').value;
+  var pressCost=0;
+  var base=parseFloat(document.getElementById('cartonPressBase').value)||15;
+  var over=parseFloat(document.getElementById('cartonPressOver').value)||0.07;
+  if(pressType!=='digital'){pressCost=base+over*totalSheets;}
+  
+  // Glue
+  var plateFee=parseFloat(document.getElementById('cartonPlate').value)||0;
+  var gluePrice=parseFloat(document.getElementById('cartonGlue').value)||0.05;
+  var glueCost=gluePrice*qty;
+  
+  // Transport
+  var tsKey=document.getElementById('cartonTransport').value;
+  var tsPrice=PRICE.transport[tsKey]||0;
+  var tsCost=tsPrice*boardArea*totalSheets;
+  
+  // Extra
+  var extraVal=parseFloat(document.getElementById('extraCost').value)||0;
+  var extraUnit=document.getElementById('extraCostUnit').textContent;
+  var extraCost=extraUnit==='元/个'?extraVal*qty:extraVal;
+  
+  window._costs={
+    board:boardTotal,die:dieFee,dieCut:dieCutCost,press:pressCost,
+    plate:plateFee,glue:glueCost,transport:tsCost,extra:extraCost,
+    boardArea:boardArea,boardPrice:price,lossMul:lossMul,
+    qty:qty,totalSheets:totalSheets,
+    dieKey:dcKey,tsKey:tsKey,
+    pressType:pressType,pressBase:base,pressOver:over,pressColor:cn,
+    gluePrice:gluePrice,tsPrice:tsPrice,
+    l:l,w:w,h:h,type:document.getElementById('cartonType').options[document.getElementById('cartonType').selectedIndex].text
+  };
+  var allCost=boardTotal+dieFee+dieCutCost+pressCost+plateFee+glueCost+tsCost+extraCost;
+  var cpu=allCost/qty;
+  var taxVal=document.getElementById('taxRate').value;
+  var taxPct=taxVal===''?13:parseInt(taxVal)||0;
+  var marginPct=parseInt(document.getElementById('marginPct').value)||10;
+  var tax=taxPct/100,margin=marginPct/100;
+  var taxPrice=cpu*(1+tax);
+  var sp=taxPrice/(1-margin);
+  var total=sp*qty;
+  
+  document.getElementById('result').style.display='block';document.getElementById('btnExport').style.display='block';
+  document.getElementById('totalPrice').textContent='¥ '+total.toFixed(2);
+  document.getElementById('unitPrice').textContent='单价 ¥ '+sp.toFixed(4)+'/个（含税'+taxPct+'% 毛利率'+marginPct+'%）';
+  
+  
+  var lines=[];
+  lines.push('【纸板】'+l.toFixed(1)+'×'+w.toFixed(1)+'×'+h.toFixed(1)+'cm ');
+  lines.push('  盒型: '+document.getElementById('cartonType').options[document.getElementById('cartonType').selectedIndex].text);
+  lines.push('  纸板: '+boardL.toFixed(1)+'×'+boardW.toFixed(1)+'cm = '+boardArea.toFixed(4)+'㎡');
+  lines.push('  ¥'+price.toFixed(2)+'/㎡ × '+lossMul.toFixed(4)+' = ¥'+boardCost.toFixed(4)+'/张 × '+totalSheets+'张 = ¥'+boardTotal.toFixed(2)+' → ¥'+(boardTotal/qty).toFixed(4)+'/个');
+  lines.push('');
+  
+  if(dieFee>0){lines.push('【刀版】新版 '+boardArea.toFixed(4)+'㎡×200=¥'+dieFee.toFixed(2)+' → ¥'+(dieFee/qty).toFixed(4)+'/个');lines.push('');}
+  if(dcKey!=='0'){lines.push('【模切】'+dcKey+' 装版¥'+dc[0]+' + ¥'+dc[1]+'/张×'+totalSheets+'=¥'+dieCutCost.toFixed(2)+' → ¥'+(dieCutCost/qty).toFixed(4)+'/个');lines.push('');}
+  
+  if(pressType==='digital'){lines.push('【印刷】数码印刷 跳过');}
+  else{
+    var cn=document.getElementById('cartonColors').value;
+    lines.push('【印刷】传统 '+cn+'色 上机¥'+base+' 单价¥'+over);
+    lines.push('  上机¥'+base+' + ¥'+over+'×'+totalSheets+'张 = ¥'+pressCost.toFixed(2)+' → ¥'+(pressCost/qty).toFixed(4)+'/个');
+  }
+  lines.push('');
+  if(plateFee>0){lines.push('【柔版】¥'+plateFee.toFixed(2)+' → ¥'+(plateFee/qty).toFixed(4)+'/个');lines.push('');}
+  lines.push('【糊口/打钉】¥'+gluePrice.toFixed(2)+'/个 × '+qty+'个 = ¥'+glueCost.toFixed(2));
+  lines.push('');
+  if(tsPrice>0){lines.push('【运输】'+tsKey+' ¥'+tsPrice.toFixed(2)+'/㎡ × '+boardArea.toFixed(4)+'㎡ × '+totalSheets+'张 = ¥'+tsCost.toFixed(2)+' → ¥'+(tsCost/qty).toFixed(4)+'/个');lines.push('');}
+  if(extraCost>0){lines.push('【其他成本】'+(extraUnit==='元/个'?'¥'+extraVal.toFixed(4)+'/个×'+qty+'个=':'总价')+' ¥'+extraCost.toFixed(2));lines.push('');}
+  
+  lines.push('<hr>');
+  lines.push('纸板 ¥'+boardTotal.toFixed(2)+' + 刀版 ¥'+dieFee.toFixed(2)+' + 模切 ¥'+dieCutCost.toFixed(2)+' + 印刷 ¥'+pressCost.toFixed(2)+' + 柔版 ¥'+plateFee.toFixed(2)+' + 糊口 ¥'+glueCost.toFixed(2)+' + 运输 ¥'+tsCost.toFixed(2)+' + 其他 ¥'+extraCost.toFixed(2)+'  + 柔版 ¥'+plateFee.toFixed(2)+' = <b>合计 ¥'+allCost.toFixed(2)+'</b>');
+  lines.push('<hr>');
+  lines.push('成本价 ¥'+cpu.toFixed(4)+'/个');
+  lines.push('含税价 ¥'+taxPrice.toFixed(4)+'/个');
+  lines.push('含毛利 ¥'+sp.toFixed(4)+'/个');
+  lines.push('总价 ¥'+total.toFixed(2)+' ('+qty+'个)');
+  document.getElementById('breakdown').innerHTML=lines.join('<br>');
+}
+
+function exportXLS(){
+  var C=window._costs||{};
+  if(!C.qty)return;
+  var date=new Date().toLocaleDateString('zh-CN');
+  var cpu=C.board/((C.qty||1))+0; // approximate
+  
+  var l='<td class="xl70" height="22" style="height:22px">';
+  var r='<td class="xl72" height="22" style="height:22px" x:num>';
+  var st=' style="height:22px"';
+  
+  var costRows=[];
+  if(C.board>0)costRows.push({name:'纸板-'+C.l.toFixed(0)+'×'+C.w.toFixed(0)+'×'+C.h.toFixed(0)+'cm '+C.type,val:C.board});
+  if(C.die>0)costRows.push({name:'刀版-新版×200',val:C.die});
+  if(C.dieCut>0)costRows.push({name:'模切-'+C.dieKey,val:C.dieCut});
+  if(C.plate>0)costRows.push({name:'柔版',val:C.plate});
+  if(C.pressType==='digital')costRows.push({name:'印刷-数码',val:0});
+  else costRows.push({name:'印刷-传统'+C.pressColor+'色',val:C.press});
+  if(C.glue>0)costRows.push({name:'糊口/打钉-'+C.gluePrice+'/个',val:C.glue});
+  if(C.transport>0)costRows.push({name:'运输-'+C.tsKey,val:C.transport});
+  if(C.extra>0)costRows.push({name:'其他成本',val:C.extra});
+  
+  var totalCost=0;
+  costRows.forEach(function(r){totalCost+=r.val;});
+  
+  var body='<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40"><head><meta charset="UTF-8"><style>.xl68{color:#FFF;font-size:14px;font-weight:700;text-align:center;background:#2F5496;border:.5pt solid #000;padding:6px}.xl70{font-size:11px;font-weight:700;color:#333;border:.5pt solid #000;padding:4px 8px;background:#F2F2F2}.xl72{font-size:11px;text-align:right;border:.5pt solid #000;padding:4px 8px}.xl73{color:#FFF;font-size:11px;font-weight:700;text-align:center;background:#2F5496;border:.5pt solid #000;padding:4px}.xl77{font-size:12px;font-weight:700;text-align:right;border:.5pt solid #000;padding:4px 8px}tr{height:22px}</style></head><body><table border="1" style="border-collapse:collapse">';
+  body+='<tr><td class="xl68" colspan="2" height="28">浙江国立包装有限公司 · 瓦楞箱报价表</td></tr>';
+  body+='<tr'+st+'>'+l+'日期</td><td class="xl72">'+date+'</td></tr>';
+  body+='<tr'+st+'>'+l+'数量</td>'+r+C.qty+'</td></tr>';
+  body+='<tr'+st+'>'+l+'纸箱尺寸</td><td class="xl72">'+C.l.toFixed(0)+' × '+C.w.toFixed(0)+' × '+C.h.toFixed(0)+' cm</td></tr>';
+  body+='<tr'+st+'>'+l+'盒型</td><td class="xl72">'+C.type+'</td></tr>';
+  body+='<tr><td class="xl73" colspan="2" height="24">成本明细</td></tr>';
+  body+='<tr'+st+'>'+l+'工序</td><td class="xl70" style="text-align:right">小计 (元)</td></tr>';
+  
+  for(var i=0;i<costRows.length;i++){
+    body+='<tr'+st+'>'+l+costRows[i].name+'</td>'+r+costRows[i].val.toFixed(2)+'</td></tr>';
+  }
+  var startRow=8,endRow=7+costRows.length;
+  body+='<tr><td class="xl73" colspan="2" height="24">报价汇总</td></tr>';
+  body+='<tr'+st+'>'+l+'总价</td><td class="xl77" x:fmla="=SUM(B'+startRow+':B'+endRow+')" x:num="'+totalCost.toFixed(4)+'">¥'+totalCost.toFixed(2)+'</td></tr>';
+  body+='<tr'+st+'>'+l+'单个成本</td><td class="xl77" x:fmla="=B'+(endRow+2)+'/B3" x:num="'+(totalCost/C.qty).toFixed(4)+'">¥'+(totalCost/C.qty).toFixed(4)+'</td></tr>';
+  
+  var taxVal=document.getElementById('taxRate').value;
+  var taxPct=taxVal===''?13:parseInt(taxVal)||0;
+  var marginPct=parseInt(document.getElementById('marginPct').value)||10;
+  var singleCost=totalCost/C.qty;
+  var taxPrice=singleCost*(1+taxPct/100);
+  var finalPrice=taxPrice/(1-marginPct/100);
+  body+='<tr'+st+'>'+l+'含税'+taxPct+'%</td><td class="xl77" x:fmla="=B'+(endRow+3)+'*(1+'+taxPct+'/100)" x:num="'+taxPrice.toFixed(4)+'">¥'+taxPrice.toFixed(4)+'</td></tr>';
+  body+='<tr'+st+'>'+l+'毛利'+marginPct+'%</td><td class="xl77" x:fmla="=B'+(endRow+4)+'/(1-'+marginPct+'/100)" x:num="'+finalPrice.toFixed(4)+'">¥'+finalPrice.toFixed(4)+'</td></tr>';
+  body+='</table></body></html>';
+  
+  var blob=new Blob([body],{type:'application/vnd.ms-excel;charset=utf-8'});
+  var a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download='瓦楞报价表_'+new Date().toISOString().slice(0,10)+'.xls';
+  a.click();
+}
+
+function toggleExtraUnit(){
+  var btn=document.getElementById('extraCostUnit');
+  btn.textContent=btn.textContent==='元/个'?'总价':'元/个';
+}
+adjMargin=function(d){var el=document.getElementById('marginPct');var v=(parseInt(el.value)||10)+d;if(v<0)v=0;el.value=v;};
+
+showPwd=function(){document.getElementById('pwdOverlay').classList.add('show');document.getElementById('pwdInput').focus();};
+checkPwd=function(){if(document.getElementById('pwdInput').value===SET_PWD){document.getElementById('pwdOverlay').classList.remove('show');openSettings();}else{document.getElementById('pwdError').style.display='block';}};
+
+function openSettings(){
+  document.getElementById('setDieCut').innerHTML=Object.keys(PRICE.dieCut).map(function(k){var v=PRICE.dieCut[k];return'<div class="srow"><label>'+k+'</label><span>装</span><input type="number" value="'+v[0]+'" step="1" data-cat="dieCut-'+k+'" data-field="0"><span>加工</span><input type="number" value="'+v[1]+'" step="0.01" data-cat="dieCut-'+k+'" data-field="1"></div>';}).join('');
+  document.getElementById('setTransport').innerHTML=Object.keys(PRICE.transport).map(function(k){return'<div class="srow"><label>'+k+'</label><input type="number" value="'+PRICE.transport[k]+'" step="0.01" data-cat="'+k+'"><span class="unit">元/㎡</span></div>';}).join('');
+  document.getElementById('setOverlay').classList.add('show');
+}
+saveSettings=function(){
+  document.querySelectorAll('#setOverlay input').forEach(function(inp){
+    var cat=inp.dataset.cat,val=parseFloat(inp.value)||0;
+    if(cat.startsWith('press-')){var parts=cat.split('-'),pKey=parts[1],pField=parseInt(inp.dataset.field);PRICE.press[pKey][pField]=val;}else if(cat.startsWith('dieCut-')){
+      var key=cat.replace('dieCut-',''),field=parseInt(inp.dataset.field);
+      PRICE.dieCut[key][field]=val;
+    }else if(PRICE.transport[cat]!==undefined)PRICE.transport[cat]=val;
+  });
+  localStorage.setItem('cartonPriceSettings',JSON.stringify({press:PRICE.press,dieCut:PRICE.dieCut,transport:PRICE.transport}));
+  closeSettings();alert('✅ 已保存');
+};
+closeSettings=function(){document.getElementById('setOverlay').classList.remove('show');};
+
+(function(){
+  // Populate press settings
+  document.getElementById('setPress').innerHTML=Object.keys(PRICE.press).map(function(k){
+    var v=PRICE.press[k];
+    return'<div class="srow"><label>'+k+'色</label><span>上机</span><input type="number" value="'+v[0]+'" step="1" data-cat="press-'+k+'" data-field="0"><span>单价</span><input type="number" value="'+v[1]+'" step="0.01" data-cat="press-'+k+'" data-field="1"></div>';
+  }).join('');
+  // Populate die-cut options
+  var dcSelect=document.getElementById('cartonDieCut');
+  Object.keys(PRICE.dieCut).forEach(function(k){
+    var v=PRICE.dieCut[k];
+    var opt=document.createElement('option');
+    opt.value=k;opt.textContent=k+' (装'+v[0]+' +'+v[1]+'/张)';
+    dcSelect.appendChild(opt);
+  });
+  // Populate transport
+  var tsSelect=document.getElementById('cartonTransport');
+  Object.keys(PRICE.transport).forEach(function(k){
+    var opt=document.createElement('option');
+    opt.value=k;opt.textContent=k+' ('+PRICE.transport[k]+')';
+    tsSelect.appendChild(opt);
+  });
+  try{var s=JSON.parse(localStorage.getItem('cartonPriceSettings'));if(s){if(s.press)PRICE.press=s.press;if(s.dieCut)PRICE.dieCut=s.dieCut;if(s.transport)PRICE.transport=s.transport;}}catch(e){}
+})();
+</script>
+</body>
+</html>
