@@ -236,7 +236,7 @@ function calculate(){
   var pressType=document.getElementById('cartonPressType').value;
   var pressCost=0;
   var base=parseFloat(document.getElementById('cartonPressBase').value);if(isNaN(base))base=15;
-  var over=parseFloat(document.getElementById('cartonPressOver').value)||0.07;
+  var over=parseFloat(document.getElementById('cartonPressOver').value);if(isNaN(over))over=0.07;
   if(pressType==='traditional'){pressCost=base+over*totalSheets;}else{var areaPrice=parseFloat(document.getElementById('cartonPressArea').value)||0.25;pressCost=areaPrice*boardArea*totalSheets;}
   
   // Glue

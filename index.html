@@ -297,7 +297,7 @@ function calcPressCost(){
   var qty=parseInt(document.getElementById('quantity').value)||0;
   var totalSheets=Math.ceil(qty>0?qty:nUp?1000/nUp:1000);
   var base=tier[0],overflow=tier[1];
-  var totalCost=totalSheets<=3000?base:totalSheets<10000?base+overflow*(totalSheets-3000):overflow*totalSheets;
+  var totalCost=totalSheets<=3000?base:base+overflow*(totalSheets-3000);
   var costPerK=totalCost/((qty>0?qty:1000)/1000);
   var perSheet=totalCost/totalSheets;
   document.getElementById('pressCostDisplay').value='单价¥'+perSheet.toFixed(4)+'/张 × '+totalSheets+'张 = ¥'+totalCost.toFixed(0);
@@ -371,7 +371,7 @@ function calculate(){
 
   // 刀版费：长宽=浪纸各-1cm，新版=面积×200，旧版=0
   var isNewDie=parseInt(document.getElementById('dieNew').value)||0;
-  var dieArea=(fL-10)*(fW-10)/1000000;
+  var dieArea=pL*pW/1000000;
   var dieFee=isNewDie?dieArea*200:0;
 
   var filmArea=pArea;
@@ -388,7 +388,7 @@ function calculate(){
 
   var cn=document.getElementById('colors').value;
   var colorCost=calcPressCost();
-  var marginPct=parseInt(document.getElementById('marginPct').value)||20;
+  var marginPct=parseInt(document.getElementById('marginPct').value);if(isNaN(marginPct))marginPct=20;
   var taxVal=document.getElementById('taxRate').value;
   var taxPct=taxVal===''?13:parseInt(taxVal)||0;
   var margin=marginPct/100,tax=taxPct/100;
@@ -450,7 +450,7 @@ function calculate(){
   lines.push('【印刷】'+document.getElementById('pressMachine').value+'五色机 '+cn+'色');
   var pressKey=document.getElementById('pressMachine').value,pressTier;
   if(pressKey==='120')pressTier=PRICE.press120[cn];else pressTier=PRICE.press142[cn];
-  lines.push('  共'+totalSheets+'张 → '+ (totalSheets<=3000?'≤3k 开机费¥'+pressTier[0]:totalSheets<10000?'开机¥'+pressTier[0]+' + ¥'+pressTier[1]+'/张×'+(totalSheets-3000):'万张上 ¥'+pressTier[1]+'/张×'+totalSheets));
+  lines.push('  共'+totalSheets+'张 → '+ (totalSheets<=3000?'≤3k 开机费¥'+pressTier[0]:'开机¥'+pressTier[0]+' + ¥'+pressTier[1]+'/张×'+(totalSheets-3000)));
   lines.push('  小计 ¥'+pressTotal.toFixed(2)+' → ¥'+(pressTotal/totalSheets).toFixed(4)+'/张 → ¥'+(pressTotal/qty).toFixed(4)+'/个');
   lines.push('');
   }
@@ -474,7 +474,7 @@ function calculate(){
   else{lines.push('【裱瓦】¥'+(pArea*PRICE.mount).toFixed(4)+'/张 × '+totalSheets+'张 = ¥'+mountTotal.toFixed(2)+' → ¥'+(mountCost/nUp).toFixed(4)+'/个');}
   lines.push('');
   lines.push('【刀版】'+(isNewDie?'新版 面积×200':'旧版免费'));
-  if(isNewDie) lines.push('  刀版尺寸 ('+fL.toFixed(1)+'-10)×('+fW.toFixed(1)+'-10) = '+dieArea.toFixed(4)+'㎡ × 200 = ¥'+dieFee.toFixed(2)+' → ¥'+(dieFee/totalSheets).toFixed(4)+'/张 → ¥'+(dieFee/qty).toFixed(4)+'/个');
+  if(isNewDie) lines.push('  刀版尺寸 '+pL.toFixed(0)+'×'+pW.toFixed(0)+'mm = '+dieArea.toFixed(4)+'㎡ × 200 = ¥'+dieFee.toFixed(2)+' → ¥'+(dieFee/totalSheets).toFixed(4)+'/张 → ¥'+(dieFee/qty).toFixed(4)+'/个');
   lines.push('');
   // 模切
   if(!enDieCut){lines.push('【模切】已跳过');}
@@ -524,7 +524,7 @@ onSurfaceChange=function(){
   document.getElementById('warnOil').style.display=oil>1?'inline':'none';
   document.getElementById('warnFoil').style.display=foil>1?'inline':'none';
 };
-adjMargin=function(d){var el=document.getElementById('marginPct');var v=(parseInt(el.value)||15)+d;if(v<0)v=0;if(v>200)v=200;el.value=v;};
+adjMargin=function(d){var el=document.getElementById('marginPct');var v=parseInt(el.value);if(isNaN(v))v=15;v+=d;if(v<0)v=0;if(v>200)v=200;el.value=v;};
 
 document.getElementById('dieL').addEventListener('input',function(){updateDimensions();calcPressCost();});
 document.getElementById('dieW').addEventListener('input',function(){updateDimensions();calcPressCost();});
