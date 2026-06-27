@@ -186,7 +186,7 @@ h1{text-align:center;font-size:1.5rem;color:#2c3e50;padding:20px 0}
     <div class="detail" id="breakdown"></div>
 </div>
 
-<div class="footer">2026.06.27 14:39 · <span onclick="showPwd()" style="cursor:pointer;text-decoration:underline">⚙ 设置</span></div>
+<div class="footer">2026.06.27 19:15 · <span onclick="showPwd()" style="cursor:pointer;text-decoration:underline">⚙ 设置</span></div>
 </div>
 
 <div class="overlay" id="pwdOverlay"><div class="panel" style="max-width:300px;text-align:center">
@@ -583,7 +583,7 @@ function exportXLS(){
   var taxPrice=singleCost*1.07;
   var marginPrice=taxPrice/0.85;
   var taxRate=document.getElementById('taxRate').value||7;
-  var marginRate=document.getElementById('marginPct').value||15;
+  var marginRate=document.getElementById('marginPct').value||0;
 
   var l='<td class="xl70" height="22" style="height:22px">';
   var r='<td class="xl72" height="22" style="height:22px" x:num>';
@@ -600,15 +600,15 @@ function exportXLS(){
   body+='<tr><td class="xl73" colspan="2" height="24">成本明细</td></tr>';
   body+='<tr'+st+'>'+l+'工序</td><td class="xl70" style="text-align:right">小计 (元)</td></tr>';
   for(var i=0;i<costRows.length;i++){
-    body+='<tr'+st+'>'+l+costRows[i].name+'</td>'+r+costRows[i].val.toFixed(2)+'</td></tr>';
+    body+='<tr'+st+'>'+l+costRows[i].name+'</td>'+r+costRows[i].val.toFixed(4)+'</td></tr>';
   }
   var startRow=10;
   var endRow=9+costRows.length;
   body+='<tr><td class="xl73" colspan="2" height="24">报价汇总</td></tr>';
   body+='<tr'+st+'>'+l+'总价</td><td class="xl77" x:fmla="=SUM(B'+startRow+':B'+endRow+')" x:num="'+totalCost.toFixed(4)+'">¥'+totalCost.toFixed(2)+'</td></tr>';
-  body+='<tr'+st+'>'+l+'单个成本</td><td class="xl77" x:fmla="=B'+(endRow+2)+'/B3" x:num="'+singleCost.toFixed(4)+'">¥'+singleCost.toFixed(4)+'</td></tr>';
-  body+='<tr'+st+'>'+l+'含税'+taxRate+'%</td><td class="xl77" x:fmla="=B'+(endRow+3)+'*(1+'+taxRate+'/100)" x:num="'+taxPrice.toFixed(4)+'">¥'+taxPrice.toFixed(4)+'</td></tr>';
-  body+='<tr'+st+'>'+l+'毛利'+marginRate+'%</td><td class="xl77" x:fmla="=B'+(endRow+4)+'/(1-'+marginRate+'/100)" x:num="'+marginPrice.toFixed(4)+'">¥'+marginPrice.toFixed(4)+'</td></tr>';
+  body+='<tr'+st+'>'+l+'单个成本</td><td class="xl77" x:fmla="=B'+(endRow+2)+'/B3" x:num="'+singleCost.toFixed(4)+'">¥'+singleCost.toFixed(2)+'</td></tr>';
+  body+='<tr'+st+'>'+l+'含税'+taxRate+'%</td><td class="xl77" x:fmla="=B'+(endRow+3)+'*(1+'+taxRate+'/100)" x:num="'+taxPrice.toFixed(4)+'">¥'+taxPrice.toFixed(2)+'</td></tr>';
+  body+='<tr'+st+'>'+l+'毛利'+marginRate+'%</td><td class="xl77" x:fmla="=B'+(endRow+4)+'/(1-'+marginRate+'/100)" x:num="'+marginPrice.toFixed(4)+'">¥'+marginPrice.toFixed(2)+'</td></tr>';
   body+='</table></body></html>';
 
   var blob=new Blob([body],{type:'application/vnd.ms-excel;charset=utf-8'});
