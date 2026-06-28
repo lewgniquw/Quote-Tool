@@ -200,7 +200,7 @@ h1{text-align:center;font-size:1.5rem;color:#2c3e50;padding:20px 0}
     <div class="detail" id="breakdown"></div>
 </div>
 
-<div class="footer">2026.06.28 11:32 · <span onclick="showPwd()" style="cursor:pointer;text-decoration:underline">⚙ 设置</span></div>
+<div class="footer">2026.06.28 13:48 · <span onclick="showPwd()" style="cursor:pointer;text-decoration:underline">⚙ 设置</span></div>
 </div>
 
 <div class="overlay" id="pwdOverlay"><div class="panel" style="max-width:300px;text-align:center">
@@ -248,14 +248,14 @@ var PRICE = {
   try{
     var s=JSON.parse(localStorage.getItem('priceSettings'));
     if(!s)return;
-    if(s.surfaceFilm)PRICE.surfaceFilm=s.surfaceFilm;
-    if(s.surfaceK)PRICE.surfaceK=s.surfaceK;
-    if(s.press120)PRICE.press120=s.press120;
-    if(s.press142)PRICE.press142=s.press142;
+    if(s.surfaceFilm)Object.keys(s.surfaceFilm).forEach(function(k){PRICE.surfaceFilm[k]=s.surfaceFilm[k];});
+    if(s.surfaceK)Object.keys(s.surfaceK).forEach(function(k){PRICE.surfaceK[k]=s.surfaceK[k];});
+    if(s.press120)Object.keys(s.press120).forEach(function(k){PRICE.press120[k]=s.press120[k];});
+    if(s.press142)Object.keys(s.press142).forEach(function(k){PRICE.press142[k]=s.press142[k];});
     if(s.mount!==undefined)PRICE.mount=s.mount;
-    if(s.dieCut)PRICE.dieCut=s.dieCut;
-    if(s.glue)PRICE.glue=s.glue;
-    if(s.transport)PRICE.transport=s.transport;
+    if(s.dieCut)Object.keys(s.dieCut).forEach(function(k){PRICE.dieCut[k]=s.dieCut[k];});
+    if(s.glue)Object.keys(s.glue).forEach(function(k){PRICE.glue[k]=s.glue[k];});
+    if(s.transport)Object.keys(s.transport).forEach(function(k){PRICE.transport[k]=s.transport[k];});
   }catch(e){}
 })();
 var SET_PWD='+987';
