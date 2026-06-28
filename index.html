@@ -202,7 +202,7 @@ h1{text-align:center;font-size:1.5rem;color:#2c3e50;padding:20px 0}
     <div class="detail" id="breakdown"></div>
 </div>
 
-<div class="footer">2026.06.28 11:13 · <span onclick="showPwd()" style="cursor:pointer;text-decoration:underline">⚙ 设置</span></div>
+<div class="footer">2026.06.28 11:25 · <span onclick="showPwd()" style="cursor:pointer;text-decoration:underline">⚙ 设置</span></div>
 </div>
 
 <div class="overlay" id="pwdOverlay"><div class="panel" style="max-width:300px;text-align:center">
@@ -500,13 +500,13 @@ function calculate(){
   lines.push('');
   // 粘盒
   if(!enGlue){lines.push('【粘盒】已跳过');}
-  else{lines.push('【粘盒】¥'+PRICE.glue[glueKey].toFixed(2)+'/个 × '+qty+'个 = ¥'+glueCost.toFixed(2));}
+  else{lines.push('【粘盒】¥'+(PRICE.glue[glueKey]||0).toFixed(2)+'/个 × '+qty+'个 = ¥'+glueCost.toFixed(2));}
   lines.push('');
   // 运输
   if(!enTransport){lines.push('【运输】已跳过');lines.push('');}
   else{
-  lines.push('【运输】'+tsKey+' ¥'+PRICE.transport[tsKey].toFixed(2)+'/㎡ (按面纸面积)');
-  lines.push('  '+pArea.toFixed(4)+'㎡ × ¥'+PRICE.transport[tsKey].toFixed(2)+' × '+totalSheets+'张 = ¥'+tsCost.toFixed(2)+' → ¥'+(tsCost/totalSheets).toFixed(4)+'/张 → ¥'+(tsCost/qty).toFixed(4)+'/个');
+  lines.push('【运输】'+tsKey+' ¥'+(PRICE.transport[tsKey]||0).toFixed(2)+'/㎡ (按面纸面积)');
+  lines.push('  '+pArea.toFixed(4)+'㎡ × ¥'+(PRICE.transport[tsKey]||0).toFixed(2)+' × '+totalSheets+'张 = ¥'+tsCost.toFixed(2)+' → ¥'+(tsCost/totalSheets).toFixed(4)+'/张 → ¥'+(tsCost/qty).toFixed(4)+'/个');
   lines.push('');
   }
   // 其他成本
@@ -607,9 +607,8 @@ function exportXLS(){
   var r='<td class="xl72" height="22" style="height:22px" x:num>';
   var st=' style="height:22px"';
 
-  var body='<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40"><head><meta charset="UTF-8"><style>.xl68{color:#FFF;font-size:14px;font-weight:700;text-align:center;background:#2F5496;border:.5pt solid #000;padding:6px}.xl70{font-size:11px;font-weight:700;color:#333;border:.5pt solid #000;padding:4px 8px;background:#F2F2F2}.xl72{font-size:11px;text-align:right;border:.5pt solid #000;padding:4px 8px}.xl73{color:#FFF;font-size:11px;font-weight:700;text-align:center;background:#2F5496;border:.5pt solid #000;padding:4px}.xl77{font-size:12px;font-weight:700;text-align:right;border:.5pt solid #000;padding:4px 8px}tr{height:22px}
-  
-</style></head><body><table border="1" style="border-collapse:collapse">';
+  var body='<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40"><head><meta charset="UTF-8"><style>.xl68{color:#FFF;font-size:14px;font-weight:700;text-align:center;background:#2F5496;border:.5pt solid #000;padding:6px}.xl70{font-size:11px;font-weight:700;color:#333;border:.5pt solid #000;padding:4px 8px;background:#F2F2F2}.xl72{font-size:11px;text-align:right;border:.5pt solid #000;padding:4px 8px}.xl73{color:#FFF;font-size:11px;font-weight:700;text-align:center;background:#2F5496;border:.5pt solid #000;padding:4px}.xl77{font-size:12px;font-weight:700;text-align:right;border:.5pt solid #000;padding:4px 8px}tr{height:22px}';
+  body+='</style></head><body><table border="1" style="border-collapse:collapse">';
   body+='<tr><td class="xl68" colspan="2" height="28">浙江国立包装有限公司 · 彩盒报价表</td></tr>';
   body+='<tr'+st+'>'+l+'日期</td><td class="xl72">'+date+'</td></tr>';
   body+='<tr'+st+'>'+l+'数量</td>'+r+qty+'</td></tr>';
