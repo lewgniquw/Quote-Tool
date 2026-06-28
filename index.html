@@ -67,9 +67,9 @@ h1{text-align:center;font-size:1.5rem;color:#2c3e50;padding:20px 0}
     <div class="row">
         <div class="field"><label>裁切长 <span class="auto-tag">自动</span></label><input type="text" id="cutSizeL" value="--" readonly style="color:#3498db;font-size:0.82rem"></div>
         <div class="field"><label>裁切宽 <span class="auto-tag">自动</span></label><input type="text" id="cutSizeW" value="--" readonly style="color:#3498db;font-size:0.82rem"></div>
-        <div class="field"><label>克重(g)</label><input type="number" id="paperGram" value="" placeholder="" style="font-size:0.82rem"></div>
+        <div class="field"><label>克重 (g)</label><input type="number" id="paperGram" value="" placeholder="" style="font-size:0.82rem"></div>
         <div class="field"><label>吨价(元/吨)</label><input type="number" id="paperTon" value="" placeholder="" style="font-size:0.82rem"></div>
-        <div class="field" style="min-width:80px"><label>损耗(张)</label><input type="number" id="paperLoss" value="180" step="1" placeholder="5%" style="font-size:0.82rem"></div>
+        <div class="field" style="min-width:80px"><label>损耗(张)</label><input type="number" id="paperLoss" value="200" step="1" placeholder="5%" style="font-size:0.82rem"></div>
     </div>
 </div>
 
@@ -86,7 +86,7 @@ h1{text-align:center;font-size:1.5rem;color:#2c3e50;padding:20px 0}
 <div class="card">
     <h2>🖨 印刷 <span id="pressLimit" style="font-size:0.75rem;font-weight:normal"></span></h2>
     <div class="row">
-        <div class="field"><label>机型</label><select id="pressMachine" onchange="checkPressLimit()"><option value="120">120对开机</option><option value="142" selected>142全开机</option></select></div>
+        <div class="field"><label>印刷机型</label><select id="pressMachine" onchange="checkPressLimit()"><option value="120">120对开机</option><option value="142" selected>142全开机</option></select></div>
         <div class="field"><label>色数</label><select id="colors"><option value="4" selected>4色</option><option value="5">5色</option></select></div>
         <div class="field"><label>印刷费 <span class="auto-tag">自动</span></label><input type="text" id="pressCostDisplay" value="--" readonly style="color:#3498db"></div>
     </div>
@@ -160,7 +160,7 @@ h1{text-align:center;font-size:1.5rem;color:#2c3e50;padding:20px 0}
 <div class="card">
     <h2>🎨 其他</h2>
     <div class="row">
-        <div class="field" style="flex:1.5"><label>运输区域</label><select id="transport"><option value="庆元">庆元 0.12</option><option value="龙泉">龙泉 0.08</option><option value="政和">政和 0.15</option><option value="建瓯">建瓯 0.25</option><option value="景宁">景宁 0.15</option><option value="丽水">丽水 0.18</option><option value="松阳">松阳 0.25</option></select></div>
+        <div class="field" style="flex:1.5"><label>运输区域 (元/㎡)</label><select id="transport"><option value="庆元">庆元 0.12</option><option value="龙泉">龙泉 0.08</option><option value="政和">政和 0.15</option><option value="建瓯">建瓯 0.25</option><option value="景宁">景宁 0.15</option><option value="丽水">丽水 0.18</option><option value="松阳">松阳 0.25</option></select></div>
         <div class="field" style="flex:1.5"><label>其他成本</label><div style="display:flex;gap:4px"><input type="number" id="extraCost" value="" step="0.001" placeholder="外加工等" style="flex:1;min-width:0"><button id="extraCostUnit" onclick="toggleExtraUnit()" style="font-size:0.75rem;padding:0 10px;height:38px;min-width:45px;border:1.5px solid #2980b9;border-radius:3px;background:#ebf5fb;color:#2980b9;cursor:pointer;font-weight:600;flex-shrink:0">元/个</button></div></div>
     </div>
     <div class="row" style="margin-top:8px">
