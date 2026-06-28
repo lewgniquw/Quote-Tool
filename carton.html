@@ -47,6 +47,22 @@ h1{text-align:center;font-size:1.5rem;color:#2c3e50;padding:20px 0}
 .mode-tab{flex:1;padding:12px;text-align:center;font-size:0.95rem;font-weight:600;cursor:pointer;border:none;background:#e8e8e8;color:#666;transition:all 0.2s;text-decoration:none;display:block}
 .mode-tab.active{background:#3498db;color:#fff}
 .help-tip:hover::after{content:attr(data-tip);position:absolute;left:0;top:24px;background:#333;color:#fff;padding:8px 12px;border-radius:6px;font-size:0.75rem;white-space:pre-line;line-height:1.6;z-index:999;min-width:220px;box-shadow:0 4px 12px rgba(0,0,0,0.2)}
+
+  @media (max-width: 768px) {
+    html{scroll-behavior:smooth;scroll-padding-top:20px}
+    body{-webkit-overflow-scrolling:touch}
+    .container{max-width:100%;padding:8px}
+    .card{padding:10px;scroll-margin-top:20px}
+    .row{flex-wrap:wrap;gap:6px}
+    .row .field{flex:1 1 100%!important;min-width:0}
+    .field input,.field select{font-size:16px;padding:10px 8px}
+    .mode-tab{font-size:0.85rem;padding:10px}
+    h2{font-size:0.95rem}
+    .btn{padding:12px;font-size:1rem}
+    .set-grid{grid-template-columns:1fr}
+    .set-card .srow input{width:60px}
+    .overlay .panel{width:95%;max-height:90vh;overflow-y:auto}
+  }
 </style>
 </head>
 <body>
@@ -351,7 +367,23 @@ function exportXLS(){
   var marginPct=marginVal===''?0:parseInt(marginVal)||0;
   var taxPrice=singleCost*(1+taxPct/100);
   var finalPrice=marginPct>0?taxPrice/(1-marginPct/100):taxPrice;
-  var body='<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40"><head><meta charset="UTF-8"><style>.xl68{color:#FFF;font-size:14px;font-weight:700;text-align:center;background:#2F5496;border:.5pt solid #000;padding:6px}.xl70{font-size:11px;font-weight:700;color:#333;border:.5pt solid #000;padding:4px 8px;background:#F2F2F2}.xl72{font-size:11px;text-align:right;border:.5pt solid #000;padding:4px 8px}.xl73{color:#FFF;font-size:11px;font-weight:700;text-align:center;background:#2F5496;border:.5pt solid #000;padding:4px}.xl77{font-size:12px;font-weight:700;text-align:right;border:.5pt solid #000;padding:4px 8px}tr{height:22px}</style></head><body><table border="1" style="border-collapse:collapse">';
+  var body='<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40"><head><meta charset="UTF-8"><style>.xl68{color:#FFF;font-size:14px;font-weight:700;text-align:center;background:#2F5496;border:.5pt solid #000;padding:6px}.xl70{font-size:11px;font-weight:700;color:#333;border:.5pt solid #000;padding:4px 8px;background:#F2F2F2}.xl72{font-size:11px;text-align:right;border:.5pt solid #000;padding:4px 8px}.xl73{color:#FFF;font-size:11px;font-weight:700;text-align:center;background:#2F5496;border:.5pt solid #000;padding:4px}.xl77{font-size:12px;font-weight:700;text-align:right;border:.5pt solid #000;padding:4px 8px}tr{height:22px}
+  @media (max-width: 768px) {
+    html{scroll-behavior:smooth;scroll-padding-top:20px}
+    body{-webkit-overflow-scrolling:touch}
+    .container{max-width:100%;padding:8px}
+    .card{padding:10px;scroll-margin-top:20px}
+    .row{flex-wrap:wrap;gap:6px}
+    .row .field{flex:1 1 100%!important;min-width:0}
+    .field input,.field select{font-size:16px;padding:10px 8px}
+    .mode-tab{font-size:0.85rem;padding:10px}
+    h2{font-size:0.95rem}
+    .btn{padding:12px;font-size:1rem}
+    .set-grid{grid-template-columns:1fr}
+    .set-card .srow input{width:60px}
+    .overlay .panel{width:95%;max-height:90vh;overflow-y:auto}
+  }
+</style></head><body><table border="1" style="border-collapse:collapse">';
   body+='<tr><td class="xl68" colspan="2" height="28">浙江国立包装有限公司 瓦楞箱报价表</td></tr>';
   body+='<tr'+st+'>'+l+'日期</td><td class="xl72">'+date+'</td></tr>';
   body+='<tr'+st+'>'+l+'数量</td>'+r+C.qty+'</td></tr>';
