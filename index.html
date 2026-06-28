@@ -53,7 +53,7 @@ h1{text-align:center;font-size:1.5rem;color:#2c3e50;padding:20px 0}
     body{-webkit-overflow-scrolling:touch}
     .container{max-width:100%;padding:8px}
     .card{padding:10px;scroll-margin-top:20px}
-    .field input,.field select{font-size:16px!important;padding:10px 8px}
+    input[type=password],.field input,.field select{font-size:16px!important;padding:10px 8px}
     .mode-tab{font-size:0.85rem;padding:10px}
     h2{font-size:0.95rem}
     .btn{padding:12px;font-size:1rem}
@@ -200,12 +200,12 @@ h1{text-align:center;font-size:1.5rem;color:#2c3e50;padding:20px 0}
     <div class="detail" id="breakdown"></div>
 </div>
 
-<div class="footer">2026.06.28 13:48 · <span onclick="showPwd()" style="cursor:pointer;text-decoration:underline">⚙ 设置</span></div>
+<div class="footer">2026.06.28 20:19 · <span onclick="showPwd()" style="cursor:pointer;text-decoration:underline">⚙ 设置</span></div>
 </div>
 
 <div class="overlay" id="pwdOverlay"><div class="panel" style="max-width:300px;text-align:center">
     <h3>🔐 输入密码</h3>
-    <div style="display:flex;gap:8px"><input type="password" id="pwdInput" placeholder="密码" style="flex:1;padding:10px;border:1px solid #ddd;border-radius:6px" onkeydown="if(event.key==='Enter')checkPwd()"></div>
+    <div style="display:flex;gap:8px"><input type="password" id="pwdInput" placeholder="密码" style="flex:1;padding:10px;border:1px solid #ddd;border-radius:6px;font-size:16px" onkeydown="if(event.key==='Enter')checkPwd()"></div>
     <button class="btn" onclick="checkPwd()" style="margin-top:12px">确认</button>
     <button onclick="document.getElementById('pwdOverlay').classList.remove('show')" style="margin-top:8px;padding:8px 30px;border:1px solid #ddd;border-radius:6px;background:#eee;cursor:pointer">取消</button>
     <p style="font-size:0.75rem;color:#e74c3c;margin-top:8px;display:none" id="pwdError">密码错误</p>
