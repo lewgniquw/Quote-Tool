@@ -63,7 +63,7 @@ h1{text-align:center;font-size:1.5rem;color:#2c3e50;padding:20px 0}
     </div>
     <div class="row" style="margin-top:4px">
         <div class="field"><label>单价 (元/㎡)</label><input type="number" id="cartonPrice" value="" step="0.1"></div>
-        <div class="field"><label>返点 (%)</label><input type="number" id="cartonRebate" value="" step="1" placeholder="留空=0"></div>
+        <div class="field"><label>返点 (%)</label><input type="number" id="cartonRebate" value="10" step="1" placeholder="留空=0"></div>
         <div class="field"><label>纸板长 (cm) <span class="auto-tag">自动</span></label><input type="number" id="cartonBoardL" value="" step="0.1" placeholder="自动或手动"></div>
         <div class="field"><label>纸板宽 (cm) <span class="auto-tag">自动</span></label><input type="number" id="cartonBoardW" value="" step="0.1" placeholder="自动或手动"></div>
     </div>
@@ -84,24 +84,24 @@ h1{text-align:center;font-size:1.5rem;color:#2c3e50;padding:20px 0}
     <div class="row">
         <div class="field"><label>印刷方式</label><select id="cartonPressType" onchange="var pr=document.getElementById('pressRow');var pa=document.getElementById('pressArea');var ba=document.getElementById('pressBaseField');var ov=document.getElementById('pressOverField');var show=this.value==='traditional';pr.style.display=show?'':'none';ba.style.display=show?'':'none';ov.style.display=show?'':'none';pa.style.display=show?'none':''"><option value="traditional">传统印刷</option><option value="area" selected>平方计价</option></select></div>
         <div class="field" id="pressRow" style="display:none"><label>色数</label><select id="cartonColors" onchange="updatePressDefaults()"><option value="1" selected>1色</option><option value="2">2色</option><option value="3">3色</option></select></div>
-        <div class="field" id="pressBaseField" style="display:none"><label>上机费</label><input type="number" id="cartonPressBase" value="15" step="1"></div>
-        <div class="field" id="pressOverField" style="display:none"><label>单价</label><input type="number" id="cartonPressOver" value="0.07" step="0.01"></div>
-        <div class="field" id="pressArea"><label>平方单价</label><input type="number" id="cartonPressArea" value="0.25" step="0.01"></div>
-        <div class="field"><label>柔版费</label><input type="number" id="cartonPlate" value="0" step="1"></div>
+        <div class="field" id="pressBaseField" style="display:none"><label>上机费 (元)</label><input type="number" id="cartonPressBase" value="15" step="1"></div>
+        <div class="field" id="pressOverField" style="display:none"><label>单价 (元/张)</label><input type="number" id="cartonPressOver" value="0.07" step="0.01"></div>
+        <div class="field" id="pressArea"><label>平方单价 (元/㎡)</label><input type="number" id="cartonPressArea" value="0.25" step="0.01"></div>
+        <div class="field"><label>柔版费 (元)</label><input type="number" id="cartonPlate" value="0" step="1"></div>
     </div>
 </div>
 
 <div class="card">
     <h2>🎨 其他</h2>
     <div class="row">
-        <div class="field"><label>糊口/打钉</label><input type="number" id="cartonGlue" value="0.05" step="0.01"><span style="font-size:0.7rem;color:#888">元/个</span></div>
-        <div class="field"><label>运输</label><select id="cartonTransport"></select></div>
+        <div class="field"><label>糊口/打钉 (元/个)</label><input type="number" id="cartonGlue" value="0" step="0.01"></div>
+        <div class="field"><label>运输 (元/㎡)</label><select id="cartonTransport"></select></div>
         <div class="field"><label>损耗(张)</label><input type="number" id="cartonLoss" value="0" step="1"></div>
     </div>
     <div class="row" style="margin-top:4px">
-        <div class="field"><label>数量</label><input type="number" id="quantity" value="" step="1" placeholder=""></div>
+        <div class="field"><label>数量 (个)</label><input type="number" id="quantity" value="" step="1" placeholder=""></div>
         <div class="field"><label>税率 (%)</label><input type="number" id="taxRate" value="7"></div>
-        <div class="field"><label>毛利率 (%)</label><div style="display:flex;gap:0"><button onclick="adjMargin(-1)" style="padding:8px 10px;border:1px solid #ddd;border-radius:6px 0 0 6px;cursor:pointer;background:#f5f5f5">−</button><input type="number" id="marginPct" value="10" style="text-align:center;border-radius:0;border-left:0;border-right:0;font-size:0.82rem"><button onclick="adjMargin(1)" style="padding:8px 10px;border:1px solid #ddd;border-radius:0 6px 6px 0;cursor:pointer;background:#f5f5f5">+</button></div></div>
+        <div class="field"><label>毛利率 (%)</label><input type="number" id="marginPct" value="10"></div>
         <div class="field"><label>其他成本</label><div style="display:flex;gap:4px"><input type="number" id="extraCost" value="" step="0.001" placeholder="外加工等" style="flex:1;min-width:0"><button id="extraCostUnit" onclick="toggleExtraUnit()" style="font-size:0.7rem;padding:0 8px;height:38px;min-width:40px;border:1.5px solid #2980b9;border-radius:3px;background:#ebf5fb;color:#2980b9;cursor:pointer;font-weight:600;flex-shrink:0">元/个</button></div></div>
     </div>
 </div>
@@ -242,7 +242,7 @@ function calculate(){
   // Glue
   var plateFee=parseFloat(document.getElementById('cartonPlate').value)||0;
   var gluePrice=parseFloat(document.getElementById('cartonGlue').value);
-  if(isNaN(gluePrice))gluePrice=0.05;
+  if(isNaN(gluePrice))gluePrice=0;
   var glueCost=gluePrice*qty;
   
   // Transport
@@ -378,7 +378,7 @@ function toggleExtraUnit(){
   var btn=document.getElementById('extraCostUnit');
   btn.textContent=btn.textContent==='元/个'?'总价':'元/个';
 }
-adjMargin=function(d){var el=document.getElementById('marginPct');var v=parseInt(el.value);if(isNaN(v))v=10;v+=d;if(v<0)v=0;el.value=v;};
+
 
 showPwd=function(){document.getElementById('pwdOverlay').classList.add('show');document.getElementById('pwdInput').focus();};
 checkPwd=function(){if(document.getElementById('pwdInput').value===SET_PWD){document.getElementById('pwdOverlay').classList.remove('show');openSettings();}else{document.getElementById('pwdError').style.display='block';}};

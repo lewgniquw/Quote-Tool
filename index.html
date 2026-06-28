@@ -113,10 +113,12 @@ h1{text-align:center;font-size:1.5rem;color:#2c3e50;padding:20px 0}
 
 
 <div class="card">
-    <h2>⚙ 加工费用</h2>
+    <h2>⚙ 加工费用 <span id="dieCutSugg" style="font-size:0.72rem;color:#27ae60;font-weight:bold"></span></h2>
     <div class="row">
         <div class="field"><label>裱瓦 <span class="auto-tag">自动</span></label><input type="text" id="mountDisplay" value="--" readonly style="color:#3498db"></div>
-        <div class="field"><label>模切机型 <span class="help-tip" data-tip="930手动: 900×640mm&#10;1100手动: 1070×760mm&#10;1300自动: 1270×970 / 430×430mm&#10;1500自动: 1470×1070 / 550×550mm&#10;1800手动: 1780×1260mm">?</span> <span id="dieCutSugg" style="font-size:0.7rem;color:#27ae60"></span></label>
+        <div class="field"><label>刀版</label>
+            <select id="dieNew"><option value="0">旧版 (免费)</option><option value="1" selected>新版 (面积×200)</option></select></div>
+        <div class="field"><label>模切机型 <span class="help-tip" data-tip="930手动: 900×640mm&#10;1100手动: 1070×760mm&#10;1300自动: 1270×970 / 430×430mm&#10;1500自动: 1470×1070 / 550×550mm&#10;1800手动: 1780×1260mm">?</span></label>
             <select id="dieCutMachine">
                 <option value="930手动" title="最大 900×640mm">930手动 (装35 加0.08)</option>
                 <option value="1100手动" title="最大 1070×760mm">1100手动 (装35 加0.10)</option>
@@ -138,8 +140,6 @@ h1{text-align:center;font-size:1.5rem;color:#2c3e50;padding:20px 0}
                 <option value="瓦楞 长>80">成品长度 &gt;80cm (0.16)</option>
                 </optgroup>
             </select></div>
-        <div class="field"><label>刀版</label>
-            <select id="dieNew"><option value="0">旧版 (免费)</option><option value="1" selected>新版 (面积×200)</option></select></div>
     </div>
 </div>
 
@@ -280,14 +280,16 @@ function updateDimensions(){
 }
 function suggestDieCut(){
   var pL=parseFloat(document.getElementById('dieL').value)||0,pW=parseFloat(document.getElementById('dieW').value)||0;
-  if(!pL||!pW){document.getElementById('dieCutSugg').textContent='';return;}
+  if(!pL||!pW){var sp2=document.getElementById('dieCutSugg');sp2.textContent='';sp2.style.border='none';sp2.style.padding='0';return;}
   var cmL=pL/10,cmW=pW/10;
   var best=null;
   Object.keys(PRICE.dieCutLimit).forEach(function(k){
     var lim=PRICE.dieCutLimit[k];
     if(cmL<=lim[0]&&cmW<=lim[1]&&!best)best=k;
   });
-  document.getElementById('dieCutSugg').textContent=best?'→ 建议: '+best:'→ 超出最大机型';
+  var sp=document.getElementById('dieCutSugg');
+  if(best){sp.textContent=' → 建议: '+best;sp.style.border='1.5px solid #27ae60';sp.style.borderRadius='3px';sp.style.padding='1px 6px';}
+  else{sp.textContent='';sp.style.border='none';sp.style.padding='0';}
 }
 function calcPressCost(){
   var mKey=document.getElementById('pressMachine').value,cn=document.getElementById('colors').value;
