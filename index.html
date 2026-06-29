@@ -131,7 +131,7 @@ h1{text-align:center;font-size:1.5rem;color:#2c3e50;padding:20px 0}
     <div class="row">
         <div class="field"><label>裱瓦 <span class="auto-tag">自动</span></label><input type="text" id="mountDisplay" value="--" readonly style="color:#3498db"></div>
         <div class="field"><label>刀版</label>
-            <select id="dieNew"><option value="0">旧版 (免费)</option><option value="1" selected>新版 (面积×200)</option></select></div>
+            <select id="dieNew"><option value="0">旧版 (免费)</option><option value="1" selected>新版 (面积×250)</option></select></div>
         <div class="field"><label>模切机型 <span class="help-tip" data-tip="930手动: 900×640mm&#10;1100手动: 1070×760mm&#10;1300自动: 1270×970 / 430×430mm&#10;1500自动: 1470×1070 / 550×550mm&#10;1800手动: 1780×1260mm">?</span></label>
             <select id="dieCutMachine">
                 <option value="930手动" title="最大 900×640mm">930手动 (装35 加0.08)</option>
@@ -200,7 +200,7 @@ h1{text-align:center;font-size:1.5rem;color:#2c3e50;padding:20px 0}
     <div class="detail" id="breakdown"></div>
 </div>
 
-<div class="footer">2026.06.28 20:23 · <span onclick="showPwd()" style="cursor:pointer;text-decoration:underline">⚙ 设置</span></div>
+<div class="footer">2026.06.29 08:49 · <span onclick="showPwd()" style="cursor:pointer;text-decoration:underline">⚙ 设置</span></div>
 </div>
 
 <div class="overlay" id="pwdOverlay"><div class="panel" style="max-width:300px;text-align:center">
@@ -385,10 +385,10 @@ function calculate(){
   var tsKey=document.getElementById('transport').value;
   var tsCost=enTransport?(PRICE.transport[tsKey]||0)*pArea*totalSheets:0;
 
-  // 刀版费：长宽=浪纸各-1cm，新版=面积×200，旧版=0
+  // 刀版费：长宽=浪纸各-1cm，新版=面积×250，旧版=0
   var isNewDie=parseInt(document.getElementById('dieNew').value)||0;
   var dieArea=pL*pW/1000000;
-  var dieFee=isNewDie?dieArea*200:0;
+  var dieFee=isNewDie?dieArea*250:0;
 
   var filmArea=pArea;
   var checks=document.querySelectorAll('#surfaceGroup input:checked'),surfaceList=[],surfaceCost=0;
@@ -490,7 +490,7 @@ function calculate(){
   else{lines.push('【裱瓦】¥'+(pArea*PRICE.mount).toFixed(4)+'/张 × '+totalSheets+'张 = ¥'+mountTotal.toFixed(2)+' → ¥'+(mountCost/nUp).toFixed(4)+'/个');}
   lines.push('');
   lines.push('【刀版】'+(isNewDie?'新版 面积×200':'旧版免费'));
-  if(isNewDie) lines.push('  刀版尺寸 '+pL.toFixed(0)+'×'+pW.toFixed(0)+'mm = '+dieArea.toFixed(4)+'㎡ × 200 = ¥'+dieFee.toFixed(2)+' → ¥'+(dieFee/totalSheets).toFixed(4)+'/张 → ¥'+(dieFee/qty).toFixed(4)+'/个');
+  if(isNewDie) lines.push('  刀版尺寸 '+pL.toFixed(0)+'×'+pW.toFixed(0)+'mm = '+dieArea.toFixed(4)+'㎡ × 250 = ¥'+dieFee.toFixed(2)+' → ¥'+(dieFee/totalSheets).toFixed(4)+'/张 → ¥'+(dieFee/qty).toFixed(4)+'/个');
   lines.push('');
   // 模切
   if(!enDieCut){lines.push('【模切】已跳过');}
@@ -579,7 +579,7 @@ function exportXLS(){
     return sel.length?sel.join('+'):'';
   })()},
     {key:'mount',name:'裱瓦',desc:(C.mountPrice||'')+'/'+String.fromCharCode(13217)},
-    {key:'die',name:'刀版',desc:'新版x200'},
+    {key:'die',name:'刀版',desc:'新版x250'},
     {key:'dieCut',name:'模切',desc:C.dcKey||''},
     {key:'glue',name:'粘盒',desc:(C.gluePrice||'')+'/'+String.fromCharCode(20010)},
     {key:'transport',name:'运输',desc:(C.tsKey||'')+' '+(C.tsPrice||'')+'/'+String.fromCharCode(13217)},
