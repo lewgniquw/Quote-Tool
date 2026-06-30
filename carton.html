@@ -89,7 +89,7 @@ h1{text-align:center;font-size:1.5rem;color:#2c3e50;padding:20px 0}
     <div class="row">
         <div class="field"><label>刀版费</label><select id="cartonDie"><option value="0" selected>不需要</option><option value="1">新版 ×250</option></select></div>
         <div class="field"><label>模切机型</label><select id="cartonDieCut" onchange="document.getElementById('cartonPieces').disabled=this.value==='0'"><option value="0" selected>不需要</option></select></div>
-        <div class="field"><label>拼版数</label><input type="number" id="cartonPieces" value="" step="1" placeholder="不模切不填" disabled></div>
+        <div class="field"><label>拼版数</label><div style="display:flex;gap:0"><button onclick="adjInput('cartonPieces',-1,1)" style="padding:8px 10px;border:1px solid #ddd;border-radius:6px 0 0 6px;cursor:pointer;background:#f5f5f5;font-size:0.9rem">−</button><input type="number" id="cartonPieces" value="" step="1" placeholder="不模切不填" disabled style="text-align:center;border-radius:0;border-left:0;border-right:0"><button onclick="adjInput('cartonPieces',1,1)" style="padding:8px 10px;border:1px solid #ddd;border-radius:0 6px 6px 0;cursor:pointer;background:#f5f5f5;font-size:0.9rem">+</button></div></div>
     </div>
 </div>
 
@@ -114,8 +114,8 @@ h1{text-align:center;font-size:1.5rem;color:#2c3e50;padding:20px 0}
     </div>
     <div class="row" style="margin-top:4px">
         <div class="field"><label>数量 (个)</label><input type="number" id="quantity" value="" step="1" placeholder=""></div>
-        <div class="field"><label>税率 (%)</label><input type="number" id="taxRate" value="7"></div>
-        <div class="field"><label>毛利率 (%)</label><input type="number" id="marginPct" value="10"></div>
+        <div class="field"><label>税率 (%)</label><div style="display:flex;gap:0"><button onclick="adjInput('taxRate',-1,0,20)" style="padding:8px 10px;border:1px solid #ddd;border-radius:6px 0 0 6px;cursor:pointer;background:#f5f5f5;font-size:0.9rem">−</button><input type="number" id="taxRate" value="7" style="text-align:center;border-radius:0;border-left:0;border-right:0"><button onclick="adjInput('taxRate',1,0,20)" style="padding:8px 10px;border:1px solid #ddd;border-radius:0 6px 6px 0;cursor:pointer;background:#f5f5f5;font-size:0.9rem">+</button></div></div>
+        <div class="field"><label>毛利率 (%)</label><div style="display:flex;gap:0"><button onclick="adjInput('marginPct',-1,0,200)" style="padding:8px 10px;border:1px solid #ddd;border-radius:6px 0 0 6px;cursor:pointer;background:#f5f5f5;font-size:0.9rem">−</button><input type="number" id="marginPct" value="10" style="text-align:center;border-radius:0;border-left:0;border-right:0"><button onclick="adjInput('marginPct',1,0,200)" style="padding:8px 10px;border:1px solid #ddd;border-radius:0 6px 6px 0;cursor:pointer;background:#f5f5f5;font-size:0.9rem">+</button></div></div>
         <div class="field"><label>其他成本</label><div style="display:flex;gap:4px"><input type="number" id="extraCost" value="" step="0.001" placeholder="外加工等" style="flex:1;min-width:0"><button id="extraCostUnit" onclick="toggleExtraUnit()" style="font-size:0.7rem;padding:0 8px;height:38px;min-width:40px;border:1.5px solid #2980b9;border-radius:3px;background:#ebf5fb;color:#2980b9;cursor:pointer;font-weight:600;flex-shrink:0">元/个</button></div></div>
     </div>
 </div>
@@ -128,7 +128,7 @@ h1{text-align:center;font-size:1.5rem;color:#2c3e50;padding:20px 0}
     <div class="detail" id="breakdown"></div>
 </div>
 
-<div class="footer">2026.06.29 08:49 · <span onclick="showPwd()" style="cursor:pointer;text-decoration:underline">⚙ 设置</span></div>
+<div class="footer">2026.06.30 10:14 · <span onclick="showPwd()" style="cursor:pointer;text-decoration:underline">⚙ 设置</span></div>
 </div>
 
 <div class="overlay" id="pwdOverlay"><div class="panel" style="max-width:300px;text-align:center">
@@ -187,6 +187,7 @@ var PRICE = {
 };
 var SET_PWD='+987';
 
+adjInput=function(id,d,min,max){var el=document.getElementById(id);var v=parseInt(el.value)||0;v+=d;if(min!==undefined&&v<min)v=min;if(max!==undefined&&v>max)v=max;el.value=v;};
 function updatePressDefaults(){
   var cn=document.getElementById('cartonColors').value;
   var d=PRICE.press[cn];

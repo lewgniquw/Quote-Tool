@@ -72,7 +72,7 @@ h1{text-align:center;font-size:1.5rem;color:#2c3e50;padding:20px 0}
     <div class="row">
         <div class="field"><label>刀版长 (mm)</label><input type="number" id="dieL" value="" step="1" placeholder="" oninput="updateDimensions()"></div>
         <div class="field"><label>刀版宽 (mm)</label><input type="number" id="dieW" value="" step="1" placeholder="" oninput="updateDimensions()"></div>
-        <div class="field"><label>拼版数 (个/张)</label><input type="number" id="piecesPerSheet" value="1" step="1"></div>
+        <div class="field"><label>拼版数 (个/张)</label><div style="display:flex;gap:0"><button onclick="adjInput('piecesPerSheet',-1,1)" style="padding:8px 10px;border:1px solid #ddd;border-radius:6px 0 0 6px;cursor:pointer;background:#f5f5f5;font-size:0.9rem">−</button><input type="number" id="piecesPerSheet" value="1" step="1" style="text-align:center;border-radius:0;border-left:0;border-right:0"><button onclick="adjInput('piecesPerSheet',1,1)" style="padding:8px 10px;border:1px solid #ddd;border-radius:0 6px 6px 0;cursor:pointer;background:#f5f5f5;font-size:0.9rem">+</button></div></div>
     </div>
 </div>
 
@@ -179,13 +179,13 @@ h1{text-align:center;font-size:1.5rem;color:#2c3e50;padding:20px 0}
     </div>
     <div class="row" style="margin-top:8px">
         <div class="field"><label>数量 (个)</label><input type="number" id="quantity" value="" placeholder="必填" min="1" step="100"></div>
-        <div class="field"><label>税率 (%)</label><input type="number" id="taxRate" value="7" min="0" max="20" step="1"></div>
+        <div class="field"><label>税率 (%)</label><div style="display:flex;gap:0"><button onclick="adjInput('taxRate',-1,0,20)" style="padding:8px 10px;border:1px solid #ddd;border-radius:6px 0 0 6px;cursor:pointer;background:#f5f5f5;font-size:0.9rem">−</button><input type="number" id="taxRate" value="7" min="0" max="20" step="1" style="text-align:center;border-radius:0;border-left:0;border-right:0"><button onclick="adjInput('taxRate',1,0,20)" style="padding:8px 10px;border:1px solid #ddd;border-radius:0 6px 6px 0;cursor:pointer;background:#f5f5f5;font-size:0.9rem">+</button></div></div>
         <div class="field">
             <label>毛利率 (%)</label>
             <div style="display:flex;align-items:center;gap:4px">
-                <button onclick="adjMargin(-1)" style="min-width:28px;height:38px;border:1px solid #ddd;border-radius:6px;background:#fafafa;cursor:pointer;font-size:1.2rem;flex:1">−</button>
+                <button onclick="adjInput('marginPct',-1,0,200)" style="min-width:28px;height:38px;border:1px solid #ddd;border-radius:6px;background:#fafafa;cursor:pointer;font-size:1.2rem;flex:1">−</button>
                 <input type="number" id="marginPct" value="15" min="0" max="200" step="1" style="flex:1;min-width:50px;padding:10px 6px;text-align:center">
-                <button onclick="adjMargin(1)" style="min-width:28px;height:38px;border:1px solid #ddd;border-radius:6px;background:#fafafa;cursor:pointer;font-size:1.2rem;flex:1">+</button>
+                <button onclick="adjInput('marginPct',1,0,200)" style="min-width:28px;height:38px;border:1px solid #ddd;border-radius:6px;background:#fafafa;cursor:pointer;font-size:1.2rem;flex:1">+</button>
             </div>
         </div>
     </div>
@@ -200,7 +200,7 @@ h1{text-align:center;font-size:1.5rem;color:#2c3e50;padding:20px 0}
     <div class="detail" id="breakdown"></div>
 </div>
 
-<div class="footer">2026.06.29 15:37 · <span onclick="showPwd()" style="cursor:pointer;text-decoration:underline">⚙ 设置</span></div>
+<div class="footer">2026.06.30 10:14 · <span onclick="showPwd()" style="cursor:pointer;text-decoration:underline">⚙ 设置</span></div>
 </div>
 
 <div class="overlay" id="pwdOverlay"><div class="panel" style="max-width:300px;text-align:center">
@@ -540,6 +540,7 @@ onSurfaceChange=function(){
   document.getElementById('warnOil').style.display=oil>1?'inline':'none';
   document.getElementById('warnFoil').style.display=foil>1?'inline':'none';
 };
+adjInput=function(id,d,min,max){var el=document.getElementById(id);var v=parseInt(el.value)||0;v+=d;if(min!==undefined&&v<min)v=min;if(max!==undefined&&v>max)v=max;el.value=v;};
 adjMargin=function(d){var el=document.getElementById('marginPct');var v=parseInt(el.value);if(isNaN(v))v=15;v+=d;if(v<0)v=0;if(v>200)v=200;el.value=v;};
 
 document.getElementById('dieL').addEventListener('input',function(){updateDimensions();calcPressCost();});
