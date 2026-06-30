@@ -109,7 +109,16 @@ h1{text-align:center;font-size:1.5rem;color:#2c3e50;padding:20px 0}
     <h2>🎨 其他</h2>
     <div class="row">
         <div class="field"><label>糊口/打钉 (元/个)</label><input type="number" id="cartonGlue" value="0" step="0.01"></div>
-        <div class="field"><label>运输 (元/㎡)</label><select id="cartonTransport"></select></div>
+        <div class="field"><label>运输 (元/㎡)</label><select id="cartonTransport"><option value="无需物流">无需物流</option>
+<option value="龙泉">龙泉 0.08</option>
+<option value="庆元">庆元 0.12</option>
+<option value="政和">政和 0.15</option>
+<option value="景宁">景宁 0.15</option>
+<option value="丽水">丽水 0.18</option>
+<option value="建瓯">建瓯 0.25</option>
+<option value="松阳">松阳 0.25</option>
+<option value="0.3">0.30</option>
+<option value="0.35">0.35</option></select></div>
         <div class="field"><label>损耗(张)</label><input type="number" id="cartonLoss" value="0" step="1"></div>
     </div>
     <div class="row" style="margin-top:4px">
@@ -128,7 +137,7 @@ h1{text-align:center;font-size:1.5rem;color:#2c3e50;padding:20px 0}
     <div class="detail" id="breakdown"></div>
 </div>
 
-<div class="footer">2026.06.30 18:39 · <span onclick="showPwd()" style="cursor:pointer;text-decoration:underline">⚙ 设置</span></div>
+<div class="footer">2026.06.30 19:31 · <span onclick="showPwd()" style="cursor:pointer;text-decoration:underline">⚙ 设置</span></div>
 </div>
 
 <div class="overlay" id="pwdOverlay"><div class="panel" style="max-width:300px;text-align:center">
@@ -182,7 +191,7 @@ h1{text-align:center;font-size:1.5rem;color:#2c3e50;padding:20px 0}
 var PRICE = {
   press: {1:[15,0.07],2:[22,0.085],3:[30,0.10]},
   dieCut: {"930手动":[35,0.08],"1100手动":[35,0.10],"1300自动":[40,0.12],"1500自动":[50,0.20],"1800手动":[50,0.30]},
-  transport: {"庆元":0.12,"龙泉":0.08,"政和":0.15,"建瓯":0.25,"景宁":0.15,"丽水":0.18,"松阳":0.25},
+  transport: {"庆元":0.12,"龙泉":0.08,"政和":0.15,"建瓯":0.25,"景宁":0.15,"丽水":0.18,"松阳":0.25,"无需物流":0,"0.3":0.3,"0.35":0.35},
   dieCutLimit: {"930手动":[90,64],"1100手动":[107,76],"1300自动":[127,97],"1500自动":[147,107],"1800手动":[178,126]}
 };
 var SET_PWD='+987';
@@ -365,7 +374,7 @@ function exportXLS(){
   else if(C.board>0)costRows.push({name:'印刷-平方计价',val:0});
   if(C.glue>0)costRows.push({name:'糊口/打钉',val:C.glue});
   if(C.transport>0)costRows.push({name:'运输-'+C.tsKey,val:C.transport});
-  if(C.extra>0)costRows.push({name:'其他成本',val:C.extra});
+  if(C.extra>0){var eu=document.getElementById('extraCostUnit');costRows.push({name:'其他成本-'+eu.options[eu.selectedIndex].text,val:C.extra});}
   var totalCost=0;
   costRows.forEach(function(r){totalCost+=r.val;});
   var singleCost=totalCost/C.qty;

@@ -174,7 +174,16 @@ h1{text-align:center;font-size:1.5rem;color:#2c3e50;padding:20px 0}
 <div class="card">
     <h2>🎨 其他</h2>
     <div class="row">
-        <div class="field" style="flex:1.5"><label>运输区域 (元/㎡)</label><select id="transport"><option value="庆元">庆元 0.12</option><option value="龙泉">龙泉 0.08</option><option value="政和">政和 0.15</option><option value="建瓯">建瓯 0.25</option><option value="景宁">景宁 0.15</option><option value="丽水">丽水 0.18</option><option value="松阳">松阳 0.25</option></select></div>
+        <div class="field" style="flex:1.5"><label>运输区域 (元/㎡)</label><select id="transport"><option value="无需物流">无需物流</option>
+<option value="龙泉">龙泉 0.08</option>
+<option value="庆元">庆元 0.12</option>
+<option value="政和">政和 0.15</option>
+<option value="景宁">景宁 0.15</option>
+<option value="丽水">丽水 0.18</option>
+<option value="建瓯">建瓯 0.25</option>
+<option value="松阳">松阳 0.25</option>
+<option value="0.3">0.30</option>
+<option value="0.35">0.35</option></select></div>
         <div class="field" style="flex:1.5"><label>其他成本</label><div style="display:flex;gap:4px"><input type="number" id="extraCost" value="" step="0.001" placeholder="外加工等" style="flex:1;min-width:0"><select id="extraCostUnit" style="width:auto;padding:0 4px;height:38px;border:1.5px solid #2980b9;border-radius:3px;background:#ebf5fb;color:#2980b9;font-weight:600;font-size:0.75rem;flex-shrink:0;text-align:center"><option value="per">元/个</option><option value="total">总价</option><option value="area">元/㎡</option></select></div></div>
     </div>
     <div class="row" style="margin-top:8px">
@@ -200,7 +209,7 @@ h1{text-align:center;font-size:1.5rem;color:#2c3e50;padding:20px 0}
     <div class="detail" id="breakdown"></div>
 </div>
 
-<div class="footer">2026.06.30 18:39 · <span onclick="showPwd()" style="cursor:pointer;text-decoration:underline">⚙ 设置</span></div>
+<div class="footer">2026.06.30 19:31 · <span onclick="showPwd()" style="cursor:pointer;text-decoration:underline">⚙ 设置</span></div>
 </div>
 
 <div class="overlay" id="pwdOverlay"><div class="panel" style="max-width:300px;text-align:center">
@@ -240,7 +249,7 @@ var PRICE = {
   mount: 0.20,
   dieCut: {"930手动":[35,0.08],"1100手动":[35,0.10],"1300自动":[40,0.12],"1500自动":[50,0.20],"1800手动":[50,0.30]},
   glue: {"卡盒 糊口<20":0.03,"卡盒 展开>80":0.05,"瓦楞 糊口<20":0.05,"瓦楞 糊口20~30":0.065,"瓦楞 糊口>30":0.08,"瓦楞 长>60":0.13,"瓦楞 长>80":0.16},
-  transport: {"庆元":0.12,"龙泉":0.08,"政和":0.15,"建瓯":0.25,"景宁":0.15,"丽水":0.18,"松阳":0.25},
+  transport: {"庆元":0.12,"龙泉":0.08,"政和":0.15,"建瓯":0.25,"景宁":0.15,"丽水":0.18,"松阳":0.25,"无需物流":0,"0.3":0.3,"0.35":0.35},
   dieCutLimit: {"930手动":[90,64],"1100手动":[107,76],"1300自动":[127,97],"1500自动":[147,107],"1800手动":[178,126]}
 };
 // 从 localStorage 恢复设置价格
@@ -484,9 +493,9 @@ function calculate(){
     lines.push('');
   }// 裱瓦
   if(!enMount){lines.push('【裱瓦】已跳过');}
-  else{lines.push('【裱瓦】¥'+PRICE.mount.toFixed(2)+'/㎡ × '+pArea.toFixed(4)+'㎡ × '+totalSheets+'张 = ¥'+mountTotal.toFixed(2)+' → ¥'+(mountCost/totalSheets).toFixed(4)+'/张 → ¥'+(mountCost/qty).toFixed(4)+'/个');}
+  else{lines.push('【裱瓦】¥'+PRICE.mount.toFixed(2)+'/㎡ × '+pArea.toFixed(4)+'㎡ × '+totalSheets+'张 = ¥'+mountTotal.toFixed(2)+' → ¥'+mountCost.toFixed(4)+'/张 → ¥'+(mountCost/nUp).toFixed(4)+'/个');}
   lines.push('');
-  lines.push('【刀版】'+(isNewDie?'新版 面积×200':'旧版免费'));
+  lines.push('【刀版】'+(isNewDie?'新版 面积×250':'旧版免费'));
   if(isNewDie) lines.push('  刀版尺寸 '+pL.toFixed(0)+'×'+pW.toFixed(0)+'mm = '+dieArea.toFixed(4)+'㎡ × 250 = ¥'+dieFee.toFixed(2)+' → ¥'+(dieFee/totalSheets).toFixed(4)+'/张 → ¥'+(dieFee/qty).toFixed(4)+'/个');
   lines.push('');
   // 模切
@@ -517,7 +526,7 @@ function calculate(){
   }
   
   lines.push('<hr>');
-  lines.push('<span style="word-break:break-all">面纸 ¥'+paperTotal.toFixed(2)+' + 浪纸 ¥'+fluteTotal.toFixed(2)+' + 印刷 ¥'+pressTotal.toFixed(2)+' + 裱瓦 ¥'+mountTotal.toFixed(2)+' + 模切 ¥'+dieCutCost.toFixed(2)+' + 粘盒 ¥'+glueCost.toFixed(2)+' + 刀版 ¥'+dieFee.toFixed(2)+' + 运输 ¥'+tsCost.toFixed(2)+' + 表面 ¥'+surfaceCost.toFixed(2)+' + 其他 ¥'+extraCost.toFixed(2)+' = <b>合计 ¥'+allCost.toFixed(2)+'</b></span>');
+  lines.push('<span style="word-break:break-all">面纸 ¥'+paperTotal.toFixed(2)+' + 浪纸 ¥'+fluteTotal.toFixed(2)+' + 印刷 ¥'+pressTotal.toFixed(2)+' + 表面 ¥'+surfaceCost.toFixed(2)+' + 裱瓦 ¥'+mountTotal.toFixed(2)+' + 刀版 ¥'+dieFee.toFixed(2)+' + 模切 ¥'+dieCutCost.toFixed(2)+' + 粘盒 ¥'+glueCost.toFixed(2)+' + 运输 ¥'+tsCost.toFixed(2)+' + 其他 ¥'+extraCost.toFixed(2)+' = <b>合计 ¥'+allCost.toFixed(2)+'</b></span>');
   lines.push('<hr>');
   lines.push('成本价 ¥'+cpu.toFixed(4)+'/个 (¥'+allCost.toFixed(2)+' ÷ '+qty+'个)');
   lines.push('含税价 ¥'+taxPrice.toFixed(4)+'/个 (¥'+cpu.toFixed(4)+' × '+(1+tax).toFixed(2)+')');
@@ -583,7 +592,7 @@ function exportXLS(){
     {key:'dieCut',name:'模切',desc:C.dcKey||''},
     {key:'glue',name:'粘盒',desc:(C.gluePrice||'')+'/'+String.fromCharCode(20010)},
     {key:'transport',name:'运输',desc:(C.tsKey||'')+' '+(C.tsPrice||'')+'/'+String.fromCharCode(13217)},
-    {key:'extra',name:'其他成本',desc:''}
+    {key:'extra',name:'其他成本',desc:(function(){var u=document.getElementById('extraCostUnit');return u.options[u.selectedIndex].text;})()}
   ];
   var totalCost=0;
   items.forEach(function(it){
