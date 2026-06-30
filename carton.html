@@ -116,7 +116,7 @@ h1{text-align:center;font-size:1.5rem;color:#2c3e50;padding:20px 0}
         <div class="field"><label>数量 (个)</label><input type="number" id="quantity" value="" step="1" placeholder=""></div>
         <div class="field"><label>税率 (%)</label><div style="display:flex;gap:0"><button onclick="adjInput('taxRate',-1,0,20)" style="padding:8px 10px;border:1px solid #ddd;border-radius:6px 0 0 6px;cursor:pointer;background:#f5f5f5;font-size:0.9rem">−</button><input type="number" id="taxRate" value="7" style="text-align:center;border-radius:0;border-left:0;border-right:0"><button onclick="adjInput('taxRate',1,0,20)" style="padding:8px 10px;border:1px solid #ddd;border-radius:0 6px 6px 0;cursor:pointer;background:#f5f5f5;font-size:0.9rem">+</button></div></div>
         <div class="field"><label>毛利率 (%)</label><div style="display:flex;gap:0"><button onclick="adjInput('marginPct',-1,0,200)" style="padding:8px 10px;border:1px solid #ddd;border-radius:6px 0 0 6px;cursor:pointer;background:#f5f5f5;font-size:0.9rem">−</button><input type="number" id="marginPct" value="10" style="text-align:center;border-radius:0;border-left:0;border-right:0"><button onclick="adjInput('marginPct',1,0,200)" style="padding:8px 10px;border:1px solid #ddd;border-radius:0 6px 6px 0;cursor:pointer;background:#f5f5f5;font-size:0.9rem">+</button></div></div>
-        <div class="field"><label>其他成本</label><div style="display:flex;gap:4px"><input type="number" id="extraCost" value="" step="0.001" placeholder="外加工等" style="flex:1;min-width:0"><button id="extraCostUnit" onclick="toggleExtraUnit()" style="font-size:0.7rem;padding:0 8px;height:38px;min-width:40px;border:1.5px solid #2980b9;border-radius:3px;background:#ebf5fb;color:#2980b9;cursor:pointer;font-weight:600;flex-shrink:0">元/个</button></div></div>
+        <div class="field"><label>其他成本</label><div style="display:flex;gap:4px"><input type="number" id="extraCost" value="" step="0.001" placeholder="外加工等" style="flex:1;min-width:0"><select id="extraCostUnit" style="width:auto;padding:0 4px;height:38px;border:1.5px solid #2980b9;border-radius:3px;background:#ebf5fb;color:#2980b9;font-weight:600;font-size:0.7rem;flex-shrink:0;text-align:center"><option value="per">元/个</option><option value="total">总价</option><option value="area" selected>元/㎡</option></select></div></div>
     </div>
 </div>
 <div class="row" style="gap:8px"><button class="btn" onclick="calculate()" style="flex:1">💰 计算报价</button><button class="btn" id="btnExport" onclick="exportXLS()" style="flex:1;background:#27ae60;display:none">📥 导出报价表</button></div>
@@ -267,8 +267,8 @@ function calculate(){
   
   // Extra
   var extraVal=parseFloat(document.getElementById('extraCost').value)||0;
-  var extraUnit=document.getElementById('extraCostUnit').textContent;
-  var extraCost=extraUnit==='元/个'?extraVal*qty:extraVal;
+  var extraUnitSel=document.getElementById('extraCostUnit');var extraUnit=extraUnitSel.options[extraUnitSel.selectedIndex].text;
+  var extraCost=extraUnit==='元/个'?extraVal*qty:extraUnit==='元/㎡'?extraVal*boardArea*totalSheets:extraVal;
   
   window._costs={
     board:boardTotal,die:dieFee,dieCut:dieCutCost,press:pressCost,
@@ -327,7 +327,16 @@ function calculate(){
   lines.push('【糊口/打钉】¥'+gluePrice.toFixed(2)+'/个 × '+qty+'个 = ¥'+glueCost.toFixed(2));
   lines.push('');
   if(tsPrice>0){lines.push('【运输】'+tsKey+' ¥'+tsPrice.toFixed(2)+'/㎡ × '+boardArea.toFixed(4)+'㎡ × '+totalSheets+'张 = ¥'+tsCost.toFixed(2)+' → ¥'+(tsCost/qty).toFixed(4)+'/个');lines.push('');}
-  if(extraCost>0){lines.push('【其他成本】'+(extraUnit==='元/个'?'¥'+extraVal.toFixed(4)+'/个×'+qty+'个=':'总价')+' ¥'+extraCost.toFixed(2));lines.push('');}
+  if(extraCost>0){
+    if(extraUnit==='元/个'){
+      lines.push('【其他成本】¥'+extraVal.toFixed(4)+'/个 × '+qty+'个 = ¥'+extraCost.toFixed(2)+' → ¥'+(extraCost/totalSheets).toFixed(4)+'/张 → ¥'+extraVal.toFixed(4)+'/个');
+    }else if(extraUnit==='元/㎡'){
+      lines.push('【其他成本】¥'+extraVal.toFixed(2)+'/㎡ × '+boardArea.toFixed(4)+'㎡ × '+totalSheets+'张 = ¥'+extraCost.toFixed(2)+' → ¥'+(extraCost/totalSheets).toFixed(4)+'/张 → ¥'+(extraCost/qty).toFixed(4)+'/个');
+    }else{
+      lines.push('【其他成本】总价 ¥'+extraCost.toFixed(2)+' → ¥'+(extraCost/qty).toFixed(4)+'/个');
+    }
+    lines.push('');
+  }
   
   lines.push('<hr>');
   lines.push('纸板 ¥'+boardTotal.toFixed(2)+' + 刀版 ¥'+dieFee.toFixed(2)+' + 模切 ¥'+dieCutCost.toFixed(2)+' + 印刷 ¥'+pressCost.toFixed(2)+' + 柔版 ¥'+plateFee.toFixed(2)+' + 糊口 ¥'+glueCost.toFixed(2)+' + 运输 ¥'+tsCost.toFixed(2)+' + 其他 ¥'+extraCost.toFixed(2)+'  + 柔版 ¥'+plateFee.toFixed(2)+' = <b>合计 ¥'+allCost.toFixed(2)+'</b>');
