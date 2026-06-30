@@ -128,7 +128,7 @@ h1{text-align:center;font-size:1.5rem;color:#2c3e50;padding:20px 0}
     <div class="detail" id="breakdown"></div>
 </div>
 
-<div class="footer">2026.06.30 11:57 · <span onclick="showPwd()" style="cursor:pointer;text-decoration:underline">⚙ 设置</span></div>
+<div class="footer">2026.06.30 14:03 · <span onclick="showPwd()" style="cursor:pointer;text-decoration:underline">⚙ 设置</span></div>
 </div>
 
 <div class="overlay" id="pwdOverlay"><div class="panel" style="max-width:300px;text-align:center">
@@ -202,7 +202,7 @@ function calcCartonBoard(){
   var h=parseFloat(document.getElementById('cartonH').value)||0;
   if(document.getElementById('cartonType').value!=='manual'&&(!l||!w||!h))return;
   var boardL=(l+w)*2+3.5;
-  var boardW=type==='fullcover'?w+h+w:w+h;
+  var boardW=type==='fullcover'?w+h+w:w+h+0.4;
   var dir=document.getElementById('cartonFluteDir').value;
   if(dir==='vertical'){boardW+=2;}else{var tmp=boardL;boardL=boardW;boardW=tmp+2;}
   document.getElementById('cartonBoardL').value=boardL.toFixed(1);
