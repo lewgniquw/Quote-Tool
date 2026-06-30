@@ -200,7 +200,7 @@ h1{text-align:center;font-size:1.5rem;color:#2c3e50;padding:20px 0}
     <div class="detail" id="breakdown"></div>
 </div>
 
-<div class="footer">2026.06.30 11:57 · <span onclick="showPwd()" style="cursor:pointer;text-decoration:underline">⚙ 设置</span></div>
+<div class="footer">2026.06.30 18:39 · <span onclick="showPwd()" style="cursor:pointer;text-decoration:underline">⚙ 设置</span></div>
 </div>
 
 <div class="overlay" id="pwdOverlay"><div class="panel" style="max-width:300px;text-align:center">
@@ -308,7 +308,7 @@ function calcPressCost(){
   var tier=press[cn]||[0,0];
   var nUp=parseInt(document.getElementById('piecesPerSheet').value)||1;
   var qty=parseInt(document.getElementById('quantity').value)||0;
-  var totalSheets=Math.ceil(qty>0?qty:nUp?1000/nUp:1000);
+  var totalSheets=qty>0?Math.ceil(qty/nUp):(nUp?Math.ceil(1000/nUp):1000);
   var base=tier[0],overflow=tier[1];
   var totalCost=totalSheets<=3000?base:base+overflow*(totalSheets-3000);
   var costPerK=totalCost/((qty>0?qty:1000)/1000);
