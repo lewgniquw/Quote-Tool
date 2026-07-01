@@ -72,7 +72,7 @@ h1{text-align:center;font-size:1.5rem;color:#2c3e50;padding:20px 0}
         <div class="field"><label>纸箱长 (cm)</label><input type="number" id="cartonL" value="" step="0.1" oninput="calcCartonBoard()"></div>
         <div class="field"><label>纸箱宽 (cm)</label><input type="number" id="cartonW" value="" step="0.1" oninput="calcCartonBoard()"></div>
         <div class="field"><label>纸箱高 (cm)</label><input type="number" id="cartonH" value="" step="0.1" oninput="calcCartonBoard()"></div>
-        <div class="field"><label>盒型</label><select id="cartonType" onchange="calcCartonBoard()"><option value="normal" selected>普通</option><option value="fullcover">全盖</option><option value="manual">异形</option></select></div>
+        <div class="field"><label>盒型</label><select id="cartonType" onchange="calcCartonBoard()"><option value="normal" selected>普通</option><option value="fullcover">全盖</option><option value="zhongkai">中开</option><option value="tiandigai">天地盖</option><option value="manual">异形</option></select></div>
         <div class="field"><label>瓦楞方向</label><select id="cartonFluteDir" onchange="calcCartonBoard()"><option value="vertical" selected>竖瓦</option><option value="horizontal">横瓦</option></select></div>
     </div>
     <div class="row" style="margin-top:4px">
@@ -137,7 +137,7 @@ h1{text-align:center;font-size:1.5rem;color:#2c3e50;padding:20px 0}
     <div class="detail" id="breakdown"></div>
 </div>
 
-<div class="footer">2026.06.30 19:31 · <span onclick="showPwd()" style="cursor:pointer;text-decoration:underline">⚙ 设置</span></div>
+<div class="footer">2026.07.01 20:58 · <span onclick="showPwd()" style="cursor:pointer;text-decoration:underline">⚙ 设置</span></div>
 </div>
 
 <div class="overlay" id="pwdOverlay"><div class="panel" style="max-width:300px;text-align:center">
@@ -210,8 +210,11 @@ function calcCartonBoard(){
   var w=parseFloat(document.getElementById('cartonW').value)||0;
   var h=parseFloat(document.getElementById('cartonH').value)||0;
   if(document.getElementById('cartonType').value!=='manual'&&(!l||!w||!h))return;
-  var boardL=(l+w)*2+3.5;
-  var boardW=type==='fullcover'?w+h+w:w+h+0.4;
+  var boardL,boardW;
+  if(type==='zhongkai'){boardL=h*2+l;boardW=w+h+w+h;}
+  else if(type==='tiandigai'){boardL=l+2*h;boardW=2*h+w;}
+  else if(type==='fullcover'){boardL=(l+w)*2+3.5;boardW=w+h+w;}
+  else{boardL=(l+w)*2+3.5;boardW=w+h+0.4;}
   var dir=document.getElementById('cartonFluteDir').value;
   if(dir==='vertical'){boardW+=2;}else{var tmp=boardL;boardL=boardW;boardW=tmp+2;}
   document.getElementById('cartonBoardL').value=boardL.toFixed(1);
@@ -310,13 +313,13 @@ function calculate(){
   lines.push('  纸板: '+boardL.toFixed(1)+'×'+boardW.toFixed(1)+'cm = '+boardArea.toFixed(4)+'㎡');
   var joinLabel=document.getElementById('cartonJoin')?'':'';
   if(document.getElementById('cartonType').value!=='manual'&&l&&w&&h){
-    var rawL=(l+w)*2+3.5;
-    var rawW=(document.getElementById('cartonType').value==='fullcover'?w+h+w:w+h);
+    var ct=document.getElementById('cartonType').value;
+    var rawL,rawW,fl,fw;
+    if(ct==='zhongkai'){rawL=h*2+l;rawW=w+h+w+h;fl='  长='+h.toFixed(1)+'×2+'+l.toFixed(1)+'='+rawL.toFixed(1);fw='  宽='+w.toFixed(1)+'+'+h.toFixed(1)+'+'+w.toFixed(1)+'+'+h.toFixed(1)+'='+rawW.toFixed(1);}
+    else if(ct==='tiandigai'){rawL=l+2*h;rawW=2*h+w;fl='  长='+l.toFixed(1)+'+2×'+h.toFixed(1)+'='+rawL.toFixed(1);fw='  宽=2×'+h.toFixed(1)+'+'+w.toFixed(1)+'='+rawW.toFixed(1);}
+    else if(ct==='fullcover'){rawL=(l+w)*2+3.5;rawW=w+h+w;fl='  长=('+l.toFixed(1)+'+'+w.toFixed(1)+')×2+3.5='+rawL.toFixed(1);fw='  宽='+w.toFixed(1)+'+'+h.toFixed(1)+'+'+w.toFixed(1)+'='+rawW.toFixed(1);}
+    else{rawL=(l+w)*2+3.5;rawW=w+h+0.4;fl='  长=('+l.toFixed(1)+'+'+w.toFixed(1)+')×2+3.5='+rawL.toFixed(1);fw='  宽='+w.toFixed(1)+'+'+h.toFixed(1)+'+0.4='+rawW.toFixed(1);}
     var dir=document.getElementById('cartonFluteDir').value;
-    var fl='  长=('+l.toFixed(1)+'+'+w.toFixed(1)+')×2+3.5='+rawL.toFixed(1);
-    var fw='  宽=';
-    if(document.getElementById('cartonType').value==='fullcover')fw+=w.toFixed(1)+'+'+h.toFixed(1)+'+'+w.toFixed(1)+'='+rawW.toFixed(1);
-    else fw+=w.toFixed(1)+'+'+h.toFixed(1)+'='+rawW.toFixed(1);
     if(dir==='vertical'){fw+=' +2cm='+(rawW+2).toFixed(1);lines.push(fl);lines.push(fw);}
     else{lines.push(fw);lines.push(fl+' +2cm='+(rawL+2).toFixed(1)+' (横瓦调换)');}
   }
@@ -450,12 +453,6 @@ closeSettings=function(){document.getElementById('setOverlay').classList.remove(
     dcSelect.appendChild(opt);
   });
   // Populate transport
-  var tsSelect=document.getElementById('cartonTransport');
-  Object.keys(PRICE.transport).forEach(function(k){
-    var opt=document.createElement('option');
-    opt.value=k;opt.textContent=k+' ('+PRICE.transport[k]+')';
-    tsSelect.appendChild(opt);
-  });
   try{var s=JSON.parse(localStorage.getItem('cartonPriceSettings'));if(s){if(s.press)PRICE.press=s.press;if(s.dieCut)PRICE.dieCut=s.dieCut;if(s.transport)PRICE.transport=s.transport;}}catch(e){}
 })();
 </script>
