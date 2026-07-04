@@ -98,7 +98,7 @@ h1{text-align:center;font-size:1.5rem;color:#2c3e50;padding:20px 0}
 </div>
 
 <div class="card">
-    <h2>🖨 印刷 <span id="pressLimit" style="font-size:0.75rem;font-weight:normal"></span></h2>
+    <h2 style="display:flex;align-items:center"><span>🖨 印刷 <span id="pressLimit" style="font-size:0.75rem;font-weight:normal"></span></span><span style="margin-left:auto;font-size:0.75rem;font-weight:normal;cursor:pointer;color:#27ae60"><input type="checkbox" id="waivePressBase" onchange="checkPressLimit()" style="width:auto;height:auto;vertical-align:middle"> 免开机费</span></h2>
     <div class="row">
         <div class="field"><label>印刷机型</label><select id="pressMachine" onchange="checkPressLimit()"><option value="120">120对开机</option><option value="142" selected>142全开机</option></select></div>
         <div class="field"><label>色数</label><select id="colors"><option value="4" selected>4色</option><option value="5">5色</option></select></div>
@@ -127,7 +127,7 @@ h1{text-align:center;font-size:1.5rem;color:#2c3e50;padding:20px 0}
 
 
 <div class="card">
-    <h2>⚙ 加工费用 <span id="dieCutSugg" style="font-size:0.72rem;color:#27ae60;font-weight:bold"></span></h2>
+    <h2 style="display:flex;align-items:center"><span>⚙ 加工费用 <span id="dieCutSugg" style="font-size:0.72rem;color:#27ae60;font-weight:normal"></span></span><span style="margin-left:auto;font-size:0.75rem;font-weight:normal;cursor:pointer;color:#27ae60"><input type="checkbox" id="waiveDieSetup" onchange="calcMount()" style="width:auto;height:auto;vertical-align:middle"> 免装版费</span></h2>
     <div class="row">
         <div class="field"><label>裱瓦 <span class="auto-tag">自动</span></label><input type="text" id="mountDisplay" value="--" readonly style="color:#3498db"></div>
         <div class="field"><label>刀版</label>
@@ -243,9 +243,9 @@ var PRICE = {
   surfaceFilm: {"亮膜":0.30,"哑膜":0.35,"亮油":0.20,"哑油":0.28,"UV油":0.45,"大面积烫金/银":3},
   surfaceK: {"烫金/银":0.30,"凹凸":0.25,"压纹":0.15},
   embossFee: 100,
-  pressLimit: {"120":[104,75,50,45],"142":[145,106,76,52]},
+  pressLimit: {"120":[104,75,50,45],"115×85":[115,85],"132×97":[132,97],"142×102":[142,102]},
   press120: {"4":[350,0.07],"5":[550,0.11]},
-  press142: {"4":[750,0.22],"5":[1150,0.27]},
+  press142: {"115×85":{"4":[520,0.11],"5":[800,0.14]},"132×97":{"4":[650,0.16],"5":[900,0.22]},"142×102":{"4":[750,0.22],"5":[1150,0.27]}},
   mount: 0.20,
   dieCut: {"930手动":[35,0.08],"1100手动":[35,0.10],"1300自动":[40,0.12],"1500自动":[50,0.20],"1800手动":[50,0.30]},
   glue: {"卡盒 糊口<20":0.03,"卡盒 展开>80":0.05,"瓦楞 糊口<20":0.05,"瓦楞 糊口20~30":0.065,"瓦楞 糊口>30":0.08,"瓦楞 长>60":0.13,"瓦楞 长>80":0.16},
@@ -275,12 +275,25 @@ function checkPressLimit(){
   var pLmm=parseFloat(document.getElementById('dieL').value)||0,pWmm=parseFloat(document.getElementById('dieW').value)||0;
   var cutWmm=pWmm+20;cutWmm=Math.ceil(cutWmm/5)*5;
   var pL=(pLmm+20)/10,pW=cutWmm/10;
-  var mKey=document.getElementById('pressMachine').value,lim=PRICE.pressLimit[mKey]||[999,999,0,0];
-  var ok=pL>=lim[2]&&pL<=lim[0]&&pW>=lim[3]&&pW<=lim[1];
-  var el=document.getElementById('pressLimit'),warn=document.getElementById('pressWarning');
-  el.textContent='| 最大 '+lim[0]+'×'+lim[1]+'cm 最小 '+lim[2]+'×'+lim[3]+'cm';
-  if(ok){warn.style.display='none';el.style.color='#27ae60';}else{warn.style.display='block';warn.textContent='⚠ 裁切尺寸超出该机型范围！';el.style.color='#e74c3c';}
-  calcPressCost();return ok;
+  var mKey=document.getElementById('pressMachine').value;
+  if(mKey==='120'){
+    var lim=PRICE.pressLimit['120']||[999,999,0,0];
+    var ok=pL>=lim[2]&&pL<=lim[0]&&pW>=lim[3]&&pW<=lim[1];
+    var el=document.getElementById('pressLimit'),warn=document.getElementById('pressWarning');
+    el.textContent='| 最大 '+lim[0]+'×'+lim[1]+'cm 最小 '+lim[2]+'×'+lim[3]+'cm';
+    if(ok){warn.style.display='none';el.style.color='#27ae60';}else{warn.style.display='block';warn.textContent='⚠ 裁切尺寸超出该机型范围！';el.style.color='#e74c3c';}
+    calcPressCost();return ok;
+  }else{
+    if(!pLmm||!pWmm){document.getElementById('pressLimit').textContent='';return true;}
+    var sizes=['115×85','132×97','142×102'],best='142×102';
+    for(var i=0;i<sizes.length;i++){var L=PRICE.pressLimit[sizes[i]];if(pL<=L[0]&&pW<=L[1]){best=sizes[i];break;}}
+    var cn_=document.getElementById('colors').value;var T=PRICE.press142[best][cn_];
+    document.getElementById('pressLimit').innerHTML='| 版纸: <b>'+best+'</b> | 开机<b>¥'+T[0]+'</b> + 超数×<b>¥'+T[1]+'</b>';
+    document.getElementById('pressLimit').style.color='#27ae60';document.getElementById('pressLimit').style.fontWeight='bold';
+    document.getElementById('pressWarning').style.display='none';
+    document.getElementById('pressMachine').dataset.plate=best;
+    calcPressCost();return true;
+  }
 }
 
 
@@ -313,16 +326,18 @@ function suggestDieCut(){
 }
 function calcPressCost(){
   var mKey=document.getElementById('pressMachine').value,cn=document.getElementById('colors').value;
-  var press=mKey==='120'?PRICE.press120:PRICE.press142;
-  var tier=press[cn]||[0,0];
+  var press,tier;
+  if(mKey==='120'){press=PRICE.press120;tier=press[cn]||[0,0];}
+  else{var plate=document.getElementById('pressMachine').dataset.plate||'142×102';press=PRICE.press142[plate];tier=press[cn]||[0,0];}
   var nUp=parseInt(document.getElementById('piecesPerSheet').value)||1;
   var qty=parseInt(document.getElementById('quantity').value)||0;
   var totalSheets=qty>0?Math.ceil(qty/nUp):(nUp?Math.ceil(1000/nUp):1000);
   var base=tier[0],overflow=tier[1];
-  var totalCost=totalSheets<=3000?base:base+overflow*(totalSheets-3000);
+  var waive=document.getElementById('waivePressBase').checked;
+  var totalCost=waive?overflow*totalSheets:(totalSheets<=3000?base:base+overflow*(totalSheets-3000));
   var costPerK=totalCost/((qty>0?qty:1000)/1000);
   var perSheet=totalCost/totalSheets;
-  document.getElementById('pressCostDisplay').value='单价¥'+perSheet.toFixed(4)+'/张 × '+totalSheets+'张 = ¥'+totalCost.toFixed(0);
+  document.getElementById('pressCostDisplay').value=(waive?'[免开机] ':'')+'单价¥'+perSheet.toFixed(4)+'/张 × '+totalSheets+'张 = ¥'+totalCost.toFixed(0);
   return costPerK;
 }
 
@@ -382,7 +397,7 @@ function calculate(){
 
   var dcKey=document.getElementById('dieCutMachine').value;
   var dc=PRICE.dieCut[dcKey]||[0,0];
-  var dieCutCost=enDieCut?dc[0]+dc[1]*totalSheets:0;
+  var dieCutCost=enDieCut?((document.getElementById('waiveDieSetup').checked?0:dc[0])+dc[1]*totalSheets):0;
 
   var glueKey=document.getElementById('glueBox').value;
   var glueCost=enGlue?(PRICE.glue[glueKey]||0)*qty:0;
@@ -469,10 +484,10 @@ function calculate(){
   // 印刷
   if(!enPress){lines.push('【印刷】已跳过');lines.push('');}
   else{
-  lines.push('【印刷】'+document.getElementById('pressMachine').value+'五色机 '+cn+'色');
+  lines.push('【印刷】'+(document.getElementById('pressMachine').value==='120'?'120':'142 '+(document.getElementById('pressMachine').dataset.plate||'142×102'))+' '+cn+'色');
   var pressKey=document.getElementById('pressMachine').value,pressTier;
-  if(pressKey==='120')pressTier=PRICE.press120[cn];else pressTier=PRICE.press142[cn];
-  lines.push('  共'+totalSheets+'张 → '+ (totalSheets<=3000?'≤3k 开机费¥'+pressTier[0]:'开机¥'+pressTier[0]+' + ¥'+pressTier[1]+'/张×'+(totalSheets-3000)));
+  if(pressKey==='120')pressTier=PRICE.press120[cn];else{var bp=document.getElementById('pressMachine').dataset.plate||'142×102';pressTier=(PRICE.press142[bp]||{})[cn]||[0,0];}
+  var wbd=document.getElementById('waivePressBase').checked;lines.push('  共'+totalSheets+'张 → '+ (wbd?'免开机费 ¥'+pressTier[1]+'/张×'+totalSheets:(totalSheets<=3000?'≤3k 开机费¥'+pressTier[0]:'开机¥'+pressTier[0]+' + ¥'+pressTier[1]+'/张×'+(totalSheets-3000))));
   lines.push('  小计 ¥'+pressTotal.toFixed(2)+' → ¥'+(pressTotal/totalSheets).toFixed(4)+'/张 → ¥'+(pressTotal/qty).toFixed(4)+'/个');
   lines.push('');
   }
@@ -500,7 +515,7 @@ function calculate(){
   lines.push('');
   // 模切
   if(!enDieCut){lines.push('【模切】已跳过');}
-  else{lines.push('【模切】'+dcKey+' 装版¥'+dc[0]+' + ¥'+dc[1]+'/张×'+totalSheets+' = ¥'+dieCutCost.toFixed(2)+' → ¥'+(dieCutCost/totalSheets).toFixed(4)+'/张 → ¥'+(dieCutCost/qty).toFixed(4)+'/个');}
+  else{lines.push('【模切】'+dcKey+(document.getElementById('waiveDieSetup').checked?' 免装版':' 装版¥'+dc[0])+' + ¥'+dc[1]+'/张×'+totalSheets+' = ¥'+dieCutCost.toFixed(2)+' → ¥'+(dieCutCost/totalSheets).toFixed(4)+'/张 → ¥'+(dieCutCost/qty).toFixed(4)+'/个');}
   lines.push('');
   // 粘盒
   if(!enGlue){lines.push('【粘盒】已跳过');}
@@ -554,7 +569,7 @@ adjMargin=function(d){var el=document.getElementById('marginPct');var v=parseInt
 document.getElementById('dieL').addEventListener('input',function(){updateDimensions();calcPressCost();});
 document.getElementById('dieW').addEventListener('input',function(){updateDimensions();calcPressCost();});
 document.getElementById('pressMachine').addEventListener('change',checkPressLimit);
-document.getElementById('colors').addEventListener('change',calcPressCost);
+document.getElementById('colors').addEventListener('change',calcPressCost);document.getElementById('colors').addEventListener('change',checkPressLimit);
 document.getElementById('piecesPerSheet').addEventListener('input',function(){calcPressCost();calcMount();});
 document.getElementById('quantity').addEventListener('input',calcPressCost);
 calcMount();
@@ -649,7 +664,7 @@ function openSettings(){
   document.getElementById('setSurfaceFilm').innerHTML=Object.keys(PRICE.surfaceFilm).map(function(k){return sf(k,PRICE.surfaceFilm[k],'元/㎡','0.01');}).join('');
   document.getElementById('setSurfaceK').innerHTML=Object.keys(PRICE.surfaceK).map(function(k){return sf(k,PRICE.surfaceK[k],'元/张','0.01');}).join('');
   document.getElementById('setPress120').innerHTML=Object.keys(PRICE.press120).map(function(k){var v=PRICE.press120[k];return'<div class="srow"><label>'+k+'色</label><span>开机</span><input type="number" value="'+v[0]+'" step="1" data-cat="press120-'+k+'" data-field="0"><span>超量</span><input type="number" value="'+v[1]+'" step="0.01" data-cat="press120-'+k+'" data-field="1"></div>';}).join('');
-  document.getElementById('setPress142').innerHTML=Object.keys(PRICE.press142).map(function(k){var v=PRICE.press142[k];return'<div class="srow"><label>'+k+'色</label><span>开机</span><input type="number" value="'+v[0]+'" step="1" data-cat="press142-'+k+'" data-field="0"><span>超量</span><input type="number" value="'+v[1]+'" step="0.01" data-cat="press142-'+k+'" data-field="1"></div>';}).join('');
+  document.getElementById('setPress142').innerHTML=Object.keys(PRICE.press142).map(function(sz){var inner=PRICE.press142[sz];return'<div style="margin-bottom:8px"><b>'+sz+'</b>'+Object.keys(inner).map(function(k){var v=inner[k];return'<div class="srow"><label>'+k+'色</label><span>开机</span><input type="number" value="'+v[0]+'" step="1" data-cat="press142-'+sz+'-'+k+'" data-field="0"><span>超量</span><input type="number" value="'+v[1]+'" step="0.01" data-cat="press142-'+sz+'-'+k+'" data-field="1"></div>';}).join('');}).join('</div>');
   document.getElementById('setMount').innerHTML=sf('裱瓦',PRICE.mount,'元/㎡','0.01');
   document.getElementById('setDieCut').innerHTML=Object.keys(PRICE.dieCut).map(function(k){var v=PRICE.dieCut[k];return'<div class="srow"><label>'+k+'</label><span>装</span><input type="number" value="'+v[0]+'" step="1" data-cat="dieCut-'+k+'" data-field="0"><span>加工</span><input type="number" value="'+v[1]+'" step="0.01" data-cat="dieCut-'+k+'" data-field="1"></div>';}).join('');
   document.getElementById('setGlue').innerHTML=[
@@ -668,9 +683,12 @@ saveSettings=function(){
   document.querySelectorAll('#setOverlay input').forEach(function(inp){
     var cat=inp.dataset.cat,val=parseFloat(inp.value)||0;
     if(cat==='裱瓦')PRICE.mount=val;
-    else if(cat.startsWith('press120-')||cat.startsWith('press142-')){
+    else if(cat.startsWith('press120-')){
       var parts=cat.split('-'),pf=parts[0],pKey=parts[1],pField=parseInt(inp.dataset.field);
       PRICE[pf][pKey+''][pField]=val;
+    }else if(cat.startsWith('press142-')){
+      var parts=cat.split('-'),sz=parts[1],pKey=parts[2],pField=parseInt(inp.dataset.field);
+      PRICE.press142[sz][pKey][pField]=val;
     }else if(cat.startsWith('dieCut-')){
       var key=cat.replace('dieCut-',''),field=parseInt(inp.dataset.field);
       PRICE.dieCut[key][field]=val;
