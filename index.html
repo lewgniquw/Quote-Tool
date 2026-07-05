@@ -98,7 +98,7 @@ h1{text-align:center;font-size:1.5rem;color:#2c3e50;padding:20px 0}
 </div>
 
 <div class="card">
-    <h2 style="display:flex;align-items:center"><span>🖨 印刷 <span id="pressLimit" style="font-size:0.75rem;font-weight:normal"></span></span><span style="margin-left:auto;font-size:0.75rem;font-weight:normal;cursor:pointer;color:#27ae60"><input type="checkbox" id="waivePressBase" onchange="checkPressLimit()" style="width:auto;height:auto;vertical-align:middle"> 免开机费</span></h2>
+    <h2 style="display:flex;align-items:center"><span>🖨 印刷 <span id="pressLimit" style="font-size:0.75rem;font-weight:normal"></span></span><span style="margin-left:auto;font-size:0.75rem;font-weight:normal;cursor:pointer;color:#27ae60"><input type="checkbox" id="waivePressBase" onchange="checkPressLimit()" style="width:auto;height:auto;vertical-align:middle"> 免开机费</span><span style="margin-left:8px;font-size:0.75rem;font-weight:normal;cursor:pointer;color:#8e44ad"><input type="checkbox" id="vipMode" onchange="checkPressLimit()" style="width:auto;height:auto;vertical-align:middle"> 大客户/代加工</span></h2>
     <div class="row">
         <div class="field"><label>印刷机型</label><select id="pressMachine" onchange="checkPressLimit()"><option value="120">120对开机</option><option value="142" selected>142全开机</option></select></div>
         <div class="field"><label>色数</label><select id="colors"><option value="4" selected>4色</option><option value="5">5色</option></select></div>
@@ -285,10 +285,11 @@ function checkPressLimit(){
     calcPressCost();return ok;
   }else{
     if(!pLmm||!pWmm){document.getElementById('pressLimit').textContent='';return true;}
-    var sizes=['115×85','132×97','142×102'],best='142×102';
-    for(var i=0;i<sizes.length;i++){var L=PRICE.pressLimit[sizes[i]];if(pL<=L[0]&&pW<=L[1]){best=sizes[i];break;}}
+    var vip=document.getElementById('vipMode').checked;
+    var best='142×102';
+    if(vip){var sizes=['115×85','132×97','142×102'];for(var i=0;i<sizes.length;i++){var L=PRICE.pressLimit[sizes[i]];if(pL<=L[0]&&pW<=L[1]){best=sizes[i];break;}}}
     var cn_=document.getElementById('colors').value;var T=PRICE.press142[best][cn_];
-    document.getElementById('pressLimit').innerHTML='| 版纸: <b>'+best+'</b> | 开机<b>¥'+T[0]+'</b> + 超数×<b>¥'+T[1]+'</b>';
+    document.getElementById('pressLimit').innerHTML='| '+(vip?'版纸: ':'固定 ')+'<b>'+best+'</b> | 开机<b>¥'+T[0]+'</b> + 超数×<b>¥'+T[1]+'</b>';
     document.getElementById('pressLimit').style.color='#27ae60';document.getElementById('pressLimit').style.fontWeight='bold';
     document.getElementById('pressWarning').style.display='none';
     document.getElementById('pressMachine').dataset.plate=best;
