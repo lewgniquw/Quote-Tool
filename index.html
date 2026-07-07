@@ -278,7 +278,7 @@ function checkPressLimit(){
   var mKey=document.getElementById('pressMachine').value;
   if(mKey==='120'){
     var lim=PRICE.pressLimit['120']||[999,999,0,0];
-    var ok=pL>=lim[2]&&pL<=lim[0]&&pW>=lim[3]&&pW<=lim[1];
+    var ok=(pL>=lim[2]&&pL<=lim[0]&&pW>=lim[3]&&pW<=lim[1])||(pW>=lim[2]&&pW<=lim[0]&&pL>=lim[3]&&pL<=lim[1]);
     var el=document.getElementById('pressLimit'),warn=document.getElementById('pressWarning');
     el.textContent='| 最大 '+lim[0]+'×'+lim[1]+'cm 最小 '+lim[2]+'×'+lim[3]+'cm';
     if(ok){warn.style.display='none';el.style.color='#27ae60';}else{warn.style.display='block';warn.textContent='⚠ 裁切尺寸超出该机型范围！';el.style.color='#e74c3c';}
@@ -287,7 +287,7 @@ function checkPressLimit(){
     if(!pLmm||!pWmm){document.getElementById('pressLimit').textContent='';return true;}
     var vip=document.getElementById('vipMode').checked;
     var best='142×102';
-    if(vip){var sizes=['115×85','132×97','142×102'];for(var i=0;i<sizes.length;i++){var L=PRICE.pressLimit[sizes[i]];if(pL<=L[0]&&pW<=L[1]){best=sizes[i];break;}}}
+    if(vip){var sizes=['115×85','132×97','142×102'];for(var i=0;i<sizes.length;i++){var L=PRICE.pressLimit[sizes[i]];if((pL<=L[0]&&pW<=L[1])||(pW<=L[0]&&pL<=L[1])){best=sizes[i];break;}}}
     var cn_=document.getElementById('colors').value;var T=PRICE.press142[best][cn_];
     document.getElementById('pressLimit').innerHTML='| '+(vip?'版纸: ':'固定 ')+'<b>'+best+'</b> | 开机<b>¥'+T[0]+'</b> + 超数×<b>¥'+T[1]+'</b>';
     document.getElementById('pressLimit').style.color='#27ae60';document.getElementById('pressLimit').style.fontWeight='bold';
@@ -319,7 +319,7 @@ function suggestDieCut(){
   var best=null;
   Object.keys(PRICE.dieCutLimit).forEach(function(k){
     var lim=PRICE.dieCutLimit[k];
-    if(cmL<=lim[0]&&cmW<=lim[1]&&!best)best=k;
+    if((cmL<=lim[0]&&cmW<=lim[1]||cmW<=lim[0]&&cmL<=lim[1])&&!best)best=k;
   });
   var sp=document.getElementById('dieCutSugg');
   if(best){sp.textContent=' → 建议: '+best;sp.style.border='1.5px solid #27ae60';sp.style.borderRadius='3px';sp.style.padding='1px 6px';}
