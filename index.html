@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <script src="https://cdn.jsdelivr.net/npm/xlsx-js-style@1.2.0/dist/xlsx.bundle.js"></script>
+<script>if(typeof XLSX==="undefined"){document.write('<script src="https://unpkg.com/xlsx-js-style@1.2.0/dist/xlsx.bundle.js"><\/script>');}</script>
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>彩盒报价计算器 · 浙江国立包装</title>
 <style>
@@ -1038,6 +1039,8 @@ function exportSingleXLSX(idx){
   XLSX.writeFile(wb,(r.name||'报价')+'_'+r.time.replace(/[: ]/g,'_')+'.xlsx');
 }
 function exportSelectedXLSX(){
+  if(typeof XLSX==="undefined"){alert("XLSX库加载中,请刷新重试");return;}
+
   var cbs=document.querySelectorAll('.quoteCb:checked');
   if(!cbs.length){alert('请先勾选要导出的记录');return;}
   var history=JSON.parse(localStorage.getItem('colorBoxHistory')||'[]');
