@@ -73,17 +73,17 @@ h1{text-align:center;font-size:1.5rem;color:#2c3e50;padding:20px 0}
 <div class="card">
     <h2>📐 纸板</h2>
     <div class="row">
-        <div class="field"><label>纸箱长 (cm)</label><input type="number" id="cartonL" value="" step="0.1" oninput="calcCartonBoard()"></div>
-        <div class="field"><label>纸箱宽 (cm)</label><input type="number" id="cartonW" value="" step="0.1" oninput="calcCartonBoard()"></div>
-        <div class="field"><label>纸箱高 (cm)</label><input type="number" id="cartonH" value="" step="0.1" oninput="calcCartonBoard()"></div>
+        <div class="field"><label>纸箱长 (mm)</label><input type="number" id="cartonL" value="" step="0.1" oninput="calcCartonBoard()"></div>
+        <div class="field"><label>纸箱宽 (mm)</label><input type="number" id="cartonW" value="" step="0.1" oninput="calcCartonBoard()"></div>
+        <div class="field"><label>纸箱高 (mm)</label><input type="number" id="cartonH" value="" step="0.1" oninput="calcCartonBoard()"></div>
         <div class="field"><label>盒型</label><select id="cartonType" onchange="calcCartonBoard()"><option value="normal" selected>普通</option><option value="fullcover">全盖</option><option value="zhongkai">中开</option><option value="tiandigai">天地盖</option><option value="manual">异形</option></select></div>
         <div class="field"><label>瓦楞方向</label><select id="cartonFluteDir" onchange="calcCartonBoard()"><option value="vertical" selected>竖瓦</option><option value="horizontal">横瓦</option></select></div>
     </div>
     <div class="row" style="margin-top:4px">
         <div class="field"><label>单价 (元/㎡)</label><input type="number" id="cartonPrice" value="" step="0.1"></div>
         <div class="field"><label>返点 (%)</label><input type="number" id="cartonRebate" value="10" step="1" placeholder="留空=0"></div>
-        <div class="field"><label>纸板长 (cm) <span class="auto-tag">自动</span></label><input type="number" id="cartonBoardL" value="" step="0.1" placeholder="自动或手动"></div>
-        <div class="field"><label>纸板宽 (cm) <span class="auto-tag">自动</span></label><input type="number" id="cartonBoardW" value="" step="0.1" placeholder="自动或手动"></div>
+        <div class="field"><label>纸板长 (mm) <span class="auto-tag">自动</span></label><input type="number" id="cartonBoardL" value="" step="0.1" placeholder="自动或手动"></div>
+        <div class="field"><label>纸板宽 (mm) <span class="auto-tag">自动</span></label><input type="number" id="cartonBoardW" value="" step="0.1" placeholder="自动或手动"></div>
     </div>
 
 </div>
@@ -156,7 +156,7 @@ h1{text-align:center;font-size:1.5rem;color:#2c3e50;padding:20px 0}
     </div>
 </div>
 
-<div class="footer">2026.07.16 16:48 · <span onclick="showPwd()" style="cursor:pointer;text-decoration:underline">⚙ 设置</span></div>
+<div class="footer">2026.07.16 18:06 · <span onclick="showPwd()" style="cursor:pointer;text-decoration:underline">⚙ 设置</span></div>
 </div>
 
 <div class="overlay" id="pwdOverlay"><div class="panel" style="max-width:300px;text-align:center">
@@ -211,7 +211,7 @@ var PRICE = {
   press: {1:[15,0.07],2:[22,0.085],3:[30,0.10]},
   dieCut: {"930手动":[35,0.08],"1100手动":[35,0.10],"1300自动":[40,0.12],"1500自动":[50,0.20],"1800手动":[50,0.30]},
   transport: {"庆元":0.12,"龙泉":0.08,"政和":0.15,"建瓯":0.25,"景宁":0.15,"丽水":0.18,"松阳":0.25,"无需物流":0,"0.3":0.3,"0.35":0.35},
-  dieCutLimit: {"930手动":[90,64],"1100手动":[107,76],"1300自动":[127,97],"1500自动":[147,107],"1800手动":[178,126]}
+  dieCutLimit: {"930手动":[900,640],"1100手动":[1070,760],"1300自动":[1270,970],"1500自动":[1470,1070],"1800手动":[1780,1260]}
 };
 var SET_PWD='+987';
 
@@ -232,10 +232,10 @@ function calcCartonBoard(){
   var boardL,boardW;
   if(type==='zhongkai'){boardL=h*2+l;boardW=w+h+w+h;}
   else if(type==='tiandigai'){boardL=l+2*h;boardW=2*h+w;}
-  else if(type==='fullcover'){boardL=(l+w)*2+3.5;boardW=w+h+w;}
-  else{boardL=(l+w)*2+3.5;boardW=w+h+0.4;}
+  else if(type==='fullcover'){boardL=(l+w)*2+35;boardW=w+h+w;}
+  else{boardL=(l+w)*2+35;boardW=w+h+4;}
   var dir=document.getElementById('cartonFluteDir').value;
-  if(dir==='vertical'){boardW+=2;}else{var tmp=boardL;boardL=boardW;boardW=tmp+2;}
+  if(dir==='vertical'){boardW+=20;}else{var tmp=boardL;boardL=boardW;boardW=tmp+2;}
   document.getElementById('cartonBoardL').value=boardL.toFixed(1);
   document.getElementById('cartonBoardW').value=boardW.toFixed(1);
   // 模切机型建议
@@ -266,7 +266,7 @@ function calculate(){
   if(!boardL||!boardW)return;
   var rebate=parseFloat(document.getElementById('cartonRebate').value)||0;
   var effPrice=price*(1-rebate/100);
-  var boardArea=boardL*boardW/10000;
+  var boardArea=boardL*boardW/1000000;
   var boardCost=boardArea*effPrice*lossMul;
   var boardTotal=boardCost*totalSheets;
   var priceUsed=rebate>0?effPrice:price;
@@ -329,15 +329,15 @@ function calculate(){
   var lines=[];
   lines.push('【纸板】'+l.toFixed(1)+'×'+w.toFixed(1)+'×'+h.toFixed(1)+'cm ');
   lines.push('  盒型: '+document.getElementById('cartonType').options[document.getElementById('cartonType').selectedIndex].text);
-  lines.push('  纸板: '+boardL.toFixed(1)+'×'+boardW.toFixed(1)+'cm = '+boardArea.toFixed(4)+'㎡');
+  lines.push('  纸板: '+boardL.toFixed(1)+'×'+boardW.toFixed(1)+'mm = '+boardArea.toFixed(4)+'㎡');
   var joinLabel=document.getElementById('cartonJoin')?'':'';
   if(document.getElementById('cartonType').value!=='manual'&&l&&w&&h){
     var ct=document.getElementById('cartonType').value;
     var rawL,rawW,fl,fw;
     if(ct==='zhongkai'){rawL=h*2+l;rawW=w+h+w+h;fl='  长='+h.toFixed(1)+'×2+'+l.toFixed(1)+'='+rawL.toFixed(1);fw='  宽='+w.toFixed(1)+'+'+h.toFixed(1)+'+'+w.toFixed(1)+'+'+h.toFixed(1)+'='+rawW.toFixed(1);}
     else if(ct==='tiandigai'){rawL=l+2*h;rawW=2*h+w;fl='  长='+l.toFixed(1)+'+2×'+h.toFixed(1)+'='+rawL.toFixed(1);fw='  宽=2×'+h.toFixed(1)+'+'+w.toFixed(1)+'='+rawW.toFixed(1);}
-    else if(ct==='fullcover'){rawL=(l+w)*2+3.5;rawW=w+h+w;fl='  长=('+l.toFixed(1)+'+'+w.toFixed(1)+')×2+3.5='+rawL.toFixed(1);fw='  宽='+w.toFixed(1)+'+'+h.toFixed(1)+'+'+w.toFixed(1)+'='+rawW.toFixed(1);}
-    else{rawL=(l+w)*2+3.5;rawW=w+h+0.4;fl='  长=('+l.toFixed(1)+'+'+w.toFixed(1)+')×2+3.5='+rawL.toFixed(1);fw='  宽='+w.toFixed(1)+'+'+h.toFixed(1)+'+0.4='+rawW.toFixed(1);}
+    else if(ct==='fullcover'){rawL=(l+w)*2+35;rawW=w+h+w;fl='  长=('+l.toFixed(1)+'+'+w.toFixed(1)+')×2+3.5='+rawL.toFixed(1);fw='  宽='+w.toFixed(1)+'+'+h.toFixed(1)+'+'+w.toFixed(1)+'='+rawW.toFixed(1);}
+    else{rawL=(l+w)*2+35;rawW=w+h+4;fl='  长=('+l.toFixed(1)+'+'+w.toFixed(1)+')×2+3.5='+rawL.toFixed(1);fw='  宽='+w.toFixed(1)+'+'+h.toFixed(1)+'+0.4='+rawW.toFixed(1);}
     var dir=document.getElementById('cartonFluteDir').value;
     if(dir==='vertical'){fw+=' +2cm='+(rawW+2).toFixed(1);lines.push(fl);lines.push(fw);}
     else{lines.push(fw);lines.push(fl+' +2cm='+(rawL+2).toFixed(1)+' (横瓦调换)');}
@@ -411,7 +411,7 @@ function exportXLS(){
   body+='<tr><td class="xl68" colspan="2" height="28">浙江国立包装有限公司 瓦楞箱报价表</td></tr>';
   body+='<tr'+st+'>'+l+'日期</td><td class="xl72">'+date+'</td></tr>';
   body+='<tr'+st+'>'+l+'数量</td>'+r+C.qty+'</td></tr>';
-  body+='<tr'+st+'>'+l+'纸箱尺寸</td><td class="xl72">'+C.l.toFixed(0)+' x '+C.w.toFixed(0)+' x '+C.h.toFixed(0)+' cm</td></tr>';
+  body+='<tr'+st+'>'+l+'纸箱尺寸</td><td class="xl72">'+C.l.toFixed(0)+' x '+C.w.toFixed(0)+' x '+C.h.toFixed(0)+' mm</td></tr>';
   body+='<tr'+st+'>'+l+'盒型</td><td class="xl72">'+C.type+'</td></tr>';
   body+='<tr><td class="xl73" colspan="2" height="24">成本明细</td></tr>';
   body+='<tr'+st+'>'+l+'工序</td><td class="xl70" style="text-align:right">小计(元)</td></tr>';
@@ -616,9 +616,9 @@ function buildQuoteSheet(r){
   rows.push(['客户/产品名称',r.name||'']);
   rows.push(['日期',r.time||'']);
   rows.push(['数量',qty]);
-  rows.push(['纸箱尺寸',((r.l||0).toFixed(0))+' × '+((r.w||0).toFixed(0))+' × '+((r.h||0).toFixed(0))+' cm']);
+  rows.push(['纸箱尺寸',((r.l||0).toFixed(0))+' × '+((r.w||0).toFixed(0))+' × '+((r.h||0).toFixed(0))+' mm']);
   rows.push(['盒型',r.type||'']);
-  rows.push(['纸板尺寸',((r.boardL||0).toFixed(1))+' × '+((r.boardW||0).toFixed(1))+' cm']);
+  rows.push(['纸板尺寸',((r.boardL||0).toFixed(1))+' × '+((r.boardW||0).toFixed(1))+' mm']);
   rows.push(['成本明细','']);
   rows.push(['工序','小计 (元)']);
   var items=[
