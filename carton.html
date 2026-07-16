@@ -722,7 +722,7 @@ function exportSelectedXLSX(){
   XLSX.writeFile(wb,'瓦楞报价_多选_'+new Date().toISOString().slice(0,10)+'.xlsx');
 }
 
-function showTooltip(e,html){var g=document.getElementById('globalTooltip');g.innerHTML=html;g.style.display='block';g.style.left=Math.min(e.clientX+10,window.innerWidth-320)+'px';g.style.top=(e.clientY-10)+'px';}
+function showTooltip(e,html){var g=document.getElementById('globalTooltip');g.innerHTML=html;g.style.display='block';g.style.left=Math.min(e.clientX+10,window.innerWidth-320)+'px';var r=e.target.closest('tr');if(r){var rc=r.getBoundingClientRect();g.style.bottom=(window.innerHeight-rc.top+5)+'px';g.style.top='auto';}else{g.style.top=(e.clientY-10)+'px';}}
 function hideTooltip(){document.getElementById('globalTooltip').style.display='none';}
 
 renderQuoteTable();
