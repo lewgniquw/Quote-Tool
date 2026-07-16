@@ -2,8 +2,8 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<script src="https://cdn.jsdelivr.net/npm/xlsx-js-style@1.2.0/dist/xlsx.bundle.js"></script>
-<script>if(typeof XLSX==="undefined"){document.write('<script src="https://unpkg.com/xlsx-js-style@1.2.0/dist/xlsx.bundle.js"><\/script>');}</script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx-js-style@1.2.0/dist/xlsx.bundle.js" onerror="var s=document.createElement('script');s.src='https://unpkg.com/xlsx-js-style@1.2.0/dist/xlsx.bundle.js';document.head.appendChild(s);"></script>
+
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>彩盒报价计算器 · 浙江国立包装</title>
 <style>
@@ -229,7 +229,7 @@ h1{text-align:center;font-size:1.5rem;color:#2c3e50;padding:20px 0}
     </div>
 </div>
 
-<div class="footer">2026.07.16 13:44 · <span onclick="showPwd()" style="cursor:pointer;text-decoration:underline">⚙ 设置</span></div>
+<div class="footer">2026.07.16 15:24 · <span onclick="showPwd()" style="cursor:pointer;text-decoration:underline">⚙ 设置</span></div>
 </div>
 
 <div class="overlay" id="pwdOverlay"><div class="panel" style="max-width:300px;text-align:center">
@@ -836,7 +836,7 @@ function saveQuote(){
   history.unshift(record);
   localStorage.setItem('colorBoxHistory', JSON.stringify(history));
 
-  renderQuoteHistory();
+  if(typeof XLSX!=='undefined'||document.readyState==='complete'){renderQuoteHistory();}else{window.addEventListener('load',function(){renderQuoteHistory();});}
   alert('✅ 报价已保存');
 }
 
@@ -878,12 +878,12 @@ function deleteQuote(idx){
   var history=JSON.parse(localStorage.getItem('colorBoxHistory')||'[]');
   history.splice(idx,1);
   localStorage.setItem('colorBoxHistory',JSON.stringify(history));
-  renderQuoteHistory();
+  if(typeof XLSX!=='undefined'||document.readyState==='complete'){renderQuoteHistory();}else{window.addEventListener('load',function(){renderQuoteHistory();});}
 }
 function clearQuoteHistory(){
   if(!confirm('确定清空所有报价记录？此操作不可恢复。'))return;
   localStorage.removeItem('colorBoxHistory');
-  renderQuoteHistory();
+  if(typeof XLSX!=='undefined'||document.readyState==='complete'){renderQuoteHistory();}else{window.addEventListener('load',function(){renderQuoteHistory();});}
 }
 function toggleSelectAll(){ toggleAllCheckboxes(); }
 function toggleAllCheckboxes(){
@@ -1071,7 +1071,7 @@ function exportSelectedXLSX(){
 function showTooltip(e,html){var g=document.getElementById('globalTooltip');g.innerHTML=html;g.style.display='block';g.style.left=Math.min(e.clientX+10,window.innerWidth-320)+'px';var r=e.target.closest('tr');if(r){var rc=r.getBoundingClientRect();g.style.bottom=(window.innerHeight-rc.top+5)+'px';g.style.top='auto';}else{g.style.top=(e.clientY-10)+'px';}}
 function hideTooltip(){document.getElementById('globalTooltip').style.display='none';}
 
-renderQuoteHistory();
+if(typeof XLSX!=='undefined'||document.readyState==='complete'){renderQuoteHistory();}else{window.addEventListener('load',function(){renderQuoteHistory();});}
 </script>
 <div id="globalTooltip" class="gtip" style="display:none;position:fixed;z-index:99999;"></div>
 </body>
