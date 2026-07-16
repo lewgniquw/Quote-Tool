@@ -156,7 +156,7 @@ h1{text-align:center;font-size:1.5rem;color:#2c3e50;padding:20px 0}
     </div>
 </div>
 
-<div class="footer">2026.07.16 15:24 · <span onclick="showPwd()" style="cursor:pointer;text-decoration:underline">⚙ 设置</span></div>
+<div class="footer">2026.07.16 15:40 · <span onclick="showPwd()" style="cursor:pointer;text-decoration:underline">⚙ 设置</span></div>
 </div>
 
 <div class="overlay" id="pwdOverlay"><div class="panel" style="max-width:300px;text-align:center">
@@ -562,11 +562,30 @@ function renderQuoteTable(){
       +'印刷¥'+((r.pressCost||0).toFixed(2))+' + 柔版¥'+((r.plateCost||0).toFixed(2))+' + 糊口¥'+((r.glueCost||0).toFixed(2))+'\u003cbr\u003e'
       +'运输¥'+((r.tsCost||0).toFixed(2))+' + 其他¥'+((r.extraCost||0).toFixed(2))+' = \u003cb\u003e总成本 ¥'+((r.allCost||0).toFixed(2))+'\u003c/b\u003e\u003cbr\u003e'
       +'含税含利单价: ¥'+((r.unitPrice||0).toFixed(4))+' | 总价: ¥'+((r.total||0).toFixed(2));
-    return '\u003ctr\u003e\u003ctd style="padding:6px 8px;border-bottom:1px solid #eee;text-align:center"\u003e\u003cinput type="checkbox" class="quoteCb" data-idx="'+i+'" onchange="updateSelectedCount()"\u003e\u003c/td\u003e\u003ctd style="padding:6px 8px;border-bottom:1px solid #eee"\u003e'+(r.name||'')+'\u003c/td\u003e\u003ctd style="padding:6px 8px;border-bottom:1px solid #eee"\u003e'+dim+'\u003c/td\u003e\u003ctd style="padding:6px 8px;border-bottom:1px solid #eee"\u003e'+(r.type||'')+'\u003c/td\u003e\u003ctd style="padding:6px 8px;border-bottom:1px solid #eee;text-align:right"\u003e'+q+'\u003c/td\u003e\u003ctd style="padding:6px 8px;border-bottom:1px solid #eee;text-align:right"\u003e¥'+up+'\u003c/td\u003e\u003ctd style="padding:6px 8px;border-bottom:1px solid #eee;text-align:center" onmouseenter=\'showTooltip(event,'+JSON.stringify(tip)+')\' onmouseleave=\'hideTooltip()\'\u003e\u003cbutton onclick="deleteQuote('+i+')" style="background:#e74c3c;color:#fff;border:none;padding:2px 8px;border-radius:4px;cursor:pointer;font-size:0.75rem"\u003e删除\u003c/button\u003e\u003c/td\u003e\u003ctd style="padding:6px 8px;border-bottom:1px solid #eee;text-align:center"\u003e\u003cbutton onclick="exportSingleXLSX('+i+')" style="background:#3498db;color:#fff;border:none;padding:2px 8px;border-radius:4px;cursor:pointer;font-size:0.75rem"\u003e导出\u003c/button\u003e\u003c/td\u003e\u003c/tr\u003e';
+    return '\u003ctr\u003e\u003ctd style="padding:6px 8px;border-bottom:1px solid #eee;text-align:center"\u003e\u003cinput type="checkbox" class="quoteCb" data-idx="'+i+'" onchange="updateSelectedCount()"\u003e\u003c/td\u003e\u003ctd style="padding:6px 8px;border-bottom:1px solid #eee;cursor:pointer" onclick="editName('+i+',this)" id="name-'+i+'"\u003e'+(r.name||'')+'\u003c/td\u003e\u003ctd style="padding:6px 8px;border-bottom:1px solid #eee"\u003e'+dim+'\u003c/td\u003e\u003ctd style="padding:6px 8px;border-bottom:1px solid #eee"\u003e'+(r.type||'')+'\u003c/td\u003e\u003ctd style="padding:6px 8px;border-bottom:1px solid #eee;text-align:right"\u003e'+q+'\u003c/td\u003e\u003ctd style="padding:6px 8px;border-bottom:1px solid #eee;text-align:right"\u003e¥'+up+'\u003c/td\u003e\u003ctd style="padding:6px 8px;border-bottom:1px solid #eee;text-align:center" onmouseenter=\'showTooltip(event,'+JSON.stringify(tip)+')\' onmouseleave=\'hideTooltip()\'\u003e\u003cbutton onclick="deleteQuote('+i+')" style="background:#e74c3c;color:#fff;border:none;padding:2px 8px;border-radius:4px;cursor:pointer;font-size:0.75rem"\u003e删除\u003c/button\u003e\u003c/td\u003e\u003ctd style="padding:6px 8px;border-bottom:1px solid #eee;text-align:center"\u003e\u003cbutton onclick="exportSingleXLSX('+i+')" style="background:#3498db;color:#fff;border:none;padding:2px 8px;border-radius:4px;cursor:pointer;font-size:0.75rem"\u003e导出\u003c/button\u003e\u003c/td\u003e\u003c/tr\u003e';
   }).join('');
   updateSelectedCount();
 }
 
+function editName(idx,el){
+  var history=JSON.parse(localStorage.getItem('cartonBoxHistory')||'[]');
+  if(idx<0||idx>=history.length)return;
+  var oldVal=el.textContent;
+  var inp=document.createElement('input');
+  inp.type='text';inp.value=oldVal;
+  inp.style.cssText='width:100%;padding:2px 4px;border:1px solid #3498db;border-radius:3px;font-size:0.8rem';
+  el.textContent='';el.appendChild(inp);
+  inp.focus();inp.select();
+  function save(){
+    var newVal=inp.value.trim();
+    if(!newVal)newVal=oldVal;
+    history[idx].name=newVal;
+    localStorage.setItem('cartonBoxHistory',JSON.stringify(history));
+    renderQuoteTable();
+  }
+  inp.onblur=save;
+  inp.onkeydown=function(e){if(e.key==='Enter'){inp.blur();}};
+}
 function deleteQuote(idx){
   if(!confirm('确定删除该条报价记录？'))return;
   var history=JSON.parse(localStorage.getItem('cartonBoxHistory')||'[]');
@@ -690,7 +709,7 @@ function exportSingleXLSX(idx){
   var r=history[idx];
   var wb=XLSX.utils.book_new();
   var ws=buildQuoteSheet(r);
-  var sName=(r.name||'报价').substring(0,31);
+  var sName=(r.name||'报价').replace(/[:\\\/?*\[\]]/g,'').substring(0,31);
   XLSX.utils.book_append_sheet(wb,ws,sName);
   XLSX.writeFile(wb,(r.name||'报价')+'_'+r.time.replace(/[: ]/g,'_')+'.xlsx');
 }
@@ -709,7 +728,7 @@ function exportSelectedXLSX(){
     if(idx>=0&&idx<history.length){
       var r=history[idx];
       var ws=buildQuoteSheet(r);
-      var rawName=r.name||('报价'+idx);
+      var rawName=(r.name||('报价'+idx)).replace(/[:\\\/?*\[\]]/g,'');
       var sName=rawName.substring(0,31);
       if(usedNames[sName]!==undefined){
         var cnt=1;
