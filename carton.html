@@ -156,7 +156,7 @@ h1{text-align:center;font-size:1.5rem;color:#2c3e50;padding:20px 0}
     </div>
 </div>
 
-<div class="footer">2026.07.16 15:40 · <span onclick="showPwd()" style="cursor:pointer;text-decoration:underline">⚙ 设置</span></div>
+<div class="footer">2026.07.16 16:48 · <span onclick="showPwd()" style="cursor:pointer;text-decoration:underline">⚙ 设置</span></div>
 </div>
 
 <div class="overlay" id="pwdOverlay"><div class="panel" style="max-width:300px;text-align:center">
@@ -650,6 +650,14 @@ function buildQuoteSheet(r){
   rows.push(['含税'+taxRate+'%',taxPrice]);
   rows.push(['毛利'+marginRate+'%',marginPrice]);
   var ws=XLSX.utils.aoa_to_sheet(rows);
+  // === Formula cells (汇总) ===
+  var costCount=items.filter(function(it){return it.val>0;}).length;
+  var fc=9, lc=8+costCount, tr=lc+2, sr=tr+1, txr=sr+1, mr=txr+1;
+  ws['B'+tr].f='=SUM(B'+fc+':B'+lc+')';
+  ws['B'+sr].f='=B'+tr+'/B3';
+  ws['B'+txr].f='=B'+sr+'*(1+'+taxRate+'/100)';
+  ws['B'+mr].f='=B'+txr+'/(1-'+marginRate+'/100)';
+
   var titleFill={fgColor:{rgb:'2F5496'}};
   var headerFill={fgColor:{rgb:'D6E4F0'}};
   var labelFill={fgColor:{rgb:'F2F2F2'}};
