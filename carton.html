@@ -149,13 +149,13 @@ h1{text-align:center;font-size:1.5rem;color:#2c3e50;padding:20px 0}
     </div>
     <div style="overflow-x:auto">
         <table style="width:100%;border-collapse:collapse;font-size:0.8rem" id="quoteTable">
-            <thead><tr style="background:#f0f2f5"><th style="padding:8px;border-bottom:2px solid #3498db;text-align:center;width:30px"><input type="checkbox" id="selectAll" onclick="toggleSelectAll()" title="全选/取消全选"></th><th style="padding:8px;border-bottom:2px solid #3498db;text-align:left">名称</th><th style="padding:8px;border-bottom:2px solid #3498db;text-align:left">纸板尺寸</th><th style="padding:8px;border-bottom:2px solid #3498db;text-align:left">盒型</th><th style="padding:8px;border-bottom:2px solid #3498db;text-align:right">数量</th><th style="padding:8px;border-bottom:2px solid #3498db;text-align:right">单价</th><th style="padding:8px;border-bottom:2px solid #3498db;text-align:center">删除</th><th style="padding:8px;border-bottom:2px solid #3498db;text-align:center">导出</th></tr></thead>
+            <thead><tr style="background:#f0f2f5"><th style="padding:8px;border-bottom:2px solid #3498db;text-align:center;width:30px"><input type="checkbox" id="selectAll" onclick="toggleSelectAll()" title="全选/取消全选"></th><th style="padding:8px;border-bottom:2px solid #3498db;text-align:left">名称</th><th style="padding:8px;border-bottom:2px solid #3498db;text-align:left">纸板尺寸</th><th style="padding:8px;border-bottom:2px solid #3498db;text-align:left">盒型</th><th style="padding:8px;border-bottom:2px solid #3498db;text-align:right">数量</th><th style="padding:8px;border-bottom:2px solid #3498db;text-align:right">成本</th><th style="padding:8px;border-bottom:2px solid #3498db;text-align:center">删除</th><th style="padding:8px;border-bottom:2px solid #3498db;text-align:center">导出</th></tr></thead>
             <tbody id="quoteTableBody"><tr><td colspan="8" style="text-align:center;color:#aaa;padding:20px">暂无记录</td></tr></tbody>
         </table>
     </div>
 </div>
 
-<div class="footer">2026.07.16 11:45 · <span onclick="showPwd()" style="cursor:pointer;text-decoration:underline">⚙ 设置</span></div>
+<div class="footer">2026.07.16 13:44 · <span onclick="showPwd()" style="cursor:pointer;text-decoration:underline">⚙ 设置</span></div>
 </div>
 
 <div class="overlay" id="pwdOverlay"><div class="panel" style="max-width:300px;text-align:center">
@@ -544,7 +544,7 @@ function renderQuoteTable(){
   tbody.innerHTML=history.map(function(r,i){
     var dim=((r.l||0).toFixed(1))+'×'+((r.w||0).toFixed(1))+'×'+((r.h||0).toFixed(1));
     var q=(r.qty||0);
-    var up=(r.unitPrice||0).toFixed(4);
+    var up=((r.allCost||0)/(r.qty||1)).toFixed(4);
     var tip='\u003cb\u003e\ud83d\udccb 完整报价参数\u003c/b\u003e\u003cbr\u003e'
       +'纸板尺寸: '+((r.boardL||0).toFixed(1))+'×'+((r.boardW||0).toFixed(1))+'cm\u003cbr\u003e'
       +'纸板单价: ¥'+(r.price||0).toFixed(2)+(r.rebate?' 返点'+r.rebate+'%':'')+'\u003cbr\u003e'

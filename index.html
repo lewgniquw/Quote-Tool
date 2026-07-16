@@ -222,13 +222,13 @@ h1{text-align:center;font-size:1.5rem;color:#2c3e50;padding:20px 0}
     </div>
     <div style="overflow-x:auto">
         <table style="width:100%;border-collapse:collapse;font-size:0.8rem" id="historyTable">
-            <thead><tr style="background:#f0f2f5"><th style="padding:8px;border-bottom:2px solid #3498db;text-align:center;width:30px"><input type="checkbox" id="selectAll" onclick="toggleSelectAll()" title="全选/取消全选"></th><th style="padding:8px;border-bottom:2px solid #3498db;text-align:left">名称</th><th style="padding:8px;border-bottom:2px solid #3498db;text-align:left">时间</th><th style="padding:8px;border-bottom:2px solid #3498db;text-align:right">刀版长宽</th><th style="padding:8px;border-bottom:2px solid #3498db;text-align:right">面纸材质</th><th style="padding:8px;border-bottom:2px solid #3498db;text-align:right">浪纸材质</th><th style="padding:8px;border-bottom:2px solid #3498db;text-align:right">数量</th><th style="padding:8px;border-bottom:2px solid #3498db;text-align:right">单价</th><th style="padding:8px;border-bottom:2px solid #3498db;text-align:center">操作</th></tr></thead>
+            <thead><tr style="background:#f0f2f5"><th style="padding:8px;border-bottom:2px solid #3498db;text-align:center;width:30px"><input type="checkbox" id="selectAll" onclick="toggleSelectAll()" title="全选/取消全选"></th><th style="padding:8px;border-bottom:2px solid #3498db;text-align:left">名称</th><th style="padding:8px;border-bottom:2px solid #3498db;text-align:left">时间</th><th style="padding:8px;border-bottom:2px solid #3498db;text-align:right">刀版长宽</th><th style="padding:8px;border-bottom:2px solid #3498db;text-align:right">面纸材质</th><th style="padding:8px;border-bottom:2px solid #3498db;text-align:right">浪纸材质</th><th style="padding:8px;border-bottom:2px solid #3498db;text-align:right">数量</th><th style="padding:8px;border-bottom:2px solid #3498db;text-align:right">成本</th><th style="padding:8px;border-bottom:2px solid #3498db;text-align:center">操作</th></tr></thead>
             <tbody id="historyBody"><tr><td colspan="9" style="text-align:center;color:#aaa;padding:20px">暂无记录</td></tr></tbody>
         </table>
     </div>
 </div>
 
-<div class="footer">2026.07.16 11:16 · <span onclick="showPwd()" style="cursor:pointer;text-decoration:underline">⚙ 设置</span></div>
+<div class="footer">2026.07.16 13:44 · <span onclick="showPwd()" style="cursor:pointer;text-decoration:underline">⚙ 设置</span></div>
 </div>
 
 <div class="overlay" id="pwdOverlay"><div class="panel" style="max-width:300px;text-align:center">
@@ -848,7 +848,7 @@ function renderQuoteHistory(){
     var q=(r.qty||0);
     var paperMat=(r.gram||0)+'g/¥'+(r.tonPrice||0);
     var fluteMat='¥'+(r.flutePrice||0)+'/㎡';
-    var cost=(r.unitPrice||0).toFixed(4);
+    var cost=((r.allCost||0)/(r.qty||1)).toFixed(4);
     var tip='<b>\u{1f4cb} 完整报价参数</b><br>'
       +'刀版: '+dL.toFixed(0)+'\u00d7'+dW.toFixed(0)+'mm | 裁切: '+(r.cutL||'--')+'\u00d7'+(r.cutW||'--')+'mm<br>'
       +'克重: '+paperMat+' | 浪纸单价: '+fluteMat+'<br>'
