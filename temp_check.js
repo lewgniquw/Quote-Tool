@@ -1,263 +1,3 @@
-<!DOCTYPE html>
-<html lang="zh-CN">
-<head>
-<meta charset="UTF-8">
-<script src="https://cdn.jsdelivr.net/npm/xlsx-js-style@1.2.0/dist/xlsx.bundle.js"></script>
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>彩盒报价计算器 · 浙江国立包装</title>
-<style>
-*{margin:0;padding:0;box-sizing:border-box}
-body{font-family:'Microsoft YaHei',sans-serif;background:#f0f2f5;min-height:100vh;padding:20px}
-.container{max-width:800px;margin:0 auto}
-h1{text-align:center;font-size:1.5rem;color:#2c3e50;padding:20px 0}
-.card{background:#fff;border-radius:10px;padding:20px;margin-bottom:14px;box-shadow:0 1px 8px rgba(0,0,0,0.06)}
-.card h2{font-size:1rem;color:#2c3e50;margin-bottom:14px;padding-bottom:8px;border-bottom:2px solid #3498db}
-.row{display:flex;flex-wrap:wrap;gap:10px}
-.field{flex:1;min-width:100px}
-.field label{display:block;font-size:0.78rem;color:#888;margin-bottom:3px}
-.field input,.field select{width:100%;padding:10px;border:1px solid #ddd;border-radius:6px;font-size:0.9rem;text-align:center;background:#fff}
-.field input:focus,.field select:focus{outline:none;border-color:#3498db}
-.check-group{display:flex;flex-wrap:wrap;gap:6px}
-.check-group label{display:flex;align-items:center;gap:4px;padding:8px 14px;border:1px solid #ddd;border-radius:20px;font-size:0.85rem;cursor:pointer;background:#fafafa}
-.check-group input{display:none}
-.check-group label:has(input:checked){background:#e8f4fd;border-color:#3498db;color:#3498db}
-.btn{display:block;width:100%;padding:14px;border:none;border-radius:8px;background:#3498db;color:#fff;font-size:1.1rem;cursor:pointer;margin-top:8px}
-.btn:hover{background:#2980b9}
-.btn-sm{padding:8px 18px;font-size:0.85rem;border-radius:6px;width:auto}
-.result{background:linear-gradient(135deg,#2c3e50,#3498db);color:#fff;border-radius:10px;padding:30px;text-align:center;display:none}
-.result .total{font-size:3rem;font-weight:700;margin:8px 0}
-.result .unit{font-size:0.9rem;opacity:0.85}
-.result .detail{font-size:0.8rem;opacity:0.75;margin-top:12px;line-height:1.8;text-align:left}
-.overlay{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);z-index:100;justify-content:center;align-items:center}
-.overlay.show{display:flex}
-.panel{background:#fff;border-radius:16px;padding:28px;max-width:700px;width:95%;max-height:85vh;overflow-y:auto}
-.panel h3{font-size:1.1rem;margin-bottom:16px}
-.set-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px}
-.set-card{background:#fafbfc;border:1px solid #e0e0e0;border-radius:10px;padding:14px}
-.set-card h4{font-size:0.82rem;margin-bottom:10px;color:#2c3e50;font-weight:600}
-.set-card .srow{display:flex;align-items:center;gap:6px;margin-bottom:5px}
-.set-card .srow label{font-size:0.78rem;color:#444;min-width:52px;font-weight:500}
-.set-card .srow input{width:72px;padding:7px 8px;border:1px solid #d0d0d0;border-radius:5px;font-size:0.82rem;text-align:right}
-.set-card .srow .unit{font-size:0.72rem;color:#999;min-width:36px}
-.set-card .srow span{font-size:0.72rem;color:#888;margin:0 2px}
-.footer{text-align:center;color:#aaa;font-size:0.7rem;margin-top:20px}
-.auto-tag{font-size:0.7rem;color:#3498db;margin-left:4px}
-
-.help-tip{position:relative;cursor:help;color:#999;font-size:0.8rem;margin-left:4px}
-.mode-tabs{display:flex;gap:0;margin-bottom:14px;border-radius:8px;overflow:hidden}
-.mode-tab{flex:1;padding:12px;text-align:center;font-size:0.95rem;font-weight:600;cursor:pointer;border:none;background:#e8e8e8;color:#666;transition:all 0.2s;text-decoration:none;display:block}
-.mode-tab.active{background:#3498db;color:#fff}
-.help-tip:hover::after{content:attr(data-tip);position:absolute;left:0;top:24px;background:#333;color:#fff;padding:8px 12px;border-radius:6px;font-size:0.75rem;white-space:pre-line;line-height:1.6;z-index:999;min-width:220px;box-shadow:0 4px 12px rgba(0,0,0,0.2)}
-
-  @media (max-width: 768px) {
-    html{scroll-behavior:smooth;scroll-padding-top:20px}
-    body{-webkit-overflow-scrolling:touch}
-    .container{max-width:100%;padding:8px}
-    .card{padding:10px;scroll-margin-top:20px}
-    input[type=password],.field input,.field select,.panel input,.panel select{font-size:16px!important;padding:10px 8px}
-    .mode-tab{font-size:0.85rem;padding:10px}
-    h2{font-size:0.95rem}
-    .btn{padding:12px;font-size:1rem}
-    .set-grid{grid-template-columns:1fr}
-    .set-card .srow input{width:60px}
-    .overlay .panel{width:95%;max-height:90vh;overflow-y:auto}
-  }
-.gtip{background:#2c3e50;color:#fff;padding:10px 14px;border-radius:8px;font-size:0.7rem;max-width:300px;line-height:1.7;box-shadow:0 4px 20px rgba(0,0,0,0.4);pointer-events:none;text-align:left}
-.gtip hr{border-color:#555;margin:4px 0}
-</style>
-</head>
-<body>
-<div class="container">
-    <div class="mode-tabs"><a class="mode-tab active" href="javascript:void(0)">📦 彩盒报价</a><a class="mode-tab" href="carton.html">📐 瓦楞箱报价</a></div>
-
-<div class="card">
-    <h2>🔪 刀版</h2>
-    <div class="row">
-        <div class="field"><label>刀版长 (mm)</label><input type="number" id="dieL" value="" step="1" placeholder="" oninput="updateDimensions()"></div>
-        <div class="field"><label>刀版宽 (mm)</label><input type="number" id="dieW" value="" step="1" placeholder="" oninput="updateDimensions()"></div>
-        <div class="field"><label>拼版数 (个/张)</label><div style="display:flex;gap:0"><button onclick="adjInput('piecesPerSheet',-1,1)" style="padding:8px 10px;border:1px solid #ddd;border-radius:6px 0 0 6px;cursor:pointer;background:#f5f5f5;font-size:0.9rem">−</button><input type="number" id="piecesPerSheet" value="1" step="1" style="text-align:center;border-radius:0;border-left:0;border-right:0"><button onclick="adjInput('piecesPerSheet',1,1)" style="padding:8px 10px;border:1px solid #ddd;border-radius:0 6px 6px 0;cursor:pointer;background:#f5f5f5;font-size:0.9rem">+</button></div></div>
-    </div>
-</div>
-
-<div class="card">
-    <h2>📄 面纸</h2>
-    <div class="row">
-        <div class="field"><label>裁切长 <span class="auto-tag">自动</span></label><input type="text" id="cutSizeL" value="--" readonly style="color:#3498db;font-size:0.82rem"></div>
-        <div class="field"><label>裁切宽 <span class="auto-tag">自动</span></label><input type="text" id="cutSizeW" value="--" readonly style="color:#3498db;font-size:0.82rem"></div>
-        <div class="field"><label>克重 (g)</label><input type="number" id="paperGram" value="" placeholder="" style="font-size:0.82rem"></div>
-        <div class="field"><label>吨价(元/吨)</label><input type="number" id="paperTon" value="" placeholder="" style="font-size:0.82rem"></div>
-        <div class="field" style="min-width:80px"><label>损耗(张)</label><input type="number" id="paperLoss" value="200" step="1" placeholder="5%" style="font-size:0.82rem"></div>
-    </div>
-</div>
-
-<div class="card">
-    <h2>📦 浪纸</h2>
-    <div class="row">
-        <div class="field"><label>浪纸长 (mm) <span class="auto-tag">自动</span></label><input type="text" id="fluteLDisp" value="--" readonly style="color:#3498db"></div>
-        <div class="field"><label>浪纸宽 (mm) <span class="auto-tag">自动</span></label><input type="text" id="fluteWDisp" value="--" readonly style="color:#3498db"></div>
-        <div class="field"><label>单价 (元/㎡)</label><input type="number" id="flutePrice" value="" step="0.1"></div>
-        <div class="field"><label>返点 (%)</label><input type="number" id="fluteRebate" value="0" step="0.1" oninput="calcFlute();calculate()"></div>
-        <div class="field"><label>损耗 (张) 留空=3%</label><input type="number" id="fluteLoss" value="30" step="1" placeholder="留空默认3%"></div>
-    </div>
-</div>
-
-<div class="card">
-    <h2 style="display:flex;align-items:center"><span>🖨 印刷 <span id="pressLimit" style="font-size:0.75rem;font-weight:normal"></span></span><span style="margin-left:auto;font-size:0.75rem;font-weight:normal;cursor:pointer;color:#27ae60"><input type="checkbox" id="waivePressBase" onchange="checkPressLimit()" style="width:auto;height:auto;vertical-align:middle"> 免开机费</span><span style="margin-left:8px;font-size:0.75rem;font-weight:normal;cursor:pointer;color:#8e44ad"><input type="checkbox" id="vipMode" onchange="checkPressLimit()" style="width:auto;height:auto;vertical-align:middle"> 大客户/代加工</span></h2>
-    <div class="row">
-        <div class="field"><label>印刷机型</label><select id="pressMachine" onchange="checkPressLimit()"><option value="120">120对开机</option><option value="142" selected>142全开机</option></select></div>
-        <div class="field"><label>色数</label><select id="colors"><option value="4" selected>4色</option><option value="5">5色</option></select></div>
-        <div class="field"><label>印刷费 <span class="auto-tag">自动</span></label><input type="text" id="pressCostDisplay" value="--" readonly style="color:#3498db"></div>
-    </div>
-    <span id="pressWarning" style="display:none;font-size:0.75rem;color:#e74c3c"></span>
-</div>
-
-<div class="card">
-    <h2>✨ 表面处理</h2>
-    <div class="check-group" id="surfaceGroup">
-        <label><input type="checkbox" value="亮膜"><span>亮膜</span></label>
-        <label><input type="checkbox" value="哑膜"><span>哑膜</span></label>
-        <label><input type="checkbox" value="亮油"><span>亮油</span></label>
-        <label><input type="checkbox" value="哑油"><span>哑油</span></label>
-        <label><input type="checkbox" value="UV油"><span>UV油</span></label>
-        <label><input type="checkbox" value="大面积烫金/银"><span>大面积烫金/银</span></label><label style="cursor:pointer;margin-right:8px"><input type="checkbox" value="防刮膜" onchange="onSurfaceChange()"><span>防刮膜</span></label>
-        <label><input type="checkbox" value="烫金/银"><span>烫金/银</span></label>
-        <label><input type="checkbox" value="凹凸"><span>凹凸</span></label>
-        <label><input type="checkbox" value="压纹"><span>压纹</span></label>
-    </div>
-    <span id="warnFilm" style="display:none;font-size:0.75rem;color:#e74c3c">⚠ 覆膜：亮膜/哑膜二选一</span>
-    <span id="warnOil" style="display:none;font-size:0.75rem;color:#e74c3c">⚠ 上油：亮油/哑油/UV油三选一</span>
-    <span id="warnFoil" style="display:none;font-size:0.75rem;color:#e74c3c">⚠ 烫金：烫金/银、大面积烫金/银二选一</span>
-</div>
-
-
-<div class="card">
-    <h2 style="display:flex;align-items:center"><span>⚙ 加工费用 <span id="dieCutSugg" style="font-size:0.72rem;color:#27ae60;font-weight:normal"></span></span><span style="margin-left:auto;font-size:0.75rem;font-weight:normal;cursor:pointer;color:#27ae60"><input type="checkbox" id="waiveDieSetup" onchange="calcMount()" style="width:auto;height:auto;vertical-align:middle"> 免装版费</span></h2>
-    <div class="row">
-        <div class="field"><label>裱瓦 <span class="auto-tag">自动</span></label><input type="text" id="mountDisplay" value="--" readonly style="color:#3498db"></div>
-        <div class="field"><label>刀版</label>
-            <select id="dieNew"><option value="0">旧版 (免费)</option><option value="1" selected>新版 (面积×250)</option></select></div>
-        <div class="field"><label>模切机型 <span class="help-tip" data-tip="930手动: 900×640mm&#10;1100手动: 1070×760mm&#10;1300自动: 1270×970 / 430×430mm&#10;1500自动: 1470×1070 / 550×550mm&#10;1800手动: 1780×1260mm">?</span></label>
-            <select id="dieCutMachine">
-                <option value="930手动" title="最大 900×640mm">930手动 (装35 加0.08)</option>
-                <option value="1100手动" title="最大 1070×760mm">1100手动 (装35 加0.10)</option>
-                <option value="1300自动" selected title="最大 1270×970mm | 最小 430×430mm">1300自动 (装40 加0.12)</option>
-                <option value="1500自动" title="最大 1470×1070mm | 最小 550×550mm">1500自动 (装50 加0.20)</option>
-                <option value="1800手动" title="最大 1780×1260mm">1800手动 (装50 加0.30)</option>
-            </select></div>
-        <div class="field"><label>粘盒</label>
-            <select id="glueBox">
-                <optgroup label="卡盒">
-                <option value="卡盒 糊口<20">糊口 &lt;20cm (0.03)</option>
-                <option value="卡盒 展开>80">展开 &gt;80cm (0.05)</option>
-                </optgroup>
-                <optgroup label="瓦楞盒">
-                <option value="瓦楞 糊口<20" selected>糊口 &lt;20cm (0.05)</option>
-                <option value="瓦楞 糊口20~30">糊口 20~30cm (0.065)</option>
-                <option value="瓦楞 糊口>30">糊口 &gt;30cm (0.08)</option>
-                <option value="瓦楞 长>60">成品长度 &gt;60cm (0.13)</option>
-                <option value="瓦楞 长>80">成品长度 &gt;80cm (0.16)</option>
-                </optgroup>
-            </select></div>
-    </div>
-</div>
-
-<div class="card" style="padding:10px 12px">
-    <div style="display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center">
-        <span style="font-weight:600;font-size:0.9rem;color:#555">🔧 工序开关</span>
-        <label style="font-size:0.85rem;cursor:pointer"><input type="checkbox" id="chkPaper" checked> 面纸</label>
-        <label style="font-size:0.85rem;cursor:pointer"><input type="checkbox" id="chkFlute" checked> 浪纸</label>
-        <label style="font-size:0.85rem;cursor:pointer"><input type="checkbox" id="chkPress" checked> 印刷</label>
-        <label style="font-size:0.85rem;cursor:pointer"><input type="checkbox" id="chkSurface" checked> 表面</label>
-        <label style="font-size:0.85rem;cursor:pointer"><input type="checkbox" id="chkMount" checked> 裱瓦</label>
-        <label style="font-size:0.85rem;cursor:pointer"><input type="checkbox" id="chkDieCut" checked> 模切</label>
-        <label style="font-size:0.85rem;cursor:pointer"><input type="checkbox" id="chkGlue" checked> 粘盒</label>
-        <label style="font-size:0.85rem;cursor:pointer"><input type="checkbox" id="chkTransport" checked> 运输</label>
-    </div>
-</div>
-
-<div class="card">
-    <h2>🎨 其他</h2>
-    <div class="row">
-        <div class="field" style="flex:1.5"><label>运输区域 (元/㎡)</label><select id="transport"><option value="无需物流">无需物流</option>
-<option value="龙泉">龙泉 0.08</option>
-<option value="庆元">庆元 0.12</option>
-<option value="政和">政和 0.15</option>
-<option value="景宁">景宁 0.15</option>
-<option value="丽水">丽水 0.18</option>
-<option value="建瓯">建瓯 0.25</option>
-<option value="松阳">松阳 0.25</option>
-<option value="0.3">0.30</option>
-<option value="0.35">0.35</option></select></div>
-        <div class="field" style="flex:1.5"><label>其他成本</label><div style="display:flex;gap:4px"><input type="number" id="extraCost" value="" step="0.001" placeholder="外加工等" style="flex:1;min-width:0"><select id="extraCostUnit" style="width:auto;padding:0 4px;height:38px;border:1.5px solid #2980b9;border-radius:3px;background:#ebf5fb;color:#2980b9;font-weight:600;font-size:0.75rem;flex-shrink:0;text-align:center"><option value="per">元/个</option><option value="total">总价</option><option value="area">元/㎡</option></select></div></div>
-    </div>
-    <div class="row" style="margin-top:8px">
-        <div class="field"><label>数量 (个)</label><input type="number" id="quantity" value="" placeholder="必填" min="1" step="100"></div>
-        <div class="field"><label>税率 (%)</label><div style="display:flex;gap:0"><button onclick="adjInput('taxRate',-1,0,20)" style="padding:8px 10px;border:1px solid #ddd;border-radius:6px 0 0 6px;cursor:pointer;background:#f5f5f5;font-size:0.9rem">−</button><input type="number" id="taxRate" value="7" min="0" max="20" step="1" style="text-align:center;border-radius:0;border-left:0;border-right:0"><button onclick="adjInput('taxRate',1,0,20)" style="padding:8px 10px;border:1px solid #ddd;border-radius:0 6px 6px 0;cursor:pointer;background:#f5f5f5;font-size:0.9rem">+</button></div></div>
-        <div class="field">
-            <label>毛利率 (%)</label>
-            <div style="display:flex;align-items:center;gap:4px">
-                <button onclick="adjInput('marginPct',-1,0,200)" style="min-width:28px;height:38px;border:1px solid #ddd;border-radius:6px;background:#fafafa;cursor:pointer;font-size:1.2rem;flex:1">−</button>
-                <input type="number" id="marginPct" value="15" min="0" max="200" step="1" style="flex:1;min-width:50px;padding:10px 6px;text-align:center">
-                <button onclick="adjInput('marginPct',1,0,200)" style="min-width:28px;height:38px;border:1px solid #ddd;border-radius:6px;background:#fafafa;cursor:pointer;font-size:1.2rem;flex:1">+</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<div class="row" style="gap:8px"><button class="btn" onclick="calculate()" style="flex:1">💰 计算报价</button><button class="btn" onclick="saveQuote()" style="flex:1;background:#8e44ad;display:none" id="btnSave">💾 保存报价</button><button class="btn" id="btnExport" onclick="exportXLS()" style="flex:1;background:#27ae60;display:none">📥 导出报价表</button></div>
-
-<div class="result" id="result">
-    <div class="unit">预估报价</div>
-    <div class="total" id="totalPrice">¥ --</div>
-    <div class="unit" id="unitPrice"></div>
-    <div class="detail" id="breakdown"></div>
-</div>
-
-<div class="card" id="historyCard">
-    <h2>📋 报价记录</h2>
-    <div style="display:flex;gap:8px;margin-bottom:12px;align-items:center">
-        <button class="btn btn-sm" onclick="clearQuoteHistory()" style="background:#e74c3c">🗑 清空记录</button>
-        <button class="btn btn-sm" onclick="exportSelectedXLSX()" style="background:#3498db">📥 导出选中</button>
-        <span id="selectedCount" style="font-weight:600;color:#2c3e50;font-size:0.85rem;margin-left:auto">已选 0 条</span>
-    </div>
-    <div style="overflow-x:auto">
-        <table style="width:100%;border-collapse:collapse;font-size:0.8rem" id="historyTable">
-            <thead><tr style="background:#f0f2f5"><th style="padding:8px;border-bottom:2px solid #3498db;text-align:center;width:30px"><input type="checkbox" id="selectAll" onclick="toggleSelectAll()" title="全选/取消全选"></th><th style="padding:8px;border-bottom:2px solid #3498db;text-align:left">名称</th><th style="padding:8px;border-bottom:2px solid #3498db;text-align:left">时间</th><th style="padding:8px;border-bottom:2px solid #3498db;text-align:right">刀版长宽</th><th style="padding:8px;border-bottom:2px solid #3498db;text-align:right">面纸材质</th><th style="padding:8px;border-bottom:2px solid #3498db;text-align:right">浪纸材质</th><th style="padding:8px;border-bottom:2px solid #3498db;text-align:right">数量</th><th style="padding:8px;border-bottom:2px solid #3498db;text-align:right">单价</th><th style="padding:8px;border-bottom:2px solid #3498db;text-align:center">操作</th></tr></thead>
-            <tbody id="historyBody"><tr><td colspan="9" style="text-align:center;color:#aaa;padding:20px">暂无记录</td></tr></tbody>
-        </table>
-    </div>
-</div>
-
-<div class="footer">2026.07.16 11:16 · <span onclick="showPwd()" style="cursor:pointer;text-decoration:underline">⚙ 设置</span></div>
-</div>
-
-<div class="overlay" id="pwdOverlay"><div class="panel" style="max-width:300px;text-align:center">
-    <h3>🔐 输入密码</h3>
-    <div style="display:flex;gap:8px"><input type="password" id="pwdInput" placeholder="密码" style="flex:1;padding:10px;border:1px solid #ddd;border-radius:6px;font-size:16px" onkeydown="if(event.key==='Enter')checkPwd()"></div>
-    <button class="btn" onclick="checkPwd()" style="margin-top:12px">确认</button>
-    <button onclick="document.getElementById('pwdOverlay').classList.remove('show')" style="margin-top:8px;padding:8px 30px;border:1px solid #ddd;border-radius:6px;background:#eee;cursor:pointer">取消</button>
-    <p style="font-size:0.75rem;color:#e74c3c;margin-top:8px;display:none" id="pwdError">密码错误</p>
-</div></div>
-
-<div class="overlay" id="setOverlay"><div class="panel">
-    <h3>⚙ 后台价格设置</h3>
-    <div class="set-grid">
-        <div class="set-card"><h4>✨ 表面处理 (元/㎡)</h4><div id="setSurfaceFilm"></div></div>
-        <div class="set-card"><h4>✨ 表面处理 (元/张)</h4><div id="setSurfaceK"></div></div>
-        <div class="set-card"><h4>🖨 120五色机 (开机费,超量单价)</h4><div id="setPress120"></div></div>
-        <div class="set-card"><h4>🖨 142五色机 (开机费,超量单价)</h4><div id="setPress142"></div></div>
-        <div class="set-card"><h4>📦 裱瓦 (元/㎡)</h4><div id="setMount"></div></div>
-        <div class="set-card"><h4>🔪 模切 (装版费,加工费)</h4><div id="setDieCut"></div></div>
-        <div class="set-card"><h4>📐 粘盒 (元/个)</h4><div id="setGlue"></div></div>
-        <div class="set-card"><h4>🚚 运输 (元/㎡)</h4><div id="setTransport"></div></div>
-    </div>
-    <div style="display:flex;gap:10px;justify-content:center;margin-top:16px">
-        <button class="btn btn-sm" onclick="saveSettings()">💾 保存</button>
-        <button onclick="closeSettings()" style="padding:8px 30px;border:1px solid #ddd;border-radius:6px;background:#eee;cursor:pointer">取消</button>
-    </div>
-</div></div>
-
-<script>
 var PRICE = {
   surfaceFilm: {"亮膜":0.30,"哑膜":0.35,"亮油":0.20,"哑油":0.28,"UV油":0.45,"大面积烫金/银":3,"防刮膜":0.80},
   surfaceK: {"烫金/银":0.30,"凹凸":0.25,"压纹":0.15},
@@ -349,7 +89,7 @@ function calcPressCost(){
   var press,tier;
   if(mKey==='120'){press=PRICE.press120;tier=press[cn]||[0,0];}
   else{var plate=document.getElementById('pressMachine').dataset.plate||'142×102';press=PRICE.press142[plate];tier=press[cn]||[0,0];}
-  var nUp=parseInt(document.getElementById('piecesPerSheet').value);if(isNaN(nUp))nUp=1;
+  var nUp=parseInt(document.getElementById('piecesPerSheet').value)||1;
   var qty=parseInt(document.getElementById('quantity').value)||0;
   var totalSheets=qty>0?Math.ceil(qty/nUp):(nUp?Math.ceil(1000/nUp):1000);
   var base=tier[0],overflow=tier[1];
@@ -379,7 +119,7 @@ function calculate(){
   var pL=parseFloat(document.getElementById('dieL').value)||0,pW=parseFloat(document.getElementById('dieW').value)||0;
   var gram=parseInt(document.getElementById('paperGram').value)||0;
   var tonPrice=parseFloat(document.getElementById('paperTon').value)||0;
-  var nUp=parseInt(document.getElementById('piecesPerSheet').value);if(isNaN(nUp))nUp=1;
+  var nUp=parseInt(document.getElementById('piecesPerSheet').value)||1;
   // 裁纸尺寸: 刀版+20mm, 宽凑整5cm
   var cutL=pL+20,cutW=pW+20;
   cutW=Math.ceil(cutW/50)*50;
@@ -409,7 +149,7 @@ function calculate(){
 
   // 浪纸计价面积 = 长 × 宽
   var fArea=fL*fW/1000000;
-  var fRebate=parseFloat(document.getElementById('fluteRebate').value)||0;var effFPrice=fPrice*(1-fRebate/100);var fluteRaw=effFPrice*fArea;
+  var fluteRaw=fPrice*fArea;
   var flutePerSheet=fluteRaw*fLossMul;
 
   var mountCost=calcMount();
@@ -745,7 +485,7 @@ function saveQuote(){
   var gram=parseInt(document.getElementById('paperGram').value)||0;
   var tonPrice=parseFloat(document.getElementById('paperTon').value)||0;
   var flutePrice=parseFloat(document.getElementById('flutePrice').value)||0;
-  var nUp=parseInt(document.getElementById('piecesPerSheet').value);if(isNaN(nUp))nUp=1;
+  var nUp=parseInt(document.getElementById('piecesPerSheet').value)||1;
   var paperLossRaw=document.getElementById('paperLoss').value;
   var paperLoss=paperLossRaw===''?0:parseFloat(paperLossRaw);
   if(isNaN(paperLoss))paperLoss=200;
@@ -884,7 +624,6 @@ function clearQuoteHistory(){
   localStorage.removeItem('colorBoxHistory');
   renderQuoteHistory();
 }
-function toggleSelectAll(){ toggleAllCheckboxes(); }
 function toggleAllCheckboxes(){
   var checked=document.getElementById('selectAll').checked;
   document.querySelectorAll('.quoteCb').forEach(function(cb){cb.checked=checked;});
@@ -915,7 +654,7 @@ function buildQuoteSheet(r){
     {name:'浪纸',desc:(r.flutePrice||'')+'/㎡',val:r.fluteTotal||0},
     {name:'印刷',desc:(r.pressMachine||'')+' '+(r.colors||''),val:r.pressTotal||0},
     {name:'表面处理',desc:r.surface||'',val:r.surfaceCost||0},
-    {name:'裱瓦',desc:'0.20元/㎡',val:r.mountTotal||0},
+    {name:'裱瓦',desc:r.mount||'',val:r.mountTotal||0},
     {name:'刀版',desc:r.dieNew||'',val:r.dieFee||0},
     {name:'模切',desc:r.dieCutMachine||'',val:r.dieCutCost||0},
     {name:'粘盒',desc:r.glueBox||'',val:r.glueCost||0},
@@ -1069,7 +808,3 @@ function showTooltip(e,html){var g=document.getElementById('globalTooltip');g.in
 function hideTooltip(){document.getElementById('globalTooltip').style.display='none';}
 
 renderQuoteHistory();
-</script>
-<div id="globalTooltip" class="gtip" style="display:none;position:fixed;z-index:99999;"></div>
-</body>
-</html>
