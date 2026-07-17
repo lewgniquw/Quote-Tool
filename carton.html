@@ -156,7 +156,7 @@ h1{text-align:center;font-size:1.5rem;color:#2c3e50;padding:20px 0}
     </div>
 </div>
 
-<div class="footer">2026.07.16 18:06 · <span onclick="showPwd()" style="cursor:pointer;text-decoration:underline">⚙ 设置</span></div>
+<div class="footer">2026.07.17 08:46 · <span onclick="showPwd()" style="cursor:pointer;text-decoration:underline">⚙ 设置</span></div>
 </div>
 
 <div class="overlay" id="pwdOverlay"><div class="panel" style="max-width:300px;text-align:center">
@@ -342,7 +342,7 @@ function calculate(){
     if(dir==='vertical'){fw+=' +2cm='+(rawW+2).toFixed(1);lines.push(fl);lines.push(fw);}
     else{lines.push(fw);lines.push(fl+' +2cm='+(rawL+2).toFixed(1)+' (横瓦调换)');}
   }
-  lines.push('  单价¥'+price.toFixed(2)+(rebate>0?' 返点'+rebate+'%→¥'+effPrice.toFixed(2):'')+'/㎡ × '+lossMul.toFixed(4)+' = ¥'+boardCost.toFixed(4)+'/张 × '+totalSheets+'张 = ¥'+boardTotal.toFixed(2)+' → ¥'+(boardTotal/qty).toFixed(4)+'/个');
+  lines.push('  单价¥'+price.toFixed(2)+(rebate>0?' 返点'+rebate+'%→¥'+effPrice.toFixed(2):'')+'/㎡'+(lossMul>1?' × 损耗'+lossMul.toFixed(4):'')+' = ¥'+boardCost.toFixed(4)+'/张 × '+totalSheets+'张 = ¥'+boardTotal.toFixed(2)+' → ¥'+(boardTotal/qty).toFixed(4)+'/个');
   lines.push('');
   
   if(dieFee>0){lines.push('【刀版】新版 '+boardArea.toFixed(4)+'㎡×200=¥'+dieFee.toFixed(2)+' → ¥'+(dieFee/qty).toFixed(4)+'/个');lines.push('');}

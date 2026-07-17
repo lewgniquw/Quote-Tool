@@ -229,7 +229,7 @@ h1{text-align:center;font-size:1.5rem;color:#2c3e50;padding:20px 0}
     </div>
 </div>
 
-<div class="footer">2026.07.16 16:48 · <span onclick="showPwd()" style="cursor:pointer;text-decoration:underline">⚙ 设置</span></div>
+<div class="footer">2026.07.17 08:46 · <span onclick="showPwd()" style="cursor:pointer;text-decoration:underline">⚙ 设置</span></div>
 </div>
 
 <div class="overlay" id="pwdOverlay"><div class="panel" style="max-width:300px;text-align:center">
@@ -495,7 +495,7 @@ function calculate(){
   if(!enFlute){lines.push('【浪纸】已跳过');lines.push('');}
   else{
   lines.push('【浪纸】¥'+fPrice.toFixed(2)+'/㎡');
-  lines.push('  刀版: '+pL.toFixed(0)+'×'+pW.toFixed(0)+'mm → 浪纸: '+fL.toFixed(0)+'×'+fW.toFixed(0)+'mm (+1cm/+3cm) = '+fArea.toFixed(4)+'㎡ × ¥'+fPrice.toFixed(2)+' = ¥'+fluteRaw.toFixed(4));
+  lines.push('  刀版: '+pL.toFixed(0)+'×'+pW.toFixed(0)+'mm → 浪纸: '+fL.toFixed(0)+'×'+fW.toFixed(0)+'mm (+1cm/+3cm) = '+fArea.toFixed(4)+'㎡ × ¥'+fPrice.toFixed(2)+(fRebate>0?' 返点'+fRebate+'%→¥'+effFPrice.toFixed(2):'')+' = ¥'+fluteRaw.toFixed(4));
   if(!isNaN(fLoss)&&fLoss>0) lines.push('  损耗: ('+totalSheets+'+'+fLoss+')/'+totalSheets+' = '+fLossMul.toFixed(4));
   else lines.push('  损耗: 默认3% = '+fLossMul.toFixed(4));
   lines.push('  单张价: ¥'+fluteRaw.toFixed(4)+' × '+fLossMul.toFixed(4)+' = ¥'+flutePerSheet.toFixed(4)+'/张 → ¥'+(flutePerSheet/nUp).toFixed(4)+'/个');
