@@ -150,13 +150,13 @@ h1{text-align:center;font-size:1.5rem;color:#2c3e50;padding:20px 0}
     </div>
     <div style="overflow-x:auto">
         <table style="width:100%;border-collapse:collapse;font-size:0.8rem" id="quoteTable">
-            <thead><tr style="background:#f0f2f5"><th style="padding:8px;border-bottom:2px solid #3498db;text-align:center;width:30px"><input type="checkbox" id="selectAll" onclick="toggleSelectAll()" title="全选/取消全选"></th><th style="padding:8px;border-bottom:2px solid #3498db;text-align:left">名称</th><th style="padding:8px;border-bottom:2px solid #3498db;text-align:left">纸板尺寸</th><th style="padding:8px;border-bottom:2px solid #3498db;text-align:left">盒型</th><th style="padding:8px;border-bottom:2px solid #3498db;text-align:right">数量</th><th style="padding:8px;border-bottom:2px solid #3498db;text-align:right">成本</th><th style="padding:8px;border-bottom:2px solid #3498db;text-align:center">删除</th><th style="padding:8px;border-bottom:2px solid #3498db;text-align:center">导出</th></tr></thead>
-            <tbody id="quoteTableBody"><tr><td colspan="8" style="text-align:center;color:#aaa;padding:20px">暂无记录</td></tr></tbody>
+            <thead><tr style="background:#f0f2f5"><th style="padding:8px;border-bottom:2px solid #3498db;text-align:center;width:30px"><input type="checkbox" id="selectAll" onclick="toggleSelectAll()" title="全选/取消全选"></th><th style="padding:8px;border-bottom:2px solid #3498db;text-align:left">名称</th><th style="padding:8px;border-bottom:2px solid #3498db;text-align:left">时间</th><th style="padding:8px;border-bottom:2px solid #3498db;text-align:left">纸箱尺寸</th><th style="padding:8px;border-bottom:2px solid #3498db;text-align:left">纸板尺寸</th><th style="padding:8px;border-bottom:2px solid #3498db;text-align:left">盒型</th><th style="padding:8px;border-bottom:2px solid #3498db;text-align:right">数量</th><th style="padding:8px;border-bottom:2px solid #3498db;text-align:right">成本</th><th style="padding:8px;border-bottom:2px solid #3498db;text-align:center">操作</th></tr></thead>
+            <tbody id="quoteTableBody"><tr><td colspan="9" style="text-align:center;color:#aaa;padding:20px">暂无记录</td></tr></tbody>
         </table>
     </div>
 </div>
 
-<div class="footer">2026.07.17 08:46 · <span onclick="showPwd()" style="cursor:pointer;text-decoration:underline">⚙ 设置</span></div>
+<div class="footer">2026.07.19 17:31 · <span onclick="showPwd()" style="cursor:pointer;text-decoration:underline">⚙ 设置</span></div>
 </div>
 
 <div class="overlay" id="pwdOverlay"><div class="panel" style="max-width:300px;text-align:center">
@@ -538,16 +538,17 @@ function saveQuote(){
   alert('✅ 报价已保存');
 }
 
+function fmt(v,d){var s=v.toFixed(d);return s.replace(/\.?0+$/,"");}
 function renderQuoteTable(){
   var history=JSON.parse(localStorage.getItem('cartonBoxHistory')||'[]');
   var tbody=document.getElementById('quoteTableBody');
-  if(!history.length){tbody.innerHTML='<tr><td colspan="8" style="text-align:center;color:#aaa;padding:20px">暂无记录</td></tr>';return;}
+  if(!history.length){tbody.innerHTML='<tr><td colspan="9" style="text-align:center;color:#aaa;padding:20px">暂无记录</td></tr>';return;}
   tbody.innerHTML=history.map(function(r,i){
-    var dim=((r.l||0).toFixed(1))+'×'+((r.w||0).toFixed(1))+'×'+((r.h||0).toFixed(1));
+    var dim=(fmt(r.l||0,1))+'×'+(fmt(r.w||0,1))+'×'+(fmt(r.h||0,1));
     var q=(r.qty||0);
-    var up=((r.allCost||0)/(r.qty||1)).toFixed(4);
+    var up=((r.allCost||0)/(r.qty||1)).toFixed(2);
     var tip='\u003cb\u003e\ud83d\udccb 完整报价参数\u003c/b\u003e\u003cbr\u003e'
-      +'纸板尺寸: '+((r.boardL||0).toFixed(1))+'×'+((r.boardW||0).toFixed(1))+'cm\u003cbr\u003e'
+      +'纸板尺寸: '+(fmt(r.boardL||0,1))+'×'+(fmt(r.boardW||0,1))+'mm\u003cbr\u003e'
       +'纸板单价: ¥'+(r.price||0).toFixed(2)+(r.rebate?' 返点'+r.rebate+'%':'')+'\u003cbr\u003e'
       +'刀版: ¥'+((r.dieFee||0).toFixed(2))+' | 模切: '+(r.dcKey||'无')+'\u003cbr\u003e'
       +'拼版: '+(r.pieces||1)+' | 损耗: '+(r.loss||0)+'张\u003cbr\u003e'
@@ -562,7 +563,7 @@ function renderQuoteTable(){
       +'印刷¥'+((r.pressCost||0).toFixed(2))+' + 柔版¥'+((r.plateCost||0).toFixed(2))+' + 糊口¥'+((r.glueCost||0).toFixed(2))+'\u003cbr\u003e'
       +'运输¥'+((r.tsCost||0).toFixed(2))+' + 其他¥'+((r.extraCost||0).toFixed(2))+' = \u003cb\u003e总成本 ¥'+((r.allCost||0).toFixed(2))+'\u003c/b\u003e\u003cbr\u003e'
       +'含税含利单价: ¥'+((r.unitPrice||0).toFixed(4))+' | 总价: ¥'+((r.total||0).toFixed(2));
-    return '\u003ctr\u003e\u003ctd style="padding:6px 8px;border-bottom:1px solid #eee;text-align:center"\u003e\u003cinput type="checkbox" class="quoteCb" data-idx="'+i+'" onchange="updateSelectedCount()"\u003e\u003c/td\u003e\u003ctd style="padding:6px 8px;border-bottom:1px solid #eee;cursor:pointer" onclick="editName('+i+',this)" id="name-'+i+'"\u003e'+(r.name||'')+'\u003c/td\u003e\u003ctd style="padding:6px 8px;border-bottom:1px solid #eee"\u003e'+dim+'\u003c/td\u003e\u003ctd style="padding:6px 8px;border-bottom:1px solid #eee"\u003e'+(r.type||'')+'\u003c/td\u003e\u003ctd style="padding:6px 8px;border-bottom:1px solid #eee;text-align:right"\u003e'+q+'\u003c/td\u003e\u003ctd style="padding:6px 8px;border-bottom:1px solid #eee;text-align:right"\u003e¥'+up+'\u003c/td\u003e\u003ctd style="padding:6px 8px;border-bottom:1px solid #eee;text-align:center" onmouseenter=\'showTooltip(event,'+JSON.stringify(tip)+')\' onmouseleave=\'hideTooltip()\'\u003e\u003cbutton onclick="deleteQuote('+i+')" style="background:#e74c3c;color:#fff;border:none;padding:2px 8px;border-radius:4px;cursor:pointer;font-size:0.75rem"\u003e删除\u003c/button\u003e\u003c/td\u003e\u003ctd style="padding:6px 8px;border-bottom:1px solid #eee;text-align:center"\u003e\u003cbutton onclick="exportSingleXLSX('+i+')" style="background:#3498db;color:#fff;border:none;padding:2px 8px;border-radius:4px;cursor:pointer;font-size:0.75rem"\u003e导出\u003c/button\u003e\u003c/td\u003e\u003c/tr\u003e';
+    return '\u003ctr\u003e\u003ctd style="padding:6px 8px;border-bottom:1px solid #eee;text-align:center"\u003e\u003cinput type="checkbox" class="quoteCb" data-idx="'+i+'" onchange="updateSelectedCount()"\u003e\u003c/td\u003e\u003ctd style="padding:6px 8px;border-bottom:1px solid #eee;cursor:pointer" onclick="editName('+i+',this)" id="name-'+i+'"\u003e'+(r.name||'')+'\u003c/td\u003e\u003ctd style="padding:6px 8px;border-bottom:1px solid #eee"\u003e'+(r.time||'')+'\u003c/td\u003e\u003ctd style="padding:6px 8px;border-bottom:1px solid #eee"\u003e'+dim+'\u003c/td\u003e\u003ctd style="padding:6px 8px;border-bottom:1px solid #eee"\u003e'+(fmt(r.boardL||0,1))+'\u00d7'+(fmt(r.boardW||0,1))+'\u003c/td\u003e\u003ctd style="padding:6px 8px;border-bottom:1px solid #eee"\u003e'+(r.type||'')+'\u003c/td\u003e\u003ctd style="padding:6px 8px;border-bottom:1px solid #eee;text-align:right"\u003e'+q+'\u003c/td\u003e\u003ctd style="padding:6px 8px;border-bottom:1px solid #eee;text-align:right"\u003e\u00a5'+up+'\u003c/td\u003e\u003ctd style="padding:6px 8px;border-bottom:1px solid #eee;text-align:center" onmouseenter=\'showTooltip(event,'+JSON.stringify(tip)+')\' onmouseleave=\'hideTooltip()\'\u003e\u003cbutton onclick="deleteQuote('+i+')" style="background:#e74c3c;color:#fff;border:none;padding:2px 8px;border-radius:4px;cursor:pointer;font-size:0.75rem"\u003e删除\u003c/button\u003e \u003cbutton onclick="exportSingleXLSX('+i+')" style="background:#3498db;color:#fff;border:none;padding:2px 8px;border-radius:4px;cursor:pointer;font-size:0.75rem"\u003e导出\u003c/button\u003e\u003c/td\u003e\u003c/tr\u003e';
   }).join('');
   updateSelectedCount();
 }
@@ -618,11 +619,11 @@ function buildQuoteSheet(r){
   rows.push(['数量',qty]);
   rows.push(['纸箱尺寸',((r.l||0).toFixed(0))+' × '+((r.w||0).toFixed(0))+' × '+((r.h||0).toFixed(0))+' mm']);
   rows.push(['盒型',r.type||'']);
-  rows.push(['纸板尺寸',((r.boardL||0).toFixed(1))+' × '+((r.boardW||0).toFixed(1))+' mm']);
+  rows.push(['纸板尺寸',(fmt(r.boardL||0,1))+' × '+(fmt(r.boardW||0,1))+' mm']);
   rows.push(['成本明细','']);
   rows.push(['工序','小计 (元)']);
   var items=[
-    {name:'纸板',desc:((r.boardL||0).toFixed(1))+'×'+((r.boardW||0).toFixed(1))+'cm ¥'+(r.price||0).toFixed(2)+'/㎡',val:r.boardCost||0},
+    {name:'纸板',desc:(fmt(r.boardL||0,1))+'×'+(fmt(r.boardW||0,1))+'cm ¥'+(r.price||0).toFixed(2)+'/㎡',val:r.boardCost||0},
     {name:'刀版',desc:'新版×250',val:r.dieCost||0},
     {name:'模切',desc:r.dcKey||'',val:r.dieCutCost||0},
     {name:'印刷',desc:(r.pressType==='traditional'?('传统'+r.colors+'色'):('平方计价 ¥'+(r.pressArea||0)+'/㎡')),val:r.pressCost||0},
