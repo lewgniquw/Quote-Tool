@@ -264,7 +264,7 @@ h1{text-align:center;font-size:1.5rem;color:#2c3e50;padding:20px 0}
     </div>
 </div>
 
-<div class="footer">2026.07.21 23:19 · <span onclick="showPwd()" style="cursor:pointer;text-decoration:underline">⚙ 设置</span></div>
+<div class="footer">2026.07.21 23:34 · <span onclick="showPwd()" style="cursor:pointer;text-decoration:underline">⚙ 设置</span></div>
 </div>
 
 <div class="overlay" id="pwdOverlay"><div class="panel" style="max-width:300px;text-align:center">
@@ -559,7 +559,7 @@ function calculate(){
     updateOutsource();
   }
 
-    var extraUnitSel=document.getElementById('extraCostUnit');var extraUnit=extraUnitSel.options[extraUnitSel.selectedIndex].text;
+    var extraUnitSel=document.getElementById('extraCostUnit');var extraUnit=extraUnitSel.selectedIndex>=0?extraUnitSel.options[extraUnitSel.selectedIndex].text:'元/个';
   var extraVal=parseFloat(document.getElementById('extraCost').value)||0;
   var extraArea=pArea||0;if(!extraArea){extraArea=(fL||0)*(fW||0)/1000000;};var extraCost=extraUnit==='元/个'?extraVal*qty:extraUnit==='元/㎡'?extraVal*extraArea*totalSheets:extraVal;
   if(document.getElementById('twoPiece').checked&&document.querySelector('input[name="twoPieceMode"]:checked').value==='split'){
@@ -890,7 +890,12 @@ function saveQuote(){
   var C=window._costs||{};
   var qty=parseInt(document.getElementById('quantity').value)||0;
   if(!qty||Object.keys(C).length===0){alert('请先计算报价');return;}
-  var clientName=prompt('请输入客户/产品名称：');if(!clientName||!clientName.trim()){alert('名称不能为空');return;}clientName=clientName.trim();
+  var loaded=window._loadedIdx!=null;var overwrite=false;
+  if(loaded&&window._loadedIdx<JSON.parse(localStorage.getItem('colorBoxHistory')||'[]').length){overwrite=confirm('已从记录「'+(window._loadedName||'')+'」加载。\n\n确定=覆盖原记录\n取消=另存为新记录');}
+  var clientName;
+  if(overwrite){clientName=window._loadedName||'';}
+  else{clientName=prompt('请输入客户/产品名称：');if(!clientName||!clientName.trim()){alert('名称不能为空');return;}}
+  clientName=clientName.trim();
 
   // === 读取所有表单参数 ===
   var pL=parseFloat(document.getElementById('dieL').value)||0;
@@ -933,7 +938,7 @@ function saveQuote(){
   if(isNaN(marginPct))marginPct=20;
 
   var extraUnitSel=document.getElementById('extraCostUnit');
-  var extraMode=extraUnitSel.options[extraUnitSel.selectedIndex].text;
+  var extraMode=extraUnitSel.selectedIndex>=0?extraUnitSel.options[extraUnitSel.selectedIndex].text:'元/个';
   var extraVal=parseFloat(document.getElementById('extraCost').value)||0;
 
   // === 从 window._costs 取各分项小计 ===
@@ -1001,7 +1006,12 @@ function saveQuote(){
   };
 
   var history=JSON.parse(localStorage.getItem('colorBoxHistory')||'[]');
-  history.unshift(record);
+  if(overwrite){
+    history[window._loadedIdx]=record;
+  }else{
+    history.unshift(record);
+  }
+  window._loadedIdx=null;window._loadedName=null;
   localStorage.setItem('colorBoxHistory', JSON.stringify(history));
 
   if(typeof XLSX!=='undefined'||document.readyState==='complete'){renderQuoteHistory();}else{window.addEventListener('load',function(){renderQuoteHistory();});}
@@ -1106,6 +1116,7 @@ function loadQuote(idx){
   else{set('outsourceEnabled',false);document.getElementById('outsourceCard').style.display='none';}
   if(r.tsCustom){set('transportCustom',r.tsCustom);document.getElementById('transportCustom').style.display='';}
   updateDimensions();checkPressLimit();suggestDieCut();updateOutsource();
+  window._loadedIdx=idx;window._loadedName=r.name;
   window.scrollTo({top:0,behavior:'smooth'});
 }function clearQuoteHistory(){
   if(!confirm('确定清空所有报价记录？此操作不可恢复。'))return;
