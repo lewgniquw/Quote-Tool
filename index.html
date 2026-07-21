@@ -153,7 +153,7 @@ h1{text-align:center;font-size:1.5rem;color:#2c3e50;padding:20px 0}
         <div class="field"><label>刀版</label>
             <select id="dieNew"><option value="0">旧版 (免费)</option><option value="1" selected>新版 (面积×250)</option></select></div>
         <div class="field"><label>模切机型 <span class="help-tip" data-tip="930手动: 900×640mm&#10;1100手动: 1070×760mm&#10;1300自动: 1270×970 / 430×430mm&#10;1500自动: 1470×1070 / 550×550mm&#10;1800手动: 1780×1260mm">?</span></label>
-            <select id="dieCutMachine">
+            <select id="dieCutMachine" onchange="this.dataset.manual='1'">
                 <option value="930手动" title="最大 900×640mm">930手动 (装35 加0.08)</option>
                 <option value="1100手动" title="最大 1070×760mm">1100手动 (装35 加0.10)</option>
                 <option value="1300自动" selected title="最大 1270×970mm | 最小 430×430mm">1300自动 (装40 加0.12)</option>
@@ -197,7 +197,7 @@ h1{text-align:center;font-size:1.5rem;color:#2c3e50;padding:20px 0}
         <label style="font-size:0.85rem;cursor:pointer;color:#27ae60"><input type="checkbox" id="waivePressBase" onchange="updatePressDisplay()" style="width:auto;height:auto;vertical-align:middle"> 免开机费</label>
         <label style="font-size:0.85rem;cursor:pointer;color:#27ae60"><input type="checkbox" id="waiveDieSetup" style="width:auto;height:auto;vertical-align:middle"> 免装版费</label>
         <label style="font-size:0.85rem;cursor:pointer;color:#8e44ad"><input type="checkbox" id="vipMode" onchange="checkPressLimit()" style="width:auto;height:auto;vertical-align:middle"> 大客户/代加工</label>
-        <label style="font-size:0.85rem;cursor:pointer;color:#e74c3c"><input type="checkbox" id="outsourceEnabled" onchange="var oc=document.getElementById('outsourceCard');oc.style.display=this.checked?'':'none';document.getElementById('chkPress').checked=!this.checked" style="width:auto;height:auto;vertical-align:middle"> 外加工</label>
+        <label style="font-size:0.85rem;cursor:pointer;color:#e74c3c"><input type="checkbox" id="outsourceEnabled" onchange="var oc=document.getElementById('outsourceCard');oc.style.display=this.checked?'':'none';" style="width:auto;height:auto;vertical-align:middle"> 外加工</label>
     </div>
 </div>
 
@@ -229,7 +229,6 @@ h1{text-align:center;font-size:1.5rem;color:#2c3e50;padding:20px 0}
     <div class="row" style="margin-top:8px">
         <div class="field"><label>数量 (个)</label><input type="number" id="quantity" value="" placeholder="必填" min="1" step="100"></div>
         <div class="field"><label>税率 (%)</label><div style="display:flex;gap:0"><button onclick="adjInput('taxRate',-1,0,20)" style="padding:8px 10px;border:1px solid #ddd;border-radius:6px 0 0 6px;cursor:pointer;background:#f5f5f5;font-size:0.9rem">−</button><input type="number" id="taxRate" value="7" min="0" max="20" step="1" style="text-align:center;border-radius:0;border-left:0;border-right:0"><button onclick="adjInput('taxRate',1,0,20)" style="padding:8px 10px;border:1px solid #ddd;border-radius:0 6px 6px 0;cursor:pointer;background:#f5f5f5;font-size:0.9rem">+</button></div></div>
-        <div class="field"><label>客户返点(%)</label><input type="number" id="rebatePct" value="0" step="0.1"></div>
         <div class="field">
             <label>毛利率 (%)</label>
             <div style="display:flex;align-items:center;gap:4px">
@@ -265,7 +264,7 @@ h1{text-align:center;font-size:1.5rem;color:#2c3e50;padding:20px 0}
     </div>
 </div>
 
-<div class="footer">2026.07.20 22:29 · <span onclick="showPwd()" style="cursor:pointer;text-decoration:underline">⚙ 设置</span></div>
+<div class="footer">2026.07.21 08:30 · <span onclick="showPwd()" style="cursor:pointer;text-decoration:underline">⚙ 设置</span></div>
 </div>
 
 <div class="overlay" id="pwdOverlay"><div class="panel" style="max-width:300px;text-align:center">
@@ -299,7 +298,7 @@ var PRICE = {
   surfaceFilm: {"亮膜":0.30,"哑膜":0.35,"亮油":0.20,"哑油":0.28,"UV油":0.45,"大面积烫金/银":3,"防刮膜":0.80},
   surfaceK: {"烫金/银":0.30,"凹凸":0.25,"压纹":0.15},
   embossFee: 100,
-  pressLimit: {"120":[104,75,50,45],"115×85":[115,85],"132×97":[132,97],"142×102":[142,102]},
+  pressLimit: {"120":[104,75,50,45],"115×85":[115,85,76,52],"132×97":[132,97,76,52],"142×102":[142,102,76,52]},
   press120: {"4":[350,0.07],"5":[550,0.11]},
   press142: {"115×85":{"4":[520,0.11],"5":[800,0.14]},"132×97":{"4":[650,0.16],"5":[900,0.22]},"142×102":{"4":[750,0.22],"5":[1150,0.27]}},
   mount: 0.20,
@@ -371,11 +370,13 @@ function checkPressLimit(){
     var best='142×102';
     if(vip){var sizes=['115×85','132×97','142×102'];for(var i=0;i<sizes.length;i++){var L=PRICE.pressLimit[sizes[i]];if((pL<=L[0]&&pW<=L[1])||(pW<=L[0]&&pL<=L[1])){best=sizes[i];break;}}}
     var cn_=document.getElementById('colors').value;var T=PRICE.press142[best][cn_];
-    document.getElementById('pressLimit').innerHTML='| '+(vip?'版纸: ':'固定 ')+'<b>'+best+'</b> | 开机<b>¥'+T[0]+'</b> + 超数×<b>¥'+T[1]+'</b>';
-    document.getElementById('pressLimit').style.color='#27ae60';document.getElementById('pressLimit').style.fontWeight='bold';
-    document.getElementById('pressWarning').style.display='none';
+    var lim2=PRICE.pressLimit[best]||[999,999,0,0];
+    var ok=(pL>=lim2[2]&&pL<=lim2[0]&&pW>=lim2[3]&&pW<=lim2[1])||(pW>=lim2[2]&&pW<=lim2[0]&&pL>=lim2[3]&&pL<=lim2[1]);
+    var el=document.getElementById('pressLimit'),warn=document.getElementById('pressWarning');
+    el.innerHTML='| '+(vip?'版纸: ':'固定 ')+'<b>'+best+'</b> | 最大 '+lim2[0]+'×'+lim2[1]+'cm 最小 '+lim2[2]+'×'+lim2[3]+'cm | 开机<b>¥'+T[0]+'</b> + 超数×<b>¥'+T[1]+'</b>';
+    if(ok){warn.style.display='none';el.style.color='#27ae60';}else{warn.style.display='block';warn.textContent='⚠ 裁切尺寸超出该版纸范围！';el.style.color='#e74c3c';}
     document.getElementById('pressMachine').dataset.plate=best;
-    updatePressDisplay();return true;
+    updatePressDisplay();return ok;
   }
 }
 
@@ -403,6 +404,8 @@ function suggestDieCut(){
     var lim=PRICE.dieCutLimit[k];
     if((cmL<=lim[0]&&cmW<=lim[1]||cmW<=lim[0]&&cmL<=lim[1])&&!best)best=k;
   });
+  var sel=document.getElementById('dieCutMachine');
+  if(!sel.dataset.manual&&best)sel.value=best;
   var sp=document.getElementById('dieCutSugg');
   if(best){sp.textContent=' → 建议: '+best;sp.style.border='1.5px solid #27ae60';sp.style.borderRadius='3px';sp.style.padding='1px 6px';}
   else{sp.textContent='';sp.style.border='none';sp.style.padding='0';}
@@ -601,9 +604,6 @@ window._costs={
   var total=sp*qty;
 
   // 客户返点（不加入allCost避免循环依赖）
-  var rebatePct=parseFloat(document.getElementById('rebatePct').value);if(isNaN(rebatePct))rebatePct=0;
-  var rebateAmount=total*rebatePct/100;
-  window._rebateAmount=rebateAmount;
 
   document.getElementById('result').style.display='block';document.getElementById('btnExport').style.display='block';document.getElementById('btnSave').style.display='block';
   document.getElementById('totalPrice').textContent='¥ '+total.toFixed(2);
@@ -713,7 +713,6 @@ window._costs={
   }
   
   // 客户返点
-  if(rebatePct>0){lines.push('<hr>');lines.push('【客户返点】'+rebatePct.toFixed(1)+'% × ¥'+total.toFixed(2)+' = ¥'+rebateAmount.toFixed(2)+' → ¥'+(rebateAmount/qty).toFixed(4)+'/个');lines.push('');}
   lines.push('<hr>');
   lines.push('<span style="word-break:break-all">面纸 ¥'+paperTotal.toFixed(2)+' + 浪纸 ¥'+fluteTotal.toFixed(2)+' + 印刷 ¥'+pressTotal.toFixed(2)+' + 表面 ¥'+surfaceCost.toFixed(2)+' + 裱瓦 ¥'+mountTotal.toFixed(2)+' + 刀版 ¥'+dieFee.toFixed(2)+' + 模切 ¥'+dieCutCost.toFixed(2)+' + 粘盒 ¥'+glueCost.toFixed(2)+' + 运输 ¥'+tsCost.toFixed(2)+' + 外加工 ¥'+outsourceCost.toFixed(2)+' + 其他 ¥'+extraCost.toFixed(2)+' = <b>合计 ¥'+allCost.toFixed(2)+'</b></span>');
   lines.push('<hr>');
@@ -981,7 +980,7 @@ function saveQuote(){
     transport:transport,
     tsCustom:transportCustom,
     taxRate:taxPct, marginPct:marginPct,
- rebatePct:(parseFloat(document.getElementById('rebatePct').value)||0), rebateAmount:(window._rebateAmount||0),
+ 
     extraMode:extraMode, extraVal:extraVal,
     paperTotal:paperTotal, fluteTotal:fluteTotal,
     pressTotal:pressTotal, surfaceCost:surfaceCost,

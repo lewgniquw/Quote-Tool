@@ -113,7 +113,7 @@ h1{text-align:center;font-size:1.5rem;color:#2c3e50;padding:20px 0}
     <h2>🎨 其他</h2>
     <div class="row">
         <div class="field"><label>糊口/打钉 (元/个)</label><input type="number" id="cartonGlue" value="0" step="0.01"></div>
-        <div class="field"><label>运输 (元/㎡)</label><select id="cartonTransport"><option value="无需物流">无需物流</option>
+        <div class="field"><label>运输 (元/㎡)</label><select id="cartonTransport" onchange="var ci=document.getElementById('cartonTransportCustom');ci.style.display=this.value==='custom'?'':'none';if(this.value!=='custom')ci.value='';calculate()"><option value="无需物流">无需物流</option>
 <option value="龙泉">龙泉 0.08</option>
 <option value="庆元">庆元 0.12</option>
 <option value="政和">政和 0.15</option>
@@ -122,7 +122,7 @@ h1{text-align:center;font-size:1.5rem;color:#2c3e50;padding:20px 0}
 <option value="建瓯">建瓯 0.25</option>
 <option value="松阳">松阳 0.25</option>
 <option value="0.3">0.30</option>
-<option value="0.35">0.35</option></select></div>
+<option value="0.35">0.35</option><option value="custom">自定义</option></select><input type="number" id="cartonTransportCustom" value="" step="0.01" placeholder="手动输入 元/㎡" style="display:none;margin-top:3px;width:100%;padding:8px;border:1px solid #ddd;border-radius:6px;font-size:0.85rem;text-align:center" oninput="calculate()"></div>
         <div class="field"><label>损耗(张)</label><input type="number" id="cartonLoss" value="0" step="1"></div>
     </div>
     <div class="row" style="margin-top:4px">
@@ -156,7 +156,7 @@ h1{text-align:center;font-size:1.5rem;color:#2c3e50;padding:20px 0}
     </div>
 </div>
 
-<div class="footer">2026.07.19 17:31 · <span onclick="showPwd()" style="cursor:pointer;text-decoration:underline">⚙ 设置</span></div>
+<div class="footer">2026.07.19 22:33 · <span onclick="showPwd()" style="cursor:pointer;text-decoration:underline">⚙ 设置</span></div>
 </div>
 
 <div class="overlay" id="pwdOverlay"><div class="panel" style="max-width:300px;text-align:center">
@@ -293,7 +293,8 @@ function calculate(){
   
   // Transport
   var tsKey=document.getElementById('cartonTransport').value;
-  var tsPrice=PRICE.transport[tsKey]||0;
+  var tsCustom=parseFloat(document.getElementById('cartonTransportCustom').value);
+  var tsPrice=tsKey==='custom'?(isNaN(tsCustom)?0:tsCustom):(PRICE.transport[tsKey]||0);
   var tsCost=tsPrice*boardArea*totalSheets;
   
   // Extra
@@ -620,23 +621,22 @@ function buildQuoteSheet(r){
   rows.push(['纸箱尺寸',((r.l||0).toFixed(0))+' × '+((r.w||0).toFixed(0))+' × '+((r.h||0).toFixed(0))+' mm']);
   rows.push(['盒型',r.type||'']);
   rows.push(['纸板尺寸',(fmt(r.boardL||0,1))+' × '+(fmt(r.boardW||0,1))+' mm']);
-  rows.push(['成本明细','']);
-  rows.push(['工序','小计 (元)']);
+  rows.push(['成本明细（工序）','小计 (元)']);
   var items=[
-    {name:'纸板',desc:(fmt(r.boardL||0,1))+'×'+(fmt(r.boardW||0,1))+'cm ¥'+(r.price||0).toFixed(2)+'/㎡',val:r.boardCost||0},
+    {name:'纸板',desc:(fmt(r.boardL||0,1))+'×'+(fmt(r.boardW||0,1))+'mm ¥'+(r.price||0).toFixed(2)+'/㎡',val:r.boardCost||0},
     {name:'刀版',desc:'新版×250',val:r.dieCost||0},
     {name:'模切',desc:r.dcKey||'',val:r.dieCutCost||0},
     {name:'印刷',desc:(r.pressType==='traditional'?('传统'+r.colors+'色'):('平方计价 ¥'+(r.pressArea||0)+'/㎡')),val:r.pressCost||0},
     {name:'柔版',desc:'',val:r.plateCost||0},
     {name:'糊口/打钉',desc:'¥'+((r.gluePrice||0).toFixed(2))+'/个',val:r.glueCost||0},
-    {name:'运输',desc:r.transport||'',val:r.tsCost||0},
+    {name:'运输',desc:r.transport||''+(r.tsPrice!==undefined?' ¥'+Number(r.tsPrice).toFixed(2)+'/㎡':''),val:r.tsCost||0},
     {name:'其他成本',desc:(r.extraMode||'')+' ¥'+(r.extraVal||0),val:r.extraCost||0}
   ];
   var totalCost=0;
   items.forEach(function(it){
     if(it.val>0){
       var label=it.name+(it.desc?'-'+it.desc:'');
-      rows.push([label,it.val]);
+      rows.push([label,Math.round(it.val*100)/100]);
       totalCost+=it.val;
     }
   });
@@ -646,14 +646,14 @@ function buildQuoteSheet(r){
   var taxPrice=singleCost*(1+taxRate/100);
   var marginPrice=taxPrice/(1-marginRate/100);
   rows.push(['报价汇总','']);
-  rows.push(['总价',totalCost]);
-  rows.push(['单个成本',singleCost]);
-  rows.push(['含税'+taxRate+'%',taxPrice]);
-  rows.push(['毛利'+marginRate+'%',marginPrice]);
+  rows.push(['总价',Math.round(totalCost*100)/100]);
+  rows.push(['单个成本',Math.round(singleCost*100)/100]);
+  rows.push(['含税'+taxRate+'%',Math.round(taxPrice*100)/100]);
+  rows.push(['毛利'+marginRate+'%',Math.round(marginPrice*100)/100]);
   var ws=XLSX.utils.aoa_to_sheet(rows);
   // === Formula cells (汇总) ===
   var costCount=items.filter(function(it){return it.val>0;}).length;
-  var fc=9, lc=8+costCount, tr=lc+2, sr=tr+1, txr=sr+1, mr=txr+1;
+  var fc=8, lc=7+costCount, tr=lc+2, sr=tr+1, txr=sr+1, mr=txr+1;
   ws['B'+tr].f='=SUM(B'+fc+':B'+lc+')';
   ws['B'+sr].f='=B'+tr+'/B3';
   ws['B'+txr].f='=B'+sr+'*(1+'+taxRate+'/100)';
@@ -669,9 +669,8 @@ function buildQuoteSheet(r){
   var border={top:{style:'thin',color:{rgb:'000000'}},bottom:{style:'thin',color:{rgb:'000000'}},left:{style:'thin',color:{rgb:'000000'}},right:{style:'thin',color:{rgb:'000000'}}};
   var numFmt='#,##0.00';
   var rowType={};
-  [0, 8, 8+items.filter(function(it){return it.val>0;}).length+1].forEach(function(rr){rowType[rr]='title';});
-  [9].forEach(function(rr){rowType[rr]='subheader';});
-  var range=XLSX.utils.decode_range(ws['!ref']);
+  [0, 6, 6+costCount+1].forEach(function(rr){rowType[rr]='title';});
+    var range=XLSX.utils.decode_range(ws['!ref']);
   for(var R=range.s.r; R<=range.e.r; R++){
     for(var C=range.s.c; C<=range.e.c; C++){
       var addr=XLSX.utils.encode_cell({r:R, c:C});
@@ -682,6 +681,8 @@ function buildQuoteSheet(r){
       if(rowType[R]==='title'){
         cell.s={font:titleFont, fill:titleFill, alignment:{horizontal:'center',vertical:'center',wrapText:true}, border:border};
         if(typ==='n') cell.z=numFmt;
+        if(!ws['!rows']) ws['!rows']=[];
+        ws['!rows'][R] = ws['!rows'][R]||{}; ws['!rows'][R].hpt = 28;
       } else if(rowType[R]==='subheader'){
         if(C===0) cell.s={font:labelFont, fill:headerFill, alignment:{horizontal:'left'}, border:border};
         else {cell.s={font:headerFont, fill:headerFill, alignment:{horizontal:'right'}, border:border}; if(typ==='n'){cell.z=numFmt; cell.t='n';}}
