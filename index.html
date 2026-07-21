@@ -264,7 +264,7 @@ h1{text-align:center;font-size:1.5rem;color:#2c3e50;padding:20px 0}
     </div>
 </div>
 
-<div class="footer">2026.07.21 23:34 · <span onclick="showPwd()" style="cursor:pointer;text-decoration:underline">⚙ 设置</span></div>
+<div class="footer">2026.07.21 23:35 · <span onclick="showPwd()" style="cursor:pointer;text-decoration:underline">⚙ 设置</span></div>
 </div>
 
 <div class="overlay" id="pwdOverlay"><div class="panel" style="max-width:300px;text-align:center">
@@ -981,8 +981,10 @@ function saveQuote(){
     enFlute:document.getElementById('chkFlute').checked, enSurface:document.getElementById('chkSurface').checked,
     enMount:document.getElementById('chkMount').checked, enDieCut:document.getElementById('chkDieCut').checked,
     enGlue:document.getElementById('chkGlue').checked, enTransport:document.getElementById('chkTransport').checked,
-    plateSize:plateSize, waivePressBase:waivePressBase,
+    plateSize:plateSize, waivePressBase:waivePressBase, waivePressRaw:document.getElementById('waivePressBase').checked,
+    waiveDieRaw:document.getElementById('waiveDieSetup').checked, vipRaw:document.getElementById('vipMode').checked,
     surface:surfaceStr,
+    surfaceRaw:(function(){var a=[];document.querySelectorAll('#surfaceGroup input:checked').forEach(function(c){a.push(c.value)});return a;})(),
     mount:mountDisp,
     dieNew:dieNew==='1'?'新版':'旧版', dieNewRaw:dieNew,
     dieCutMachine:dieCutMachine,
@@ -1115,6 +1117,19 @@ function loadQuote(idx){
   if(r.outsourceCost>0){set('outsourceEnabled',true);document.getElementById('outsourceCard').style.display='';}
   else{set('outsourceEnabled',false);document.getElementById('outsourceCard').style.display='none';}
   if(r.tsCustom){set('transportCustom',r.tsCustom);document.getElementById('transportCustom').style.display='';}
+  // Restore surface checkboxes
+  if(r.surfaceRaw){
+    var allCbs=document.querySelectorAll('#surfaceGroup input[type=checkbox]');
+    for(var ai=0;ai<allCbs.length;ai++)allCbs[ai].checked=false;
+    for(var si=0;si<r.surfaceRaw.length;si++){
+      var cb=document.querySelector('#surfaceGroup input[value="'+r.surfaceRaw[si]+'"]');
+      if(cb)cb.checked=true;
+    }
+  }
+  // Restore special settings
+  set('waivePressBase',r.waivePressRaw!==false);
+  set('waiveDieSetup',r.waiveDieRaw!==false);
+  set('vipMode',r.vipRaw||false);
   updateDimensions();checkPressLimit();suggestDieCut();updateOutsource();
   window._loadedIdx=idx;window._loadedName=r.name;
   window.scrollTo({top:0,behavior:'smooth'});
