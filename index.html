@@ -264,7 +264,7 @@ h1{text-align:center;font-size:1.5rem;color:#2c3e50;padding:20px 0}
     </div>
 </div>
 
-<div class="footer">2026.07.21 08:30 · <span onclick="showPwd()" style="cursor:pointer;text-decoration:underline">⚙ 设置</span></div>
+<div class="footer">2026.07.21 17:02 · <span onclick="showPwd()" style="cursor:pointer;text-decoration:underline">⚙ 设置</span></div>
 </div>
 
 <div class="overlay" id="pwdOverlay"><div class="panel" style="max-width:300px;text-align:center">
@@ -948,7 +948,7 @@ function saveQuote(){
   var tsCost=C.transport||0;
   var extraCost=C.extra||0;
 
-  var allCost=paperTotal+fluteTotal+pressTotal+mountTotal+dieCutCost+glueCost+dieFee+tsCost+surfaceCost+outsourceCost+extraCost;
+  var allCost=paperTotal+fluteTotal+pressTotal+mountTotal+dieCutCost+glueCost+dieFee+tsCost+surfaceCost+(C.outsourceCost||0)+extraCost;
   var cpu=allCost/qty;
   var tax=taxPct/100, margin=marginPct/100;
   var sp=cpu*(1+tax)/(1-margin);
