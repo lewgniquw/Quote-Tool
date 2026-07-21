@@ -228,7 +228,7 @@ h1{text-align:center;font-size:1.5rem;color:#2c3e50;padding:20px 0}
     </div>
     <div class="row" style="margin-top:8px">
         <div class="field"><label>数量 (个)</label><input type="number" id="quantity" value="" placeholder="必填" min="1" step="100"></div>
-        <div class="field"><label>税率 (%)</label><div style="display:flex;gap:0"><button onclick="adjInput('taxRate',-1,0,20)" style="padding:8px 10px;border:1px solid #ddd;border-radius:6px 0 0 6px;cursor:pointer;background:#f5f5f5;font-size:0.9rem">−</button><input type="number" id="taxRate" value="7" min="0" max="20" step="1" style="text-align:center;border-radius:0;border-left:0;border-right:0"><button onclick="adjInput('taxRate',1,0,20)" style="padding:8px 10px;border:1px solid #ddd;border-radius:0 6px 6px 0;cursor:pointer;background:#f5f5f5;font-size:0.9rem">+</button></div></div>
+        <div class="field"><label>税率 (%)</label><div style="display:flex;gap:0"><button onclick="adjInput('taxRate',-1,0,20)" style="padding:8px 10px;border:1px solid #ddd;border-radius:6px 0 0 6px;cursor:pointer;background:#f5f5f5;font-size:0.9rem">−</button><input type="number" id="taxRate" value="" min="0" max="20" step="1" style="text-align:center;border-radius:0;border-left:0;border-right:0"><button onclick="adjInput('taxRate',1,0,20)" style="padding:8px 10px;border:1px solid #ddd;border-radius:0 6px 6px 0;cursor:pointer;background:#f5f5f5;font-size:0.9rem">+</button></div></div>
         <div class="field">
             <label>毛利率 (%)</label>
             <div style="display:flex;align-items:center;gap:4px">
@@ -264,7 +264,7 @@ h1{text-align:center;font-size:1.5rem;color:#2c3e50;padding:20px 0}
     </div>
 </div>
 
-<div class="footer">2026.07.21 17:02 · <span onclick="showPwd()" style="cursor:pointer;text-decoration:underline">⚙ 设置</span></div>
+<div class="footer">2026.07.21 23:19 · <span onclick="showPwd()" style="cursor:pointer;text-decoration:underline">⚙ 设置</span></div>
 </div>
 
 <div class="overlay" id="pwdOverlay"><div class="panel" style="max-width:300px;text-align:center">
@@ -369,7 +369,7 @@ function checkPressLimit(){
     var vip=document.getElementById('vipMode').checked;
     var best='142×102';
     if(vip){var sizes=['115×85','132×97','142×102'];for(var i=0;i<sizes.length;i++){var L=PRICE.pressLimit[sizes[i]];if((pL<=L[0]&&pW<=L[1])||(pW<=L[0]&&pL<=L[1])){best=sizes[i];break;}}}
-    var cn_=document.getElementById('colors').value;var T=PRICE.press142[best][cn_];
+    var cn_=document.getElementById('colors').value||'4';var T=(PRICE.press142[best]||{})[cn_]||[750,0.22];
     var lim2=PRICE.pressLimit[best]||[999,999,0,0];
     var ok=(pL>=lim2[2]&&pL<=lim2[0]&&pW>=lim2[3]&&pW<=lim2[1])||(pW>=lim2[2]&&pW<=lim2[0]&&pL>=lim2[3]&&pL<=lim2[1]);
     var el=document.getElementById('pressLimit'),warn=document.getElementById('pressWarning');
@@ -538,7 +538,7 @@ function calculate(){
   var colorCost=frontPress.costPerK+(backPress?backPress.costPerK:0);
   var marginPct=parseInt(document.getElementById('marginPct').value);if(isNaN(marginPct))marginPct=20;
   var taxVal=document.getElementById('taxRate').value;
-  var taxPct=taxVal===''?13:parseInt(taxVal)||0;
+  var taxPct=taxVal===''?0:parseInt(taxVal)||0;
   var margin=marginPct/100,tax=taxPct/100;
 
   // 各分项总价
@@ -928,7 +928,7 @@ function saveQuote(){
   var transportCustom=transport==='custom'?document.getElementById('transportCustom').value:null;
 
   var taxVal=document.getElementById('taxRate').value;
-  var taxPct=taxVal===''?13:parseInt(taxVal)||0;
+  var taxPct=taxVal===''?0:parseInt(taxVal)||0;
   var marginPct=parseInt(document.getElementById('marginPct').value);
   if(isNaN(marginPct))marginPct=20;
 
@@ -960,27 +960,36 @@ function saveQuote(){
   var record={
     name:clientName,
     time:ts,
-    dieL:pL, dieW:pW,
+    dieL:parseFloat(document.getElementById('dieL').value)||pL, dieW:parseFloat(document.getElementById('dieW').value)||pW,
+    dieLRaw:parseFloat(document.getElementById('dieL').value)||0, dieWRaw:parseFloat(document.getElementById('dieW').value)||0,
     cutL:cutL, cutW:cutW,
     gram:gram, tonPrice:tonPrice,
-    flutePrice:flutePrice,
+    flutePrice:flutePrice, fRebate:parseFloat(document.getElementById('fluteRebate').value)||0,
     nUp:nUp, qty:qty,
+    pLoss:parseFloat(document.getElementById('paperLoss').value)||0, fLoss:parseFloat(document.getElementById('fluteLoss').value)||0,
     paperLoss:paperLoss, fluteLoss:fluteLoss,
-    pressMachine:pressName,
+    pressMachine:pressName, pressMachineRaw:document.getElementById('pressMachine').value,
     colors:colorsFront+'色'+(colorsBack?'+反'+colorsBack:'')+ (dualSide?' 双面':''),
+    colorsRaw:colorsFront, colorsBackRaw:colorsBack||null,
     dualSide:dualSide, colorsBack:colorsBack,
-    plateSize:plateSize,
-    waivePressBase:waivePressBase,
+    enPress:document.getElementById('chkPress').checked, enPaper:document.getElementById('chkPaper').checked,
+    enFlute:document.getElementById('chkFlute').checked, enSurface:document.getElementById('chkSurface').checked,
+    enMount:document.getElementById('chkMount').checked, enDieCut:document.getElementById('chkDieCut').checked,
+    enGlue:document.getElementById('chkGlue').checked, enTransport:document.getElementById('chkTransport').checked,
+    plateSize:plateSize, waivePressBase:waivePressBase,
     surface:surfaceStr,
     mount:mountDisp,
-    dieNew:dieNew==='1'?'新版':'旧版',
+    dieNew:dieNew==='1'?'新版':'旧版', dieNewRaw:dieNew,
     dieCutMachine:dieCutMachine,
     waiveDieSetup:waiveDieSetup,
     glueBox:glueBox,
-    transport:transport,
+    transport:transport, transportRaw:document.getElementById('transport').value,
     tsCustom:transportCustom,
     taxRate:taxPct, marginPct:marginPct,
- 
+    twoPiece:document.getElementById('twoPiece').checked,
+    twoPieceMode:document.querySelector('input[name="twoPieceMode"]:checked')?document.querySelector('input[name="twoPieceMode"]:checked').value:null,
+    dieL2:parseFloat(document.getElementById('dieL2').value)||0, dieW2:parseFloat(document.getElementById('dieW2').value)||0, nUp2:parseInt(document.getElementById('piecesPerSheet2').value)||1,
+    outsourceCost:(C.outsourceCost||0),
     extraMode:extraMode, extraVal:extraVal,
     paperTotal:paperTotal, fluteTotal:fluteTotal,
     pressTotal:pressTotal, surfaceCost:surfaceCost,
@@ -1029,7 +1038,7 @@ function renderQuoteHistory(){
       +'模切\u00a5'+((r.dieCutCost||0).toFixed(2))+' + 粘盒\u00a5'+((r.glueCost||0).toFixed(2))+' + 运输\u00a5'+((r.tsCost||0).toFixed(2))+'<br>'
       +'其他\u00a5'+((r.extraCost||0).toFixed(2))+' = <b>总成本 \u00a5'+((r.allCost||0).toFixed(2))+'</b><br>'
       +'含税含利单价: \u00a5'+((r.unitPrice||0).toFixed(4))+' | 总价: \u00a5'+((r.total||0).toFixed(2));
-    return '<tr><td style="padding:6px 8px;border-bottom:1px solid #eee;text-align:center"><input type="checkbox" class="quoteCb" data-idx="'+i+'" onchange="updateSelectedCount()"></td><td style="padding:6px 8px;border-bottom:1px solid #eee;cursor:pointer" onclick="editName('+i+',this)" id="name-'+i+'">'+(r.name||'')+'</td><td style="padding:6px 8px;border-bottom:1px solid #eee">'+r.time+'</td><td style="padding:6px 8px;border-bottom:1px solid #eee;text-align:right">'+fmt(dL,0)+'\u00d7'+fmt(dW,0)+'</td><td style="padding:6px 8px;border-bottom:1px solid #eee;text-align:right">'+paperMat+'</td><td style="padding:6px 8px;border-bottom:1px solid #eee;text-align:right">'+fluteMat+'</td><td style="padding:6px 8px;border-bottom:1px solid #eee;text-align:right">'+q+'</td><td style="padding:6px 8px;border-bottom:1px solid #eee;text-align:right">\u00a5'+cost+'</td><td style="padding:6px 8px;border-bottom:1px solid #eee;text-align:center" onmouseenter=\'showTooltip(event,'+JSON.stringify(tip)+')\' onmouseleave=\'hideTooltip()\'><button onclick="deleteQuote('+i+')" style="background:#e74c3c;color:#fff;border:none;padding:2px 8px;border-radius:4px;cursor:pointer;font-size:0.75rem">删除</button> <button onclick="exportSingleXLSX('+i+')" style="background:#3498db;color:#fff;border:none;padding:2px 8px;border-radius:4px;cursor:pointer;font-size:0.75rem">导出</button></td></tr>';
+    return '<tr><td style="padding:6px 8px;border-bottom:1px solid #eee;text-align:center"><input type="checkbox" class="quoteCb" data-idx="'+i+'" onchange="updateSelectedCount()"></td><td style="padding:6px 8px;border-bottom:1px solid #eee;cursor:pointer" onclick="editName('+i+',this)" id="name-'+i+'">'+(r.name||'')+'</td><td style="padding:6px 8px;border-bottom:1px solid #eee">'+r.time+'</td><td style="padding:6px 8px;border-bottom:1px solid #eee;text-align:right">'+fmt(dL,0)+'\u00d7'+fmt(dW,0)+'</td><td style="padding:6px 8px;border-bottom:1px solid #eee;text-align:right">'+paperMat+'</td><td style="padding:6px 8px;border-bottom:1px solid #eee;text-align:right">'+fluteMat+'</td><td style="padding:6px 8px;border-bottom:1px solid #eee;text-align:right">'+q+'</td><td style="padding:6px 8px;border-bottom:1px solid #eee;text-align:right">\u00a5'+cost+'</td><td style="padding:6px 8px;border-bottom:1px solid #eee;text-align:center" onmouseenter=\'showTooltip(event,'+JSON.stringify(tip)+')\' onmouseleave=\'hideTooltip()\'><button onclick="loadQuote('+i+')" style="background:#3498db;color:#fff;border:none;padding:2px 8px;border-radius:4px;cursor:pointer;font-size:0.75rem">加载</button> <button onclick="deleteQuote('+i+')" style="background:#e74c3c;color:#fff;border:none;padding:2px 8px;border-radius:4px;cursor:pointer;font-size:0.75rem">删除</button> <button onclick="exportSingleXLSX('+i+')" style="background:#3498db;color:#fff;border:none;padding:2px 8px;border-radius:4px;cursor:pointer;font-size:0.75rem">导出</button></td></tr>';
   }).join('');
   updateSelectedCount();
 }
@@ -1059,7 +1068,46 @@ function deleteQuote(idx){
   localStorage.setItem('colorBoxHistory',JSON.stringify(history));
   if(typeof XLSX!=='undefined'||document.readyState==='complete'){renderQuoteHistory();}else{window.addEventListener('load',function(){renderQuoteHistory();});}
 }
-function clearQuoteHistory(){
+function loadQuote(idx){
+  var H=JSON.parse(localStorage.getItem('colorBoxHistory')||'[]');
+  var r=H[idx];if(!r)return;
+  var set=function(id,val){
+    var el=document.getElementById(id);
+    if(!el)return;
+    if(el.type==='checkbox')el.checked=!!val;
+    else if(el.tagName==='SELECT')el.value=val!=null?val:'';
+    else el.value=val!=null?val:'';
+  };
+  set('dieL',r.dieLRaw!=null?r.dieLRaw:(r.dieL!=null?r.dieL-20:''));
+  set('dieW',r.dieWRaw!=null?r.dieWRaw:(r.dieW!=null?r.dieW-20:''));
+  set('piecesPerSheet',r.nUp);
+  set('paperGram',r.gram);set('paperTon',r.tonPrice);
+  set('paperLoss',r.pLoss!=null?r.pLoss:(r.paperLoss!=null?r.paperLoss:''));
+  set('flutePrice',r.flutePrice);set('fluteRebate',r.fRebate||0);
+  set('fluteLoss',r.fLoss!=null?r.fLoss:(r.fluteLoss!=null?r.fluteLoss:''));
+  set('pressMachine',r.pressMachineRaw||(r.pressMachine&&r.pressMachine.indexOf('120')>=0?'120':'142'));
+  set('colors',r.colorsRaw||'4');
+  set('chkPress',r.enPress!==false);set('chkPaper',r.enPaper!==false);
+  set('chkFlute',r.enFlute!==false);set('chkSurface',r.enSurface!==false);
+  set('chkMount',r.enMount!==false);set('chkDieCut',r.enDieCut!==false);
+  set('chkGlue',r.enGlue!==false);set('chkTransport',r.enTransport!==false);
+  set('quantity',r.qty);set('taxRate',r.taxRate);set('marginPct',r.marginPct);
+  set('transport',r.transportRaw||r.transport);set('extraCost',r.extraVal);set('extraCostUnit',r.extraMode);
+  set('glueBox',r.glueBox);
+  set('dieCutMachine',r.dieCutMachine);document.getElementById('dieCutMachine').dataset.manual='1';
+  set('dieNew',r.dieNewRaw||(r.dieNew==='新版'?'1':'1'));
+  document.getElementById('pressMachine').dataset.manual='1';
+  if(r.dualSide){set('dualSide',true);set('colorsBack',r.colorsBackRaw||r.colorsBack||'4');document.getElementById('colorsBackField').style.display='block';}
+  else{set('dualSide',false);document.getElementById('colorsBackField').style.display='none';}
+  if(r.twoPiece){set('twoPiece',true);document.getElementById('twoPieceCard').style.display='block';toggleTwoPieceMode();}
+  else{set('twoPiece',false);document.getElementById('twoPieceCard').style.display='none';}
+  if(r.dieL2){set('dieL2',r.dieL2);set('dieW2',r.dieW2);set('piecesPerSheet2',r.nUp2||1);}
+  if(r.outsourceCost>0){set('outsourceEnabled',true);document.getElementById('outsourceCard').style.display='';}
+  else{set('outsourceEnabled',false);document.getElementById('outsourceCard').style.display='none';}
+  if(r.tsCustom){set('transportCustom',r.tsCustom);document.getElementById('transportCustom').style.display='';}
+  updateDimensions();checkPressLimit();suggestDieCut();updateOutsource();
+  window.scrollTo({top:0,behavior:'smooth'});
+}function clearQuoteHistory(){
   if(!confirm('确定清空所有报价记录？此操作不可恢复。'))return;
   localStorage.removeItem('colorBoxHistory');
   if(typeof XLSX!=='undefined'||document.readyState==='complete'){renderQuoteHistory();}else{window.addEventListener('load',function(){renderQuoteHistory();});}
