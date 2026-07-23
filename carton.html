@@ -71,7 +71,7 @@ h1{text-align:center;font-size:1.5rem;color:#2c3e50;padding:20px 0}
 <div class="container">
     <div class="mode-tabs"><a class="mode-tab" href="index.html">📦 彩盒报价</a><a class="mode-tab active" href="javascript:void(0)">📐 瓦楞箱报价</a></div>
 <div class="card">
-    <h2>📐 纸板</h2>
+    <h2>📐 纸板 <span id="boardAreaInfo" style="font-size:0.75rem;font-weight:normal;color:#888"></span></h2>
     <div class="row">
         <div class="field"><label>纸箱长 (mm)</label><input type="number" id="cartonL" value="" step="0.1" oninput="calcCartonBoard()"></div>
         <div class="field"><label>纸箱宽 (mm)</label><input type="number" id="cartonW" value="" step="0.1" oninput="calcCartonBoard()"></div>
@@ -89,23 +89,25 @@ h1{text-align:center;font-size:1.5rem;color:#2c3e50;padding:20px 0}
 </div>
 
 <div class="card">
-    <h2>⚙ 刀版 / 模切 <span id="dieCutSugg" style="font-size:0.7rem;color:#27ae60;font-weight:normal"></span></h2>
-    <div class="row">
-        <div class="field"><label>刀版费</label><select id="cartonDie"><option value="0" selected>不需要</option><option value="1">新版 ×250</option></select></div>
-        <div class="field"><label>模切机型</label><select id="cartonDieCut" onchange="document.getElementById('cartonPieces').disabled=this.value==='0'"><option value="0" selected>不需要</option></select></div>
-        <div class="field"><label>拼版数</label><div style="display:flex;gap:0"><button onclick="adjInput('cartonPieces',-1,1)" style="padding:8px 10px;border:1px solid #ddd;border-radius:6px 0 0 6px;cursor:pointer;background:#f5f5f5;font-size:0.9rem">−</button><input type="number" id="cartonPieces" value="" step="1" placeholder="不模切不填" disabled style="text-align:center;border-radius:0;border-left:0;border-right:0"><button onclick="adjInput('cartonPieces',1,1)" style="padding:8px 10px;border:1px solid #ddd;border-radius:0 6px 6px 0;cursor:pointer;background:#f5f5f5;font-size:0.9rem">+</button></div></div>
-    </div>
-</div>
-
-<div class="card">
     <h2>🖨 印刷</h2>
     <div class="row">
         <div class="field"><label>印刷方式</label><select id="cartonPressType" onchange="var pr=document.getElementById('pressRow');var pa=document.getElementById('pressArea');var ba=document.getElementById('pressBaseField');var ov=document.getElementById('pressOverField');var show=this.value==='traditional';pr.style.display=show?'':'none';ba.style.display=show?'':'none';ov.style.display=show?'':'none';pa.style.display=show?'none':''"><option value="traditional">传统印刷</option><option value="area" selected>平方计价</option></select></div>
         <div class="field" id="pressRow" style="display:none"><label>色数</label><select id="cartonColors" onchange="updatePressDefaults()"><option value="1" selected>1色</option><option value="2">2色</option><option value="3">3色</option></select></div>
         <div class="field" id="pressBaseField" style="display:none"><label>上机费 (元)</label><input type="number" id="cartonPressBase" value="15" step="1"></div>
         <div class="field" id="pressOverField" style="display:none"><label>单价 (元/张)</label><input type="number" id="cartonPressOver" value="0.07" step="0.01"></div>
-        <div class="field" id="pressArea"><label>平方单价 (元/㎡)</label><input type="number" id="cartonPressArea" value="0.25" step="0.01"></div>
+        <div class="field" id="pressArea"><label>平方单价 (元/㎡)</label><input type="number" id="cartonPressArea" value="0.3" step="0.01"></div>
         <div class="field"><label>柔版费 (元)</label><input type="number" id="cartonPlate" value="0" step="1"></div>
+    </div>
+</div>
+
+<div class="card">
+    <h2 onclick="var el=this.nextElementSibling;var show=el.style.display==='none';el.style.display=show?'':'none';this.querySelector('.toggle-icon').textContent=show?'▼':'▶'" style="cursor:pointer;user-select:none">
+      <span class="toggle-icon" style="color:#999;margin-right:4px">▶</span>⚙ 刀版 / 模切 <span id="dieCutSugg" style="font-size:0.7rem;color:#27ae60;font-weight:normal"></span>
+    </h2>
+    <div class="row" style="display:none">
+        <div class="field"><label>刀版费</label><select id="cartonDie"><option value="0" selected>不需要</option><option value="1">新版 ×250</option></select></div>
+        <div class="field"><label>模切机型</label><select id="cartonDieCut" onchange="document.getElementById('cartonPieces').disabled=this.value==='0'"><option value="0" selected>不需要</option></select></div>
+        <div class="field"><label>拼版数</label><div style="display:flex;gap:0"><button onclick="adjInput('cartonPieces',-1,1)" style="padding:8px 10px;border:1px solid #ddd;border-radius:6px 0 0 6px;cursor:pointer;background:#f5f5f5;font-size:0.9rem">−</button><input type="number" id="cartonPieces" value="" step="1" placeholder="不模切不填" disabled style="text-align:center;border-radius:0;border-left:0;border-right:0"><button onclick="adjInput('cartonPieces',1,1)" style="padding:8px 10px;border:1px solid #ddd;border-radius:0 6px 6px 0;cursor:pointer;background:#f5f5f5;font-size:0.9rem">+</button></div></div>
     </div>
 </div>
 
@@ -127,7 +129,7 @@ h1{text-align:center;font-size:1.5rem;color:#2c3e50;padding:20px 0}
     </div>
     <div class="row" style="margin-top:4px">
         <div class="field"><label>数量 (个)</label><input type="number" id="quantity" value="" step="1" placeholder=""></div>
-        <div class="field"><label>税率 (%)</label><div style="display:flex;gap:0"><button onclick="adjInput('taxRate',-1,0,20)" style="padding:8px 10px;border:1px solid #ddd;border-radius:6px 0 0 6px;cursor:pointer;background:#f5f5f5;font-size:0.9rem">−</button><input type="number" id="taxRate" value="7" style="text-align:center;border-radius:0;border-left:0;border-right:0"><button onclick="adjInput('taxRate',1,0,20)" style="padding:8px 10px;border:1px solid #ddd;border-radius:0 6px 6px 0;cursor:pointer;background:#f5f5f5;font-size:0.9rem">+</button></div></div>
+        <div class="field"><label>税率 (%)</label><div style="display:flex;gap:0"><button onclick="adjInput('taxRate',-1,0,20)" style="padding:8px 10px;border:1px solid #ddd;border-radius:6px 0 0 6px;cursor:pointer;background:#f5f5f5;font-size:0.9rem">−</button><input type="number" id="taxRate" value="" style="text-align:center;border-radius:0;border-left:0;border-right:0"><button onclick="adjInput('taxRate',1,0,20)" style="padding:8px 10px;border:1px solid #ddd;border-radius:0 6px 6px 0;cursor:pointer;background:#f5f5f5;font-size:0.9rem">+</button></div></div>
         <div class="field"><label>毛利率 (%)</label><div style="display:flex;gap:0"><button onclick="adjInput('marginPct',-1,0,200)" style="padding:8px 10px;border:1px solid #ddd;border-radius:6px 0 0 6px;cursor:pointer;background:#f5f5f5;font-size:0.9rem">−</button><input type="number" id="marginPct" value="10" style="text-align:center;border-radius:0;border-left:0;border-right:0"><button onclick="adjInput('marginPct',1,0,200)" style="padding:8px 10px;border:1px solid #ddd;border-radius:0 6px 6px 0;cursor:pointer;background:#f5f5f5;font-size:0.9rem">+</button></div></div>
         <div class="field"><label>其他成本</label><div style="display:flex;gap:4px"><input type="number" id="extraCost" value="" step="0.001" placeholder="外加工等" style="flex:1;min-width:0"><select id="extraCostUnit" style="width:auto;padding:0 4px;height:38px;border:1.5px solid #2980b9;border-radius:3px;background:#ebf5fb;color:#2980b9;font-weight:600;font-size:0.7rem;flex-shrink:0;text-align:center"><option value="per">元/个</option><option value="total">总价</option><option value="area" selected>元/㎡</option></select></div></div>
     </div>
@@ -144,7 +146,7 @@ h1{text-align:center;font-size:1.5rem;color:#2c3e50;padding:20px 0}
 <div class="card" id="historyCard">
     <h2>📋 报价记录</h2>
     <div style="display:flex;gap:8px;margin-bottom:12px;align-items:center">
-        <button class="btn btn-sm" onclick="clearQuoteHistory()" style="background:#e74c3c">🗑 清空记录</button>
+        <button class="btn btn-sm" onclick="deleteSelected()" style="background:#e74c3c">🗑 删除选中</button>
         <button class="btn btn-sm" onclick="exportSelectedXLSX()" style="background:#3498db">📥 导出选中</button>
         <span id="selectedCount" style="font-weight:600;color:#2c3e50;font-size:0.85rem;margin-left:auto">已选 0 条</span>
     </div>
@@ -156,7 +158,7 @@ h1{text-align:center;font-size:1.5rem;color:#2c3e50;padding:20px 0}
     </div>
 </div>
 
-<div class="footer">2026.07.22 16:56 · <span onclick="showPwd()" style="cursor:pointer;text-decoration:underline">⚙ 设置</span></div>
+<div class="footer">2026.07.23 10:54 · <span onclick="showPwd()" style="cursor:pointer;text-decoration:underline">⚙ 设置</span></div>
 </div>
 
 <div class="overlay" id="pwdOverlay"><div class="panel" style="max-width:300px;text-align:center">
@@ -176,6 +178,7 @@ h1{text-align:center;font-size:1.5rem;color:#2c3e50;padding:20px 0}
     </div>
     <div style="display:flex;gap:10px;justify-content:center;margin-top:16px">
         <button class="btn btn-sm" onclick="saveSettings()">💾 保存</button>
+        <button class="btn btn-sm" onclick="resetDefaults()" style="background:#e67e22">🔄 恢复默认</button>
         <button onclick="closeSettings()" style="padding:8px 30px;border:1px solid #ddd;border-radius:6px;background:#eee;cursor:pointer">取消</button>
     </div>
 </div></div>
@@ -188,22 +191,6 @@ h1{text-align:center;font-size:1.5rem;color:#2c3e50;padding:20px 0}
     <p style="font-size:0.75rem;color:#e74c3c;margin-top:8px;display:none" id="pwdError">密码错误</p>
 </div></div>
 
-<div class="overlay" id="setOverlay"><div class="panel">
-    <h3>⚙ 后台价格设置</h3>
-    <div class="set-grid">
-        <div class="set-card"><h4>✨ 表面处理 (元/㎡)</h4><div id="setSurfaceFilm"></div></div>
-        <div class="set-card"><h4>✨ 表面处理 (元/张)</h4><div id="setSurfaceK"></div></div>
-        <div class="set-card"><h4>🖨 120五色机 (开机费,超量单价)</h4><div id="setPress120"></div></div>
-        <div class="set-card"><h4>🖨 142五色机 (开机费,超量单价)</h4><div id="setPress142"></div></div>
-        <div class="set-card"><h4>📦 裱瓦 (元/㎡)</h4><div id="setMount"></div></div>
-        <div class="set-card"><h4>🔪 模切 (装版费,加工费)</h4><div id="setDieCut"></div></div>
-        <div class="set-card"><h4>📐 粘盒 (元/个)</h4><div id="setGlue"></div></div>
-        <div class="set-card"><h4>🚚 运输 (元/㎡)</h4><div id="setTransport"></div></div>
-    </div>
-    <div style="display:flex;gap:10px;justify-content:center;margin-top:16px">
-        <button class="btn btn-sm" onclick="saveSettings()">💾 保存</button>
-        <button onclick="closeSettings()" style="padding:8px 30px;border:1px solid #ddd;border-radius:6px;background:#eee;cursor:pointer">取消</button>
-    </div>
 </div></div>
 
 <script>
@@ -239,6 +226,7 @@ function calcCartonBoard(){
   if(dir==='vertical'){boardW+=20;}else{var tmp=boardL;boardL=boardW;boardW=tmp+2;}
   document.getElementById('cartonBoardL').value=boardL.toFixed(1);
   document.getElementById('cartonBoardW').value=boardW.toFixed(1);
+  var bai=document.getElementById('boardAreaInfo');if(bai)bai.textContent='| '+boardL+'×'+boardW+'mm = '+(boardL*boardW/1000000).toFixed(3)+'m²';
   // 模切机型建议
   var bl=boardL,bw=boardW,best=null;
   Object.keys(PRICE.dieCutLimit).forEach(function(k){
@@ -316,7 +304,7 @@ function calculate(){
   var allCost=boardTotal+dieFee+dieCutCost+pressCost+plateFee+glueCost+tsCost+extraCost;
   var cpu=allCost/qty;
   var taxVal=document.getElementById('taxRate').value;
-  var taxPct=taxVal===''?13:parseInt(taxVal)||0;
+  var taxPct=taxVal===''?0:parseInt(taxVal)||0;
   var marginPct=parseInt(document.getElementById('marginPct').value)||0;
   var tax=taxPct/100,margin=marginPct/100;
   var taxPrice=cpu*(1+tax);
@@ -350,7 +338,7 @@ function calculate(){
   if(dieFee>0){lines.push('【刀版】新版 '+boardArea.toFixed(4)+'㎡×200=¥'+dieFee.toFixed(2)+' → ¥'+(dieFee/qty).toFixed(4)+'/个');lines.push('');}
   if(dcKey!=='0'){lines.push('【模切】'+dcKey+' 装版¥'+dc[0]+' + ¥'+dc[1]+'/张×'+totalSheets+'=¥'+dieCutCost.toFixed(2)+' → ¥'+(dieCutCost/qty).toFixed(4)+'/个');lines.push('');}
   
-  if(pressType==='area'){var ap=parseFloat(document.getElementById('cartonPressArea').value)||0.25;lines.push('【印刷】平方计价 ¥'+ap.toFixed(2)+'/㎡ × '+boardArea.toFixed(4)+'㎡ × '+totalSheets+'张 = ¥'+pressCost.toFixed(2)+' → ¥'+(pressCost/qty).toFixed(4)+'/个');}else{
+  if(pressType==='area'){var ap=parseFloat(document.getElementById('cartonPressArea').value)||0.3;lines.push('【印刷】平方计价 ¥'+ap.toFixed(2)+'/㎡ × '+boardArea.toFixed(4)+'㎡ × '+totalSheets+'张 = ¥'+pressCost.toFixed(2)+' → ¥'+(pressCost/qty).toFixed(4)+'/个');}else{
     var cn=document.getElementById('cartonColors').value;
     lines.push('【印刷】传统 '+cn+'色 上机¥'+base+' 单价¥'+over);
     lines.push('  上机¥'+base+' + ¥'+over+'×'+totalSheets+'张 = ¥'+pressCost.toFixed(2)+' → ¥'+(pressCost/qty).toFixed(4)+'/个');
@@ -403,7 +391,7 @@ function exportXLS(){
   costRows.forEach(function(r){totalCost+=r.val;});
   var singleCost=totalCost/C.qty;
   var taxVal=document.getElementById('taxRate').value;
-  var taxPct=taxVal===''?13:parseInt(taxVal)||0;
+  var taxPct=taxVal===''?0:parseInt(taxVal)||0;
   var marginVal=document.getElementById('marginPct').value;
   var marginPct=marginVal===''?0:parseInt(marginVal)||0;
   var taxPrice=singleCost*(1+taxPct/100);
@@ -520,7 +508,7 @@ function saveQuote(){
   var tsCustom=transport==='custom'?(parseFloat(document.getElementById('cartonTransportCustom').value)||0):null;
   var loss=parseFloat(document.getElementById('cartonLoss').value)||0;
   var taxVal=document.getElementById('taxRate').value;
-  var taxPct=taxVal===''?13:parseInt(taxVal)||0;
+  var taxPct=taxVal===''?0:parseInt(taxVal)||0;
   var marginPct=parseInt(document.getElementById('marginPct').value)||0;
   var extraUnitSel=document.getElementById('extraCostUnit');
   var extraMode=extraUnitSel.selectedIndex>=0?extraUnitSel.options[extraUnitSel.selectedIndex].text:'元/㎡';
@@ -682,11 +670,7 @@ function loadQuote(idx){
   window._loadedIdx=idx;window._loadedName=r.name;
   window.scrollTo({top:0,behavior:'smooth'});
 }
-function clearQuoteHistory(){
-  if(!confirm('确定清空所有报价记录？此操作不可恢复。'))return;
-  localStorage.removeItem('cartonBoxHistory');
-  if(typeof XLSX!=='undefined'||document.readyState==='complete'){renderQuoteTable();}else{window.addEventListener('load',function(){renderQuoteTable();});}
-}
+
 function toggleSelectAll(){
   var checked=document.getElementById('selectAll').checked;
   document.querySelectorAll('.quoteCb').forEach(function(cb){cb.checked=checked;});

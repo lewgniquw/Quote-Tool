@@ -95,7 +95,7 @@ h1{text-align:center;font-size:1.5rem;color:#2c3e50;padding:20px 0}
 </div>
 
 <div class="card">
-    <h2>📄 面纸</h2>
+    <h2>📄 面纸 <span id="paperAreaInfo" style="font-size:0.75rem;font-weight:normal;color:#888"></span></h2>
     <div class="row">
         <div class="field"><label>裁切长 <span class="auto-tag">自动</span></label><input type="text" id="cutSizeL" value="--" readonly style="color:#3498db;font-size:0.82rem"></div>
         <div class="field"><label>裁切宽 <span class="auto-tag">自动</span></label><input type="text" id="cutSizeW" value="--" readonly style="color:#3498db;font-size:0.82rem"></div>
@@ -106,7 +106,7 @@ h1{text-align:center;font-size:1.5rem;color:#2c3e50;padding:20px 0}
 </div>
 
 <div class="card">
-    <h2>📦 浪纸</h2>
+    <h2>📦 浪纸 <span id="fluteAreaInfo" style="font-size:0.75rem;font-weight:normal;color:#888"></span></h2>
     <div class="row">
         <div class="field"><label>浪纸长 (mm) <span class="auto-tag">自动</span></label><input type="text" id="fluteLDisp" value="--" readonly style="color:#3498db"></div>
         <div class="field"><label>浪纸宽 (mm) <span class="auto-tag">自动</span></label><input type="text" id="fluteWDisp" value="--" readonly style="color:#3498db"></div>
@@ -119,7 +119,7 @@ h1{text-align:center;font-size:1.5rem;color:#2c3e50;padding:20px 0}
 <div class="card">
     <h2 style="display:flex;align-items:center"><span>🖨 印刷 <span id="pressLimit" style="font-size:0.75rem;font-weight:normal"></span></span><span style="margin-left:auto;font-size:0.75rem;font-weight:normal;cursor:pointer;color:#e67e22"><input type="checkbox" id="dualSide" onchange="toggleDualSide()" style="width:auto;height:auto;vertical-align:middle"> 双面印刷</span></h2>
     <div class="row">
-        <div class="field"><label>印刷机型</label><select id="pressMachine" onchange="checkPressLimit()"><option value="120">120对开机</option><option value="142" selected>142全开机</option></select></div>
+        <div class="field"><label>印刷机型</label><select id="pressMachine" onchange="checkPressLimit()"><option value="105">105对开机</option><option value="142" selected>142全开机</option></select></div>
         <div class="field"><label id="colorsLabel">色数</label><select id="colors"><option value="4" selected>4色</option><option value="5">5色</option></select></div>
         <div class="field" id="colorsBackField" style="display:none"><label>反面色数</label><select id="colorsBack"><option value="4" selected>4色</option><option value="5">5色</option></select></div>
         <div class="field"><label>印刷费 <span class="auto-tag">自动</span></label><input type="text" id="pressCostDisplay" value="--" readonly style="color:#3498db"></div>
@@ -252,7 +252,7 @@ h1{text-align:center;font-size:1.5rem;color:#2c3e50;padding:20px 0}
 <div class="card" id="historyCard">
     <h2>📋 报价记录</h2>
     <div style="display:flex;gap:8px;margin-bottom:12px;align-items:center">
-        <button class="btn btn-sm" onclick="clearQuoteHistory()" style="background:#e74c3c">🗑 清空记录</button>
+        <button class="btn btn-sm" onclick="deleteSelected()" style="background:#e74c3c">🗑 删除选中</button>
         <button class="btn btn-sm" onclick="exportSelectedXLSX()" style="background:#3498db">📥 导出选中</button>
         <span id="selectedCount" style="font-weight:600;color:#2c3e50;font-size:0.85rem;margin-left:auto">已选 0 条</span>
     </div>
@@ -264,7 +264,7 @@ h1{text-align:center;font-size:1.5rem;color:#2c3e50;padding:20px 0}
     </div>
 </div>
 
-<div class="footer">2026.07.21 23:46 · <span onclick="showPwd()" style="cursor:pointer;text-decoration:underline">⚙ 设置</span></div>
+<div class="footer">2026.07.23 11:51 · <span onclick="showPwd()" style="cursor:pointer;text-decoration:underline">⚙ 设置</span></div>
 </div>
 
 <div class="overlay" id="pwdOverlay"><div class="panel" style="max-width:300px;text-align:center">
@@ -280,7 +280,7 @@ h1{text-align:center;font-size:1.5rem;color:#2c3e50;padding:20px 0}
     <div class="set-grid">
         <div class="set-card"><h4>✨ 表面处理 (元/㎡)</h4><div id="setSurfaceFilm"></div></div>
         <div class="set-card"><h4>✨ 表面处理 (元/张)</h4><div id="setSurfaceK"></div></div>
-        <div class="set-card"><h4>🖨 120五色机 (开机费,超量单价)</h4><div id="setPress120"></div></div>
+        <div class="set-card"><h4>🖨 105五色机 (开机费,超量单价)</h4><div id="setPress120"></div></div>
         <div class="set-card"><h4>🖨 142五色机 (开机费,超量单价)</h4><div id="setPress142"></div></div>
         <div class="set-card"><h4>📦 裱瓦 (元/㎡)</h4><div id="setMount"></div></div>
         <div class="set-card"><h4>🔪 模切 (装版费,加工费)</h4><div id="setDieCut"></div></div>
@@ -289,6 +289,7 @@ h1{text-align:center;font-size:1.5rem;color:#2c3e50;padding:20px 0}
     </div>
     <div style="display:flex;gap:10px;justify-content:center;margin-top:16px">
         <button class="btn btn-sm" onclick="saveSettings()">💾 保存</button>
+        <button class="btn btn-sm" onclick="resetDefaults()" style="background:#e67e22">🔄 恢复默认</button>
         <button onclick="closeSettings()" style="padding:8px 30px;border:1px solid #ddd;border-radius:6px;background:#eee;cursor:pointer">取消</button>
     </div>
 </div></div>
@@ -298,9 +299,9 @@ var PRICE = {
   surfaceFilm: {"亮膜":0.30,"哑膜":0.35,"亮油":0.20,"哑油":0.28,"UV油":0.45,"大面积烫金/银":3,"防刮膜":0.80},
   surfaceK: {"烫金/银":0.30,"凹凸":0.25,"压纹":0.15},
   embossFee: 100,
-  pressLimit: {"120":[104,75,50,45],"115×85":[115,85,76,52],"132×97":[132,97,76,52],"142×102":[142,102,76,52]},
+  pressLimit: {"105":[105,75,50,45],"115×85":[115,85,76,52],"132×97":[132,97,76,52],"145×106":[145,106,76,52]},
   press120: {"4":[350,0.07],"5":[550,0.11]},
-  press142: {"115×85":{"4":[520,0.11],"5":[800,0.14]},"132×97":{"4":[650,0.16],"5":[900,0.22]},"142×102":{"4":[750,0.22],"5":[1150,0.27]}},
+  press142: {"115×85":{"4":[520,0.11],"5":[800,0.14]},"132×97":{"4":[650,0.16],"5":[900,0.22]},"145×106":{"4":[750,0.22],"5":[1150,0.27]}},
   mount: 0.20,
   dieCut: {"930手动":[35,0.08],"1100手动":[35,0.10],"1300自动":[40,0.12],"1500自动":[50,0.20],"1800手动":[50,0.30]},
   glue: {"卡盒 糊口<20":0.03,"卡盒 展开>80":0.05,"瓦楞 糊口<20":0.05,"瓦楞 糊口20~30":0.065,"瓦楞 糊口>30":0.08,"瓦楞 长>60":0.13,"瓦楞 长>80":0.16},
@@ -316,7 +317,7 @@ var PRICE = {
     if(s.surfaceFilm)Object.keys(s.surfaceFilm).forEach(function(k){PRICE.surfaceFilm[k]=s.surfaceFilm[k];});
     if(s.surfaceK)Object.keys(s.surfaceK).forEach(function(k){PRICE.surfaceK[k]=s.surfaceK[k];});
     if(s.press120)Object.keys(s.press120).forEach(function(k){PRICE.press120[k]=s.press120[k];});
-    if(s.press142)Object.keys(s.press142).forEach(function(k){PRICE.press142[k]=s.press142[k];});
+    if(s.press142){if(s.press142['142×102']){s.press142['145×106']=s.press142['142×102'];delete s.press142['142×102'];localStorage.setItem('priceSettings',JSON.stringify(s));}Object.keys(s.press142).forEach(function(k){PRICE.press142[k]=s.press142[k];});}
     if(s.mount!==undefined)PRICE.mount=s.mount;
     if(s.dieCut)Object.keys(s.dieCut).forEach(function(k){PRICE.dieCut[k]=s.dieCut[k];});
     if(s.glue)Object.keys(s.glue).forEach(function(k){PRICE.glue[k]=s.glue[k];});
@@ -325,7 +326,9 @@ var PRICE = {
 })();
 var SET_PWD='+987';
 
-function calcMount(){var pL=parseFloat(document.getElementById('dieL').value)||0,pW=parseFloat(document.getElementById('dieW').value)||0;if(!pL||!pW){document.getElementById('mountDisplay').value='--';return 0;}var cutL=pL+20,cutW=pW+20;cutW=Math.ceil(cutW/50)*50;var area=cutL*cutW/1000000;var perSheet=area*PRICE.mount;document.getElementById('mountDisplay').value='¥'+perSheet.toFixed(4)+'/张 ('+(cutL*cutW).toFixed(0)+'mm²)';return perSheet;}
+function calcMount(){var pL=parseFloat(document.getElementById('dieL').value)||0,pW=parseFloat(document.getElementById('dieW').value)||0;if(!pL||!pW){document.getElementById('mountDisplay').value='--';return 0;}var cutL=pL+20,cutW=pW+20;cutW=Math.ceil(cutW/50)*50;
+    var paperAreaInfo=document.getElementById('paperAreaInfo');
+    if(paperAreaInfo)paperAreaInfo.textContent='| '+cutL+'×'+cutW+'mm = '+(cutL*cutW/1000000).toFixed(3)+'m²';var area=cutL*cutW/1000000;var perSheet=area*PRICE.mount;document.getElementById('mountDisplay').value='¥'+perSheet.toFixed(4)+'/张 ('+(cutL*cutW).toFixed(0)+'mm²)';return perSheet;}
 
 function toggleTwoPieceMode(){
   var sp=document.querySelector('input[name="twoPieceMode"]:checked');
@@ -345,20 +348,20 @@ function toggleDualSide(){
 }
 function checkPressLimit(){
   var pLmm=parseFloat(document.getElementById('dieL').value)||0,pWmm=parseFloat(document.getElementById('dieW').value)||0;
-  // 自动选机：120能印就默认120，手动改后不覆盖
+  // 自动选机：105能印就默认105，手动改后不覆盖
   if(pLmm&&pWmm&&!document.getElementById('pressMachine').dataset.manual){
     var cutWmm=pWmm+20;cutWmm=Math.ceil(cutWmm/5)*5;
     var pL=(pLmm+20)/10,pW=cutWmm/10;
-    var lim120=PRICE.pressLimit['120']||[999,999,0,0];
+    var lim120=PRICE.pressLimit['105']||[999,999,0,0];
     var fits120=(pL>=lim120[2]&&pL<=lim120[0]&&pW>=lim120[3]&&pW<=lim120[1])||(pW>=lim120[2]&&pW<=lim120[0]&&pL>=lim120[3]&&pL<=lim120[1]);
-    document.getElementById('pressMachine').value=fits120?'120':'142';
+    document.getElementById('pressMachine').value=fits120?'105':'142';
   }
   var pLmm=parseFloat(document.getElementById('dieL').value)||0,pWmm=parseFloat(document.getElementById('dieW').value)||0;
   var cutWmm=pWmm+20;cutWmm=Math.ceil(cutWmm/5)*5;
   var pL=(pLmm+20)/10,pW=cutWmm/10;
   var mKey=document.getElementById('pressMachine').value;
-  if(mKey==='120'){
-    var lim=PRICE.pressLimit['120']||[999,999,0,0];
+  if(mKey==='105'){
+    var lim=PRICE.pressLimit['105']||[999,999,0,0];
     var ok=(pL>=lim[2]&&pL<=lim[0]&&pW>=lim[3]&&pW<=lim[1])||(pW>=lim[2]&&pW<=lim[0]&&pL>=lim[3]&&pL<=lim[1]);
     var el=document.getElementById('pressLimit'),warn=document.getElementById('pressWarning');
     el.textContent='| 最大 '+lim[0]+'×'+lim[1]+'cm 最小 '+lim[2]+'×'+lim[3]+'cm';
@@ -367,8 +370,8 @@ function checkPressLimit(){
   }else{
     if(!pLmm||!pWmm){document.getElementById('pressLimit').textContent='';return true;}
     var vip=document.getElementById('vipMode').checked;
-    var best='142×102';
-    if(vip){var sizes=['115×85','132×97','142×102'];for(var i=0;i<sizes.length;i++){var L=PRICE.pressLimit[sizes[i]];if((pL<=L[0]&&pW<=L[1])||(pW<=L[0]&&pL<=L[1])){best=sizes[i];break;}}}
+    var best='145×106';
+    if(vip){var sizes=['115×85','132×97','145×106'];for(var i=0;i<sizes.length;i++){var L=PRICE.pressLimit[sizes[i]];if((pL<=L[0]&&pW<=L[1])||(pW<=L[0]&&pL<=L[1])){best=sizes[i];break;}}}
     var cn_=document.getElementById('colors').value||'4';var T=(PRICE.press142[best]||{})[cn_]||[750,0.22];
     var lim2=PRICE.pressLimit[best]||[999,999,0,0];
     var ok=(pL>=lim2[2]&&pL<=lim2[0]&&pW>=lim2[3]&&pW<=lim2[1])||(pW>=lim2[2]&&pW<=lim2[0]&&pL>=lim2[3]&&pL<=lim2[1]);
@@ -387,6 +390,8 @@ function updateDimensions(){
   // 裁纸: 刀版+20mm, 宽向上凑整5cm
   var cutL=pL+20,cutW=pW+20;
   cutW=Math.ceil(cutW/50)*50;
+    var paperAreaInfo=document.getElementById('paperAreaInfo');
+    if(paperAreaInfo)paperAreaInfo.textContent='| '+cutL+'×'+cutW+'mm = '+(cutL*cutW/1000000).toFixed(3)+'m²';
   document.getElementById('cutSizeL').value=cutL.toFixed(0);
   document.getElementById('cutSizeW').value=cutW.toFixed(0)+' (凑整)';
   // 浪纸: 刀版+10mm(长), 刀版+30mm(宽)
@@ -394,6 +399,8 @@ function updateDimensions(){
   document.getElementById('fluteLDisp').value=fluteL.toFixed(0);
   document.getElementById('fluteWDisp').value=fluteW.toFixed(0)+' (+20mm)';
   calcMount();checkPressLimit();suggestDieCut();
+  var pd=parseFloat(document.getElementById('dieL').value)||0,pw=parseFloat(document.getElementById('dieW').value)||0;
+  if(pd&&pw){var cl=pd+20,cw=Math.ceil((pw+20)/50)*50;var pa=document.getElementById('paperAreaInfo');if(pa)pa.textContent='| '+cl+'×'+cw+'mm = '+(cl*cw/1000000).toFixed(3)+'m²';var fl=pd+10,fw=pw+30;var fa=document.getElementById('fluteAreaInfo');if(fa)fa.textContent='| '+fl+'×'+fw+'mm = '+(fl*fw/1000000).toFixed(3)+'m²';}
 }
 function suggestDieCut(){
   var pL=parseFloat(document.getElementById('dieL').value)||0,pW=parseFloat(document.getElementById('dieW').value)||0;
@@ -413,8 +420,8 @@ function suggestDieCut(){
 function calcPressCost(cnOverride){
   var mKey=document.getElementById('pressMachine').value,cn=cnOverride||document.getElementById('colors').value;
   var press,tier;
-  if(mKey==='120'){press=PRICE.press120;tier=press[cn]||[0,0];}
-  else{var plate=document.getElementById('pressMachine').dataset.plate||'142×102';press=PRICE.press142[plate];tier=press[cn]||[0,0];}
+  if(mKey==='105'){press=PRICE.press120;tier=press[cn]||[0,0];}
+  else{var plate=document.getElementById('pressMachine').dataset.plate||'145×106';press=PRICE.press142[plate];tier=press[cn]||[0,0];}
   var nUp=parseInt(document.getElementById('piecesPerSheet').value);if(isNaN(nUp))nUp=1;
   var qty=parseInt(document.getElementById('quantity').value)||0;
   var totalSheets=qty>0?Math.ceil(qty/nUp):(nUp?Math.ceil(1000/nUp):1000);
@@ -461,8 +468,11 @@ function calculate(){
   // 裁纸尺寸: 刀版+20mm, 宽凑整5cm
   var cutL=pL+20,cutW=pW+20;
   cutW=Math.ceil(cutW/50)*50;
+    var paperAreaInfo=document.getElementById('paperAreaInfo');
+    if(paperAreaInfo)paperAreaInfo.textContent='| '+cutL+'×'+cutW+'mm = '+(cutL*cutW/1000000).toFixed(3)+'m²';
   // 浪纸尺寸: 刀版+10mm(长), 刀版+30mm(宽)
   var fL=pL+10,fW=pW+30;
+    var fi=document.getElementById('fluteAreaInfo');if(fi)fi.textContent='| '+fL+'×'+fW+'mm = '+(fL*fW/1000000).toFixed(3)+'m²';
   var fPrice=parseFloat(document.getElementById('flutePrice').value)||0;
   if(enFlute){
     if(!pL||!pW){alert('请填写刀版尺寸');return;}
@@ -478,7 +488,7 @@ function calculate(){
   var autoPaperLoss=0,paperLossFormula='';
   if(isNaN(pLoss)||pLoss<=0){
     var pressM=document.getElementById('pressMachine').value;
-    var baseLoss=pressM==='120'?180:200;
+    var baseLoss=pressM==='105'?180:200;
     var extraBatches=Math.floor(totalSheets/2400);
     autoPaperLoss=baseLoss+extraBatches*50;
     paperLossFormula=pressM+'机 起步'+baseLoss+'张'+(extraBatches>0?' + '+extraBatches+'×50='+autoPaperLoss:'')+'张';
@@ -637,7 +647,7 @@ window._costs={
   if(!enPress){lines.push('【印刷】已跳过');lines.push('');}
   else{
   var pressKey=document.getElementById('pressMachine').value;
-  var plateDesc=pressKey==='120'?'120':('142 '+(document.getElementById('pressMachine').dataset.plate||'142×102'));
+  var plateDesc=pressKey==='105'?'105':('142 '+(document.getElementById('pressMachine').dataset.plate||'145×106'));
   if(ds){
     lines.push('【印刷】'+plateDesc+' 双面 ('+frontPress.cn+'+'+backPress.cn+'色)');
     var wbd=frontPress.waive;
@@ -684,7 +694,7 @@ window._costs={
     lines.push('');lines.push('<span style=background:#3498db;color:#fff;padding:3px 10px;border-radius:4px;font-weight:bold>━━━ 第二片分印明细 ━━━</span>');
     if(enPaper){lines.push('【面纸2】'+gram+'g 吨价¥'+tonPrice);lines.push('  刀版: '+p2.dL2+'×'+p2.dW2+'mm → 裁切: '+p2.pArea2.toFixed(4)+'㎡ × ¥'+pricePerM2.toFixed(4)+' = ¥'+p2.paperRaw2.toFixed(4));lines.push('  损耗: ('+p2.sh2+'+'+(isNaN(p2.pLoss2)?0:p2.pLoss2)+')/'+p2.sh2+' = '+p2.pLossMul2.toFixed(4));lines.push('  '+p2.sh2+'张 小计 ¥'+p2.paperTotal2.toFixed(2));lines.push('');}
     if(enFlute){lines.push('【浪纸2】¥'+fPrice.toFixed(2)+'/㎡');lines.push('  刀版: '+p2.dL2+'×'+p2.dW2+'mm → 浪纸: '+p2.fL2+'×'+(p2.dW2+30)+'mm = '+p2.fArea2.toFixed(4)+'㎡ × ¥'+fPrice.toFixed(2)+' = ¥'+p2.fluteRaw2.toFixed(4));lines.push('  损耗: ('+p2.sh2+'+30)/'+p2.sh2+' = '+p2.fLossMul2.toFixed(4));lines.push('  '+p2.sh2+'张 小计 ¥'+p2.fluteTotal2.toFixed(2));lines.push('');}
-    if(enPress){lines.push('【印刷2】'+(document.getElementById('pressMachine').value==='120'?'120':'142')+' '+p2.front_cn+'色');lines.push('  共'+p2.sh2+'张 → 小计 ¥'+p2.pressTotal2.toFixed(2));lines.push('');}
+    if(enPress){lines.push('【印刷2】'+(document.getElementById('pressMachine').value==='105'?'105':'142')+' '+p2.front_cn+'色');lines.push('  共'+p2.sh2+'张 → 小计 ¥'+p2.pressTotal2.toFixed(2));lines.push('');}
     if(enSurface&&p2.surfaceCost2>0)lines.push('【表面处理2】¥'+p2.surfaceCost2.toFixed(2));
     if(enMount)lines.push('【裱瓦2】¥'+PRICE.mount.toFixed(2)+'/㎡ × '+p2.pArea2.toFixed(4)+'㎡ × '+p2.sh2+'张 = ¥'+p2.mountTotal2.toFixed(2));
     lines.push('【刀版2】新版 面积×250');lines.push('  '+p2.dL2+'×'+p2.dW2+'mm = '+(p2.dL2*p2.dW2/1000000).toFixed(4)+'㎡ × 250 = ¥'+p2.dieFee2.toFixed(2));
@@ -762,7 +772,7 @@ function exportXLS(){
   var cutL=document.getElementById('cutSizeL').value||'',cutW=(document.getElementById('cutSizeW').value||'').replace(/ \(.+?\)/,'');
   var fL=document.getElementById('fluteLDisp').value||'',fW=(document.getElementById('fluteWDisp').value||'').replace(/ \(.+?\)/,'');
   var pressKey=document.getElementById('pressMachine').value;
-  var pressName=pressKey==='120'?'120对开机':'142全开机';
+  var pressName=pressKey==='105'?'105对开机':'142全开机';
   var colors=document.getElementById('colors').value;
   var date=new Date().toLocaleDateString('zh-CN');
   
@@ -901,6 +911,8 @@ function saveQuote(){
   var pL=parseFloat(document.getElementById('dieL').value)||0;
   var pW=parseFloat(document.getElementById('dieW').value)||0;
   var cutL=pL+20, cutW=pW+20; cutW=Math.ceil(cutW/50)*50;
+    var paperAreaInfo=document.getElementById('paperAreaInfo');
+    if(paperAreaInfo)paperAreaInfo.textContent='| '+cutL+'×'+cutW+'mm = '+(cutL*cutW/1000000).toFixed(3)+'m²';
   var gram=parseInt(document.getElementById('paperGram').value)||0;
   var tonPrice=parseFloat(document.getElementById('paperTon').value)||0;
   var flutePrice=parseFloat(document.getElementById('flutePrice').value)||0;
@@ -913,11 +925,11 @@ function saveQuote(){
   if(isNaN(fluteLoss))fluteLoss=30;
 
   var pressMachine=document.getElementById('pressMachine').value;
-  var pressName=pressMachine==='120'?'120对开机':'142全开机';
+  var pressName=pressMachine==='105'?'105对开机':'142全开机';
   var colorsFront=document.getElementById('colors').value;
   var colorsBack=document.getElementById('dualSide').checked?document.getElementById('colorsBack').value:null;
   var dualSide=document.getElementById('dualSide').checked;
-  var plateSize=pressMachine==='120'?'--':(document.getElementById('pressMachine').dataset.plate||'142×102');
+  var plateSize=pressMachine==='105'?'--':(document.getElementById('pressMachine').dataset.plate||'145×106');
   var waivePressBase=document.getElementById('waivePressBase').checked;
 
   var surfaceEls=document.querySelectorAll('#surfaceGroup input:checked');
@@ -1097,7 +1109,7 @@ function loadQuote(idx){
   set('paperLoss',r.pLoss!=null?r.pLoss:(r.paperLoss!=null?r.paperLoss:''));
   set('flutePrice',r.flutePrice);set('fluteRebate',r.fRebate||0);
   set('fluteLoss',r.fLoss!=null?r.fLoss:(r.fluteLoss!=null?r.fluteLoss:''));
-  set('pressMachine',r.pressMachineRaw||(r.pressMachine&&r.pressMachine.indexOf('120')>=0?'120':'142'));
+  set('pressMachine',r.pressMachineRaw||(r.pressMachine&&r.pressMachine.indexOf('105')>=0?'105':'142'));
   set('colors',r.colorsRaw||'4');
   set('chkPress',r.enPress!==false);set('chkPaper',r.enPaper!==false);
   set('chkFlute',r.enFlute!==false);set('chkSurface',r.enSurface!==false);
@@ -1130,13 +1142,27 @@ function loadQuote(idx){
   set('waivePressBase',r.waivePressRaw!==false);
   set('waiveDieSetup',r.waiveDieRaw!==false);
   set('vipMode',r.vipRaw||false);
-  updateDimensions();checkPressLimit();suggestDieCut();updateOutsource();
+  updateDimensions();checkPressLimit();suggestDieCut();
+  var pd=parseFloat(document.getElementById('dieL').value)||0,pw=parseFloat(document.getElementById('dieW').value)||0;
+  if(pd&&pw){var cl=pd+20,cw=Math.ceil((pw+20)/50)*50;var pa=document.getElementById('paperAreaInfo');if(pa)pa.textContent='| '+cl+'×'+cw+'mm = '+(cl*cw/1000000).toFixed(3)+'m²';var fl=pd+10,fw=pw+30;var fa=document.getElementById('fluteAreaInfo');if(fa)fa.textContent='| '+fl+'×'+fw+'mm = '+(fl*fw/1000000).toFixed(3)+'m²';}updateOutsource();
   window._loadedIdx=idx;window._loadedName=r.name;
   window.scrollTo({top:0,behavior:'smooth'});
-}function clearQuoteHistory(){
-  if(!confirm('确定清空所有报价记录？此操作不可恢复。'))return;
-  localStorage.removeItem('colorBoxHistory');
-  if(typeof XLSX!=='undefined'||document.readyState==='complete'){renderQuoteHistory();}else{window.addEventListener('load',function(){renderQuoteHistory();});}
+}function deleteSelected(){
+  var cbs=document.querySelectorAll('.quoteCb:checked');
+  if(cbs.length===0){alert('请先勾选要删除的记录');return;}
+  if(!confirm('确定删除选中的 '+cbs.length+' 条记录？此操作不可恢复。'))return;
+  var history=JSON.parse(localStorage.getItem('colorBoxHistory')||'[]');
+  var keep=[];cbs.forEach(function(cb){keep.push(parseInt(cb.dataset.idx));});
+  keep.sort(function(a,b){return b-a;});
+  keep.forEach(function(idx){history.splice(idx,1);});
+  localStorage.setItem('colorBoxHistory',JSON.stringify(history));
+  renderQuoteHistory();
+}
+function resetDefaults(){
+  if(!confirm('确定恢复所有价格设置为默认值？\n将覆盖当前所有修改。'))return;
+  localStorage.removeItem('colorBoxSettings');
+  Object.keys(PRICE).forEach(function(k){if(typeof PRICE[k]==='object')localStorage.removeItem('price_'+k);});
+  location.reload();
 }
 function toggleSelectAll(){ toggleAllCheckboxes(); }
 function toggleAllCheckboxes(){
